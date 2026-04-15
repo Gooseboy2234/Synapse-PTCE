@@ -6,8 +6,75 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AA1BA0072F8EC5110015709F /* StoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0062F8EC5110015709F /* StoryManager.swift */; };
+		AA1BA0092F8EC5640015709F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0082F8EC5640015709F /* SettingsView.swift */; };
+		AA1BA00B2F8ECB150015709F /* MultiAngle_D1.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA00A2F8ECB150015709F /* MultiAngle_D1.swift */; };
+		AA1BA00D2F8ECBAA0015709F /* MultiAngle_D2.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA00C2F8ECBAA0015709F /* MultiAngle_D2.swift */; };
+		AA1BA00F2F8ECC3C0015709F /* MultiAngle_D3.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA00E2F8ECC3C0015709F /* MultiAngle_D3.swift */; };
+		AA1BA0112F8ECCB90015709F /* MultiAngle_D4.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0102F8ECCB90015709F /* MultiAngle_D4.swift */; };
+		AA1BA0132F8ECED80015709F /* MultiAngle_D1b.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0122F8ECED80015709F /* MultiAngle_D1b.swift */; };
+		AA1BA0152F8ED01D0015709F /* MultiAngle_D1c.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0142F8ED01D0015709F /* MultiAngle_D1c.swift */; };
+		AA1BA0172F8ED0910015709F /* MultiAngle_D2b.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0162F8ED0910015709F /* MultiAngle_D2b.swift */; };
+		AA1BA0192F8ED1BC0015709F /* MultiAngle_D3b.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0182F8ED1BC0015709F /* MultiAngle_D3b.swift */; };
+		AA1BA01B2F8ED2280015709F /* MultiAngle_D4b.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA01A2F8ED2280015709F /* MultiAngle_D4b.swift */; };
+		AA1BA01D2F8EFD7C0015709F /* MultiAngle_D1d.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA01C2F8EFD7C0015709F /* MultiAngle_D1d.swift */; };
+		AA1BA01F2F8EFDFE0015709F /* MultiAngle_D1e.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA01E2F8EFDFE0015709F /* MultiAngle_D1e.swift */; };
+		AA1BA0212F8EFE5C0015709F /* MultiAngle_D2c.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0202F8EFE5C0015709F /* MultiAngle_D2c.swift */; };
+		AA1BA0232F8EFECB0015709F /* MultiAngle_D3c.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0222F8EFECB0015709F /* MultiAngle_D3c.swift */; };
+		AA1BA0252F8EFF3A0015709F /* MultiAngle_D4c.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0242F8EFF3A0015709F /* MultiAngle_D4c.swift */; };
+		AA1BA0272F8F08120015709F /* MultiAngle_D1f.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0262F8F08120015709F /* MultiAngle_D1f.swift */; };
+		AA1BA0292F8F092F0015709F /* MultiAngle_D1g.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0282F8F092F0015709F /* MultiAngle_D1g.swift */; };
+		AA1BA02B2F8F0AB80015709F /* MultiAngle_D1h.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA02A2F8F0AB80015709F /* MultiAngle_D1h.swift */; };
+		AA1BA02D2F8F0B420015709F /* MultiAngle_D1i.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA02C2F8F0B420015709F /* MultiAngle_D1i.swift */; };
+		AA1BA02F2F8F0C1C0015709F /* MultiAngle_D1j.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA02E2F8F0C1C0015709F /* MultiAngle_D1j.swift */; };
+		AA1BA0312F8F0C6E0015709F /* MultiAngle_D2d.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0302F8F0C6E0015709F /* MultiAngle_D2d.swift */; };
+		AA1BA0332F8F0CC50015709F /* MultiAngle_D3d.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0322F8F0CC50015709F /* MultiAngle_D3d.swift */; };
+		AA1BA0352F8F0D210015709F /* MultiAngle_D4d.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0342F8F0D210015709F /* MultiAngle_D4d.swift */; };
+		AA1BA0372F8F0EC70015709F /* MultiAngle_D1k.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0362F8F0EC70015709F /* MultiAngle_D1k.swift */; };
+		AA1BA0392F8F0F040015709F /* MultiAngle_D1l.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0382F8F0F040015709F /* MultiAngle_D1l.swift */; };
+		AA1BA03B2F8F0F870015709F /* MultiAngle_D1m.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA03A2F8F0F870015709F /* MultiAngle_D1m.swift */; };
+		AA1BA03D2F8F0FBD0015709F /* MultiAngle_D2e.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA03C2F8F0FBD0015709F /* MultiAngle_D2e.swift */; };
+		AA1BA03F2F8F0FF20015709F /* MultiAngle_D3e.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA03E2F8F0FF20015709F /* MultiAngle_D3e.swift */; };
+		AA1BA0412F8F10290015709F /* MultiAngle_D4e.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0402F8F10290015709F /* MultiAngle_D4e.swift */; };
+		AA1BA0432F8F10AA0015709F /* MultiAngle_D1n.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0422F8F10AA0015709F /* MultiAngle_D1n.swift */; };
+		AA1BA0472F8F15850015709F /* MultiAngle_D1o.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0462F8F15850015709F /* MultiAngle_D1o.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		AA1B9FD82F8E95590015709F /* Synapse PTCE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Synapse PTCE.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA1BA0062F8EC5110015709F /* StoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryManager.swift; sourceTree = "<group>"; };
+		AA1BA0082F8EC5640015709F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA1BA00A2F8ECB150015709F /* MultiAngle_D1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1.swift; sourceTree = "<group>"; };
+		AA1BA00C2F8ECBAA0015709F /* MultiAngle_D2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D2.swift; sourceTree = "<group>"; };
+		AA1BA00E2F8ECC3C0015709F /* MultiAngle_D3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D3.swift; sourceTree = "<group>"; };
+		AA1BA0102F8ECCB90015709F /* MultiAngle_D4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D4.swift; sourceTree = "<group>"; };
+		AA1BA0122F8ECED80015709F /* MultiAngle_D1b.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1b.swift; sourceTree = "<group>"; };
+		AA1BA0142F8ED01D0015709F /* MultiAngle_D1c.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1c.swift; sourceTree = "<group>"; };
+		AA1BA0162F8ED0910015709F /* MultiAngle_D2b.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D2b.swift; sourceTree = "<group>"; };
+		AA1BA0182F8ED1BC0015709F /* MultiAngle_D3b.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D3b.swift; sourceTree = "<group>"; };
+		AA1BA01A2F8ED2280015709F /* MultiAngle_D4b.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D4b.swift; sourceTree = "<group>"; };
+		AA1BA01C2F8EFD7C0015709F /* MultiAngle_D1d.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1d.swift; sourceTree = "<group>"; };
+		AA1BA01E2F8EFDFE0015709F /* MultiAngle_D1e.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1e.swift; sourceTree = "<group>"; };
+		AA1BA0202F8EFE5C0015709F /* MultiAngle_D2c.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D2c.swift; sourceTree = "<group>"; };
+		AA1BA0222F8EFECB0015709F /* MultiAngle_D3c.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D3c.swift; sourceTree = "<group>"; };
+		AA1BA0242F8EFF3A0015709F /* MultiAngle_D4c.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D4c.swift; sourceTree = "<group>"; };
+		AA1BA0262F8F08120015709F /* MultiAngle_D1f.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1f.swift; sourceTree = "<group>"; };
+		AA1BA0282F8F092F0015709F /* MultiAngle_D1g.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1g.swift; sourceTree = "<group>"; };
+		AA1BA02A2F8F0AB80015709F /* MultiAngle_D1h.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1h.swift; sourceTree = "<group>"; };
+		AA1BA02C2F8F0B420015709F /* MultiAngle_D1i.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1i.swift; sourceTree = "<group>"; };
+		AA1BA02E2F8F0C1C0015709F /* MultiAngle_D1j.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1j.swift; sourceTree = "<group>"; };
+		AA1BA0302F8F0C6E0015709F /* MultiAngle_D2d.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D2d.swift; sourceTree = "<group>"; };
+		AA1BA0322F8F0CC50015709F /* MultiAngle_D3d.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D3d.swift; sourceTree = "<group>"; };
+		AA1BA0342F8F0D210015709F /* MultiAngle_D4d.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D4d.swift; sourceTree = "<group>"; };
+		AA1BA0362F8F0EC70015709F /* MultiAngle_D1k.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1k.swift; sourceTree = "<group>"; };
+		AA1BA0382F8F0F040015709F /* MultiAngle_D1l.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1l.swift; sourceTree = "<group>"; };
+		AA1BA03A2F8F0F870015709F /* MultiAngle_D1m.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1m.swift; sourceTree = "<group>"; };
+		AA1BA03C2F8F0FBD0015709F /* MultiAngle_D2e.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D2e.swift; sourceTree = "<group>"; };
+		AA1BA03E2F8F0FF20015709F /* MultiAngle_D3e.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D3e.swift; sourceTree = "<group>"; };
+		AA1BA0402F8F10290015709F /* MultiAngle_D4e.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D4e.swift; sourceTree = "<group>"; };
+		AA1BA0422F8F10AA0015709F /* MultiAngle_D1n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1n.swift; sourceTree = "<group>"; };
+		AA1BA0462F8F15850015709F /* MultiAngle_D1o.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1o.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -34,6 +101,38 @@
 			children = (
 				AA1B9FDA2F8E95590015709F /* Synapse PTCE */,
 				AA1B9FD92F8E95590015709F /* Products */,
+				AA1BA0062F8EC5110015709F /* StoryManager.swift */,
+				AA1BA0082F8EC5640015709F /* SettingsView.swift */,
+				AA1BA00A2F8ECB150015709F /* MultiAngle_D1.swift */,
+				AA1BA00C2F8ECBAA0015709F /* MultiAngle_D2.swift */,
+				AA1BA00E2F8ECC3C0015709F /* MultiAngle_D3.swift */,
+				AA1BA0102F8ECCB90015709F /* MultiAngle_D4.swift */,
+				AA1BA0122F8ECED80015709F /* MultiAngle_D1b.swift */,
+				AA1BA0142F8ED01D0015709F /* MultiAngle_D1c.swift */,
+				AA1BA0162F8ED0910015709F /* MultiAngle_D2b.swift */,
+				AA1BA0182F8ED1BC0015709F /* MultiAngle_D3b.swift */,
+				AA1BA01A2F8ED2280015709F /* MultiAngle_D4b.swift */,
+				AA1BA01C2F8EFD7C0015709F /* MultiAngle_D1d.swift */,
+				AA1BA01E2F8EFDFE0015709F /* MultiAngle_D1e.swift */,
+				AA1BA0202F8EFE5C0015709F /* MultiAngle_D2c.swift */,
+				AA1BA0222F8EFECB0015709F /* MultiAngle_D3c.swift */,
+				AA1BA0242F8EFF3A0015709F /* MultiAngle_D4c.swift */,
+				AA1BA0262F8F08120015709F /* MultiAngle_D1f.swift */,
+				AA1BA0282F8F092F0015709F /* MultiAngle_D1g.swift */,
+				AA1BA02A2F8F0AB80015709F /* MultiAngle_D1h.swift */,
+				AA1BA02C2F8F0B420015709F /* MultiAngle_D1i.swift */,
+				AA1BA02E2F8F0C1C0015709F /* MultiAngle_D1j.swift */,
+				AA1BA0302F8F0C6E0015709F /* MultiAngle_D2d.swift */,
+				AA1BA0322F8F0CC50015709F /* MultiAngle_D3d.swift */,
+				AA1BA0342F8F0D210015709F /* MultiAngle_D4d.swift */,
+				AA1BA0362F8F0EC70015709F /* MultiAngle_D1k.swift */,
+				AA1BA0382F8F0F040015709F /* MultiAngle_D1l.swift */,
+				AA1BA03A2F8F0F870015709F /* MultiAngle_D1m.swift */,
+				AA1BA03C2F8F0FBD0015709F /* MultiAngle_D2e.swift */,
+				AA1BA03E2F8F0FF20015709F /* MultiAngle_D3e.swift */,
+				AA1BA0402F8F10290015709F /* MultiAngle_D4e.swift */,
+				AA1BA0422F8F10AA0015709F /* MultiAngle_D1n.swift */,
+				AA1BA0462F8F15850015709F /* MultiAngle_D1o.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -119,6 +218,38 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA1BA0372F8F0EC70015709F /* MultiAngle_D1k.swift in Sources */,
+				AA1BA0172F8ED0910015709F /* MultiAngle_D2b.swift in Sources */,
+				AA1BA0412F8F10290015709F /* MultiAngle_D4e.swift in Sources */,
+				AA1BA0152F8ED01D0015709F /* MultiAngle_D1c.swift in Sources */,
+				AA1BA01F2F8EFDFE0015709F /* MultiAngle_D1e.swift in Sources */,
+				AA1BA0212F8EFE5C0015709F /* MultiAngle_D2c.swift in Sources */,
+				AA1BA00F2F8ECC3C0015709F /* MultiAngle_D3.swift in Sources */,
+				AA1BA0192F8ED1BC0015709F /* MultiAngle_D3b.swift in Sources */,
+				AA1BA00D2F8ECBAA0015709F /* MultiAngle_D2.swift in Sources */,
+				AA1BA00B2F8ECB150015709F /* MultiAngle_D1.swift in Sources */,
+				AA1BA01D2F8EFD7C0015709F /* MultiAngle_D1d.swift in Sources */,
+				AA1BA03D2F8F0FBD0015709F /* MultiAngle_D2e.swift in Sources */,
+				AA1BA0272F8F08120015709F /* MultiAngle_D1f.swift in Sources */,
+				AA1BA0392F8F0F040015709F /* MultiAngle_D1l.swift in Sources */,
+				AA1BA0332F8F0CC50015709F /* MultiAngle_D3d.swift in Sources */,
+				AA1BA02B2F8F0AB80015709F /* MultiAngle_D1h.swift in Sources */,
+				AA1BA0072F8EC5110015709F /* StoryManager.swift in Sources */,
+				AA1BA03B2F8F0F870015709F /* MultiAngle_D1m.swift in Sources */,
+				AA1BA01B2F8ED2280015709F /* MultiAngle_D4b.swift in Sources */,
+				AA1BA0112F8ECCB90015709F /* MultiAngle_D4.swift in Sources */,
+				AA1BA0472F8F15850015709F /* MultiAngle_D1o.swift in Sources */,
+				AA1BA0352F8F0D210015709F /* MultiAngle_D4d.swift in Sources */,
+				AA1BA03F2F8F0FF20015709F /* MultiAngle_D3e.swift in Sources */,
+				AA1BA02D2F8F0B420015709F /* MultiAngle_D1i.swift in Sources */,
+				AA1BA0432F8F10AA0015709F /* MultiAngle_D1n.swift in Sources */,
+				AA1BA02F2F8F0C1C0015709F /* MultiAngle_D1j.swift in Sources */,
+				AA1BA0232F8EFECB0015709F /* MultiAngle_D3c.swift in Sources */,
+				AA1BA0292F8F092F0015709F /* MultiAngle_D1g.swift in Sources */,
+				AA1BA0312F8F0C6E0015709F /* MultiAngle_D2d.swift in Sources */,
+				AA1BA0092F8EC5640015709F /* SettingsView.swift in Sources */,
+				AA1BA0252F8EFF3A0015709F /* MultiAngle_D4c.swift in Sources */,
+				AA1BA0132F8ECED80015709F /* MultiAngle_D1b.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
