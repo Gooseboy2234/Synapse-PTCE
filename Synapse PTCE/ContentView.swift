@@ -141,6 +141,7 @@ struct AppLaunchView: View {
 struct MapView: View {
     @Bindable var engine: GameEngine
     @State private var selectedDomain: KnowledgeDomain? = nil
+    @State private var selectedQuest: DomainQuest? = nil
     @State private var showStore    = false
     @State private var showSettings = false
     @State private var showIntel    = false
@@ -150,10 +151,25 @@ struct MapView: View {
     var body: some View {
         ZStack {
             GridBackground()
-            if let domain = selectedDomain {
-                SectorMapView(engine: engine, domain: domain) {
-                    withAnimation(.easeInOut(duration: 0.35)) { selectedDomain = nil }
+            if let domain = selectedDomain, let quest = selectedQuest {
+                SectorMapView(engine: engine, domain: domain, quest: quest) {
+                    withAnimation(.easeInOut(duration: 0.35)) { selectedQuest = nil }
                 }
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal:   .move(edge: .trailing).combined(with: .opacity)
+                ))
+            } else if let domain = selectedDomain {
+                QuestPickerView(
+                    engine: engine,
+                    domain: domain,
+                    onSelectQuest: { quest in
+                        withAnimation(.easeInOut(duration: 0.35)) { selectedQuest = quest }
+                    },
+                    onBack: {
+                        withAnimation(.easeInOut(duration: 0.35)) { selectedDomain = nil }
+                    }
+                )
                 .transition(.asymmetric(
                     insertion: .move(edge: .trailing).combined(with: .opacity),
                     removal:   .move(edge: .trailing).combined(with: .opacity)
@@ -567,17 +583,269 @@ struct DomainHubNode: View {
     }
 }
 
+// MARK: - Domain Quest
+
+/// A named, batched subset of a domain's nodes — max 30 nodes per quest so each mesh is readable.
+/// Quests are generated dynamically: core nodes first, then each angle type split into 30-node chunks.
+struct DomainQuest: Identifiable {
+
+    let id: String
+    let name: String
+    let subtitle: String
+    let icon: String
+    /// Stable UUIDs for the nodes in this batch — used to filter engine.nodes live.
+    let nodeIDs: Set<UUID>
+
+    /// Returns the quest's nodes from the live engine array so completions are always current.
+    func nodes(from all: [DataNode]) -> [DataNode] {
+        all.filter { nodeIDs.contains($0.id) }
+    }
+
+    // Kept for call-site compatibility with SectorMapView (domain param is unused).
+    func nodes(for domain: KnowledgeDomain, from all: [DataNode]) -> [DataNode] {
+        nodes(from: all)
+    }
+
+    // MARK: - Factory
+
+    static let batchSize = 30
+
+    /// Builds all quests for one domain, each capped at `batchSize` nodes.
+    static func make(for domain: KnowledgeDomain, from allNodes: [DataNode]) -> [DomainQuest] {
+        let dn = allNodes.filter { $0.domain == domain }
+        var result: [DomainQuest] = []
+
+        // Core nodes (original base questions — no baseConceptTitle)
+        let core = dn.filter { $0.baseConceptTitle == nil }
+        result += batch(core, base: "CORE PROTOCOL", sub: "Foundations & key concepts",
+                        icon: "cpu.fill", prefix: "\(domain.rawValue)|CORE")
+
+        // Multi-angle nodes split by pedagogical angle
+        let angleDefs: [(NodeAngle, String, String, String)] = [
+            (.classification, "CLASSIFICATION", "Drug classes & categories",  "tag.fill"),
+            (.indication,     "INDICATIONS",     "Clinical uses & conditions", "heart.fill"),
+            (.mechanism,      "MECHANISMS",       "Pharmacology & action",      "gearshape.fill"),
+            (.safety,         "SAFETY & ADRs",    "Side effects & warnings",    "exclamationmark.triangle.fill"),
+            (.dosing,         "DOSING & ADMIN",   "Calculations & routes",      "number.circle.fill"),
+        ]
+        for (angle, base, sub, icon) in angleDefs {
+            let nodes = dn.filter { $0.angle == angle && $0.baseConceptTitle != nil }
+            result += batch(nodes, base: base, sub: sub,
+                            icon: icon, prefix: "\(domain.rawValue)|\(angle.rawValue)")
+        }
+
+        return result
+    }
+
+    // MARK: - Helpers
+
+    private static func batch(_ nodes: [DataNode],
+                               base: String, sub: String,
+                               icon: String, prefix: String) -> [DomainQuest] {
+        guard !nodes.isEmpty else { return [] }
+        let chunks = stride(from: 0, to: nodes.count, by: batchSize).map {
+            Array(nodes[$0 ..< min($0 + batchSize, nodes.count)])
+        }
+        return chunks.enumerated().map { i, chunk in
+            let suffix = chunks.count > 1 ? " \(roman(i + 1))" : ""
+            return DomainQuest(id: "\(prefix)|\(i)", name: base + suffix, subtitle: sub,
+                               icon: icon, nodeIDs: Set(chunk.map(\.id)))
+        }
+    }
+
+    private static func roman(_ n: Int) -> String {
+        let vals = [(1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),
+                    (100,"C"),(90,"XC"),(50,"L"),(40,"XL"),
+                    (10,"X"),(9,"IX"),(5,"V"),(4,"IV"),(1,"I")]
+        var r = ""; var n = n
+        for (v, s) in vals { while n >= v { r += s; n -= v } }
+        return r
+    }
+}
+
+// MARK: - Quest Picker View
+
+struct QuestPickerView: View {
+    let engine: GameEngine
+    let domain: KnowledgeDomain
+    let onSelectQuest: (DomainQuest) -> Void
+    let onBack: () -> Void
+
+    @Environment(\.appTheme) private var theme
+    private var accent: Color { domain.accentColor }
+
+    private var quests: [DomainQuest] {
+        DomainQuest.make(for: domain, from: engine.nodes)
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            VStack(spacing: 0) {
+                // Header
+                HStack {
+                    Button(action: onBack) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.left").font(.system(size: 11, weight: .bold))
+                            Text("HUB").font(.system(size: 11, weight: .bold, design: .monospaced))
+                        }
+                        .foregroundColor(accent)
+                    }
+                    Spacer()
+                    VStack(spacing: 2) {
+                        Text(domain.terminalSectorLabel)
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(accent)
+                            .shadow(color: accent.opacity(0.6), radius: 4)
+                        Text("SELECT PROTOCOL")
+                            .font(.system(size: 8, weight: .semibold, design: .monospaced))
+                            .foregroundColor(accent.opacity(0.5))
+                            .tracking(2)
+                    }
+                    Spacer()
+                    // Invisible balance element matching the back button width
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left").font(.system(size: 11, weight: .bold))
+                        Text("HUB").font(.system(size: 11, weight: .bold, design: .monospaced))
+                    }
+                    .foregroundColor(.clear)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .padding(.top, geo.safeAreaInsets.top)
+                .background(theme.surface.opacity(theme.isDark ? 0.85 : 0.95))
+                .overlay(Rectangle().fill(accent.opacity(0.25)).frame(height: 1), alignment: .bottom)
+
+                ScrollView(.vertical, showsIndicators: false) {
+                    LazyVGrid(
+                        columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
+                        spacing: 12
+                    ) {
+                        ForEach(quests) { quest in
+                            let nodes = quest.nodes(from: engine.nodes)
+                            Button { onSelectQuest(quest) } label: {
+                                QuestCard(quest: quest, nodes: nodes, accent: accent, theme: theme)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(16)
+                }
+            }
+        }
+        .ignoresSafeArea(edges: .top)
+        #if !os(tvOS)
+        .gesture(
+            DragGesture(minimumDistance: 30, coordinateSpace: .global)
+                .onEnded { value in
+                    if value.translation.width > 100 && abs(value.translation.height) < 80 {
+                        withAnimation(.easeInOut(duration: 0.35)) { onBack() }
+                    }
+                }
+        )
+        #endif
+        #if os(tvOS) || os(macOS)
+        .onExitCommand { withAnimation(.easeInOut(duration: 0.35)) { onBack() } }
+        #endif
+    }
+}
+
+// MARK: - Quest Card
+
+struct QuestCard: View {
+    let quest: DomainQuest
+    let nodes: [DataNode]
+    let accent: Color
+    let theme: AppTheme
+
+    private var completed: Int { nodes.filter(\.isCompleted).count }
+    private var unlocked: Int  { nodes.filter(\.isUnlocked).count }
+    private var pct: Double    { nodes.isEmpty ? 0 : Double(completed) / Double(nodes.count) }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                Image(systemName: quest.icon)
+                    .font(.system(size: 22))
+                    .foregroundColor(accent)
+                    .shadow(color: accent.opacity(theme.isDark ? 0.7 : 0.4), radius: 6)
+                Spacer()
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("\(completed)/\(nodes.count)")
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundColor(theme.secondaryText)
+                    if unlocked > completed {
+                        Text("\(unlocked - completed) ACTIVE")
+                            .font(.system(size: 7, design: .monospaced))
+                            .foregroundColor(accent.opacity(0.6))
+                    }
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(quest.name)
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(accent)
+                Text(quest.subtitle)
+                    .font(.system(size: 9, design: .monospaced))
+                    .foregroundColor(theme.secondaryText)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(accent.opacity(0.12)).frame(height: 3)
+                    Capsule()
+                        .fill(accent.opacity(0.85))
+                        .frame(width: geo.size.width * pct, height: 3)
+                        .shadow(color: pct > 0 && theme.isDark ? accent.opacity(0.6) : .clear, radius: 3)
+                }
+            }
+            .frame(height: 3)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(theme.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(pct > 0 ? accent.opacity(0.5) : accent.opacity(0.22),
+                        lineWidth: pct > 0 ? 1.5 : 1)
+        )
+        .cornerRadius(10)
+    }
+}
+
 // MARK: - Sector Map View
 
 struct SectorMapView: View {
     @Bindable var engine: GameEngine
     let domain: KnowledgeDomain
+    let quest: DomainQuest
     let onBack: () -> Void
 
     @State private var showBoss = false
 
-    private var domainNodes: [DataNode] {
+    /// Nodes filtered to this quest — recomputed live so completions immediately reflect.
+    private var displayNodes: [DataNode] {
+        quest.nodes(from: engine.nodes)
+    }
+
+    /// All domain nodes kept for the boss encounter (boss draws from full domain pool).
+    private var allDomainNodes: [DataNode] {
         engine.nodes.filter { $0.domain == domain }
+    }
+
+    private var questProgress: DomainProgress {
+        let dn = displayNodes
+        let completed = dn.filter(\.isCompleted).count
+        let ppn = engine.pointsPerNode(domain: domain)
+        return DomainProgress(
+            domain: domain,
+            completed: completed,
+            total: dn.count,
+            pointsEarned: completed * ppn,
+            pointsAvailable: dn.count * ppn
+        )
     }
 
     var body: some View {
@@ -585,7 +853,8 @@ struct SectorMapView: View {
             VStack(spacing: 0) {
                 SectorHeader(
                     domain: domain,
-                    progress: engine.progress(for: domain),
+                    questTitle: quest.name,
+                    progress: questProgress,
                     bossDefeated: engine.isBossDefeated(for: domain),
                     onBack: onBack,
                     onBossChallenge: { showBoss = true }
@@ -594,16 +863,16 @@ struct SectorMapView: View {
 
                 ScrollView(.vertical, showsIndicators: false) {
                     let mapWidth  = outerGeo.size.width
-                    let nodeCount = domainNodes.count
+                    let nodeCount = displayNodes.count
                     let canvasH   = max(900, CGFloat(nodeCount) * 36)
 
                     ZStack {
-                        SectorConnectionLines(nodes: domainNodes,
+                        SectorConnectionLines(nodes: displayNodes,
                                               mapWidth: mapWidth,
                                               canvasHeight: canvasH,
                                               color: domain.accentColor)
 
-                        ForEach(domainNodes) { node in
+                        ForEach(displayNodes) { node in
                             let prereqOK = engine.isPrerequisiteSatisfied(for: node)
                             Button {
                                 engine.selectedNode = node
@@ -623,7 +892,6 @@ struct SectorMapView: View {
             }
         }
         .ignoresSafeArea(edges: .top)
-        // Swipe right to go back (touch platforms only)
         #if !os(tvOS)
         .gesture(
             DragGesture(minimumDistance: 30, coordinateSpace: .global)
@@ -634,14 +902,13 @@ struct SectorMapView: View {
                 }
         )
         #endif
-        // Menu button (Apple TV remote) or Escape (macOS) → back to hub
         #if os(tvOS) || os(macOS)
         .onExitCommand { withAnimation(.easeInOut(duration: 0.35)) { onBack() } }
         #endif
         .sheet(isPresented: $showBoss) {
             BossEncounterView(
                 domain: domain,
-                nodes: domainNodes,
+                nodes: allDomainNodes,
                 currentStreak: engine.bossStreak(for: domain),
                 isDefeated: engine.isBossDefeated(for: domain)
             ) { wasCorrect in
@@ -655,6 +922,7 @@ struct SectorMapView: View {
 
 struct SectorHeader: View {
     let domain: KnowledgeDomain
+    let questTitle: String
     let progress: DomainProgress
     let bossDefeated: Bool
     let onBack: () -> Void
@@ -670,17 +938,23 @@ struct SectorHeader: View {
                 Button(action: onBack) {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left").font(.system(size: 11, weight: .bold))
-                        Text("HUB").font(.system(size: 11, weight: .bold, design: .monospaced))
+                        Text("BACK").font(.system(size: 11, weight: .bold, design: .monospaced))
                     }
                     .foregroundColor(domain.accentColor)
                 }
 
                 Spacer()
 
-                Text(domain.terminalSectorLabel)
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                    .foregroundColor(domain.accentColor)
-                    .shadow(color: domain.accentColor.opacity(0.6), radius: 4)
+                VStack(spacing: 1) {
+                    Text(domain.terminalSectorLabel)
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundColor(domain.accentColor)
+                        .shadow(color: domain.accentColor.opacity(0.6), radius: 4)
+                    Text(questTitle)
+                        .font(.system(size: 8, weight: .semibold, design: .monospaced))
+                        .foregroundColor(domain.accentColor.opacity(0.65))
+                        .tracking(1)
+                }
 
                 Spacer()
 
@@ -888,6 +1162,12 @@ struct EncounterView: View {
         node.options.filter { $0 != eliminatedOption }
     }
 
+    /// Glossary terms found in this node's text — computed once since node is a constant.
+    private var glossaryTerms: [(term: String, definition: String)] {
+        let text = ([node.nodeTitle, node.loreText] + node.options).joined(separator: " ")
+        return Glossary.matches(in: text)
+    }
+
     var body: some View {
         ZStack {
             theme.background.ignoresSafeArea()
@@ -1064,6 +1344,11 @@ struct EncounterView: View {
                                         )
                                 }
                             }
+                        }
+
+                        // ── Terminology panel ────────────────────────────────────
+                        if !glossaryTerms.isEmpty {
+                            GlossaryPanel(terms: glossaryTerms, color: color)
                         }
                     }
                     .padding(20)
