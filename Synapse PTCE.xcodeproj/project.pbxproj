@@ -39,6 +39,11 @@
 		AA1BA0412F8F10290015709F /* MultiAngle_D4e.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0402F8F10290015709F /* MultiAngle_D4e.swift */; };
 		AA1BA0432F8F10AA0015709F /* MultiAngle_D1n.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0422F8F10AA0015709F /* MultiAngle_D1n.swift */; };
 		AA1BA0472F8F15850015709F /* MultiAngle_D1o.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0462F8F15850015709F /* MultiAngle_D1o.swift */; };
+		AAEF108D2F907AB4006102AF /* TVContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF108C2F907AB4006102AF /* TVContentView.swift */; };
+		AAEF108F2F907AE9006102AF /* TVHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF108E2F907AE9006102AF /* TVHubView.swift */; };
+		AAEF10912F907B1B006102AF /* TVMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF10902F907B1B006102AF /* TVMapView.swift */; };
+		AAEF10932F907B66006102AF /* TVEncounterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF10922F907B66006102AF /* TVEncounterView.swift */; };
+		AAEF10952F907BA5006102AF /* TVSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF10942F907BA5006102AF /* TVSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,6 +80,11 @@
 		AA1BA0402F8F10290015709F /* MultiAngle_D4e.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D4e.swift; sourceTree = "<group>"; };
 		AA1BA0422F8F10AA0015709F /* MultiAngle_D1n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1n.swift; sourceTree = "<group>"; };
 		AA1BA0462F8F15850015709F /* MultiAngle_D1o.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1o.swift; sourceTree = "<group>"; };
+		AAEF108C2F907AB4006102AF /* TVContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVContentView.swift; sourceTree = "<group>"; };
+		AAEF108E2F907AE9006102AF /* TVHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVHubView.swift; sourceTree = "<group>"; };
+		AAEF10902F907B1B006102AF /* TVMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVMapView.swift; sourceTree = "<group>"; };
+		AAEF10922F907B66006102AF /* TVEncounterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVEncounterView.swift; sourceTree = "<group>"; };
+		AAEF10942F907BA5006102AF /* TVSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVSettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -133,6 +143,11 @@
 				AA1BA0402F8F10290015709F /* MultiAngle_D4e.swift */,
 				AA1BA0422F8F10AA0015709F /* MultiAngle_D1n.swift */,
 				AA1BA0462F8F15850015709F /* MultiAngle_D1o.swift */,
+				AAEF108C2F907AB4006102AF /* TVContentView.swift */,
+				AAEF108E2F907AE9006102AF /* TVHubView.swift */,
+				AAEF10902F907B1B006102AF /* TVMapView.swift */,
+				AAEF10922F907B66006102AF /* TVEncounterView.swift */,
+				AAEF10942F907BA5006102AF /* TVSettingsView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -222,18 +237,21 @@
 				AA1BA0172F8ED0910015709F /* MultiAngle_D2b.swift in Sources */,
 				AA1BA0412F8F10290015709F /* MultiAngle_D4e.swift in Sources */,
 				AA1BA0152F8ED01D0015709F /* MultiAngle_D1c.swift in Sources */,
+				AAEF10932F907B66006102AF /* TVEncounterView.swift in Sources */,
 				AA1BA01F2F8EFDFE0015709F /* MultiAngle_D1e.swift in Sources */,
 				AA1BA0212F8EFE5C0015709F /* MultiAngle_D2c.swift in Sources */,
 				AA1BA00F2F8ECC3C0015709F /* MultiAngle_D3.swift in Sources */,
 				AA1BA0192F8ED1BC0015709F /* MultiAngle_D3b.swift in Sources */,
 				AA1BA00D2F8ECBAA0015709F /* MultiAngle_D2.swift in Sources */,
 				AA1BA00B2F8ECB150015709F /* MultiAngle_D1.swift in Sources */,
+				AAEF108D2F907AB4006102AF /* TVContentView.swift in Sources */,
 				AA1BA01D2F8EFD7C0015709F /* MultiAngle_D1d.swift in Sources */,
 				AA1BA03D2F8F0FBD0015709F /* MultiAngle_D2e.swift in Sources */,
 				AA1BA0272F8F08120015709F /* MultiAngle_D1f.swift in Sources */,
 				AA1BA0392F8F0F040015709F /* MultiAngle_D1l.swift in Sources */,
 				AA1BA0332F8F0CC50015709F /* MultiAngle_D3d.swift in Sources */,
 				AA1BA02B2F8F0AB80015709F /* MultiAngle_D1h.swift in Sources */,
+				AAEF108F2F907AE9006102AF /* TVHubView.swift in Sources */,
 				AA1BA0072F8EC5110015709F /* StoryManager.swift in Sources */,
 				AA1BA03B2F8F0F870015709F /* MultiAngle_D1m.swift in Sources */,
 				AA1BA01B2F8ED2280015709F /* MultiAngle_D4b.swift in Sources */,
@@ -241,6 +259,7 @@
 				AA1BA0472F8F15850015709F /* MultiAngle_D1o.swift in Sources */,
 				AA1BA0352F8F0D210015709F /* MultiAngle_D4d.swift in Sources */,
 				AA1BA03F2F8F0FF20015709F /* MultiAngle_D3e.swift in Sources */,
+				AAEF10952F907BA5006102AF /* TVSettingsView.swift in Sources */,
 				AA1BA02D2F8F0B420015709F /* MultiAngle_D1i.swift in Sources */,
 				AA1BA0432F8F10AA0015709F /* MultiAngle_D1n.swift in Sources */,
 				AA1BA02F2F8F0C1C0015709F /* MultiAngle_D1j.swift in Sources */,
@@ -250,6 +269,7 @@
 				AA1BA0092F8EC5640015709F /* SettingsView.swift in Sources */,
 				AA1BA0252F8EFF3A0015709F /* MultiAngle_D4c.swift in Sources */,
 				AA1BA0132F8ECED80015709F /* MultiAngle_D1b.swift in Sources */,
+				AAEF10912F907B1B006102AF /* TVMapView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,6 +405,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Ethan Bradley Synapse";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -399,19 +421,20 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 12;
 				PRODUCT_BUNDLE_IDENTIFIER = "Yellow-Labs.Synapse-PTCE";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
 				XROS_DEPLOYMENT_TARGET = 26.4;
 			};
 			name = Debug;
@@ -429,6 +452,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Ethan Bradley Synapse";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -443,19 +468,20 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 12;
 				PRODUCT_BUNDLE_IDENTIFIER = "Yellow-Labs.Synapse-PTCE";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
 				XROS_DEPLOYMENT_TARGET = 26.4;
 			};
 			name = Release;

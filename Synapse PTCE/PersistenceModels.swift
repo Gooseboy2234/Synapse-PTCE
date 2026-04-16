@@ -2,7 +2,7 @@
 //  PersistenceModels.swift
 //  Synapse PTCE
 //
-//  v11.0 — Adds TextSizeOption, ultra-dark AppAppearance modes.
+//  v13.0 — Apple TV support, exam countdown, domain icon/shortCode.
 //
 
 import Foundation
@@ -411,6 +411,10 @@ final class UserStats {
     // MARK: Text Size
     var textSizeRaw: String
 
+    // MARK: Exam Date
+    var testDateRaw: String      // ISO8601, empty = not set
+    var planStartDateRaw: String // date when exam date was first configured
+
     // MARK: Story Progress
     var storyBeatsShown: Int
 
@@ -433,6 +437,8 @@ final class UserStats {
         gameModeRaw       = GameMode.prodigy.rawValue
         appearanceRaw     = AppAppearance.dark.rawValue
         textSizeRaw       = TextSizeOption.normal.rawValue
+        testDateRaw       = ""
+        planStartDateRaw  = ""
         storyBeatsShown   = 0
         bossStreakD1 = 0;  bossDefeatedD1 = false
         bossStreakD2 = 0;  bossDefeatedD2 = false
@@ -486,6 +492,33 @@ final class UserStats {
     var gameMode: GameMode          { GameMode(rawValue: gameModeRaw) ?? .prodigy }
     var appAppearance: AppAppearance { AppAppearance(rawValue: appearanceRaw) ?? .dark }
     var textSizeOption: TextSizeOption { TextSizeOption(rawValue: textSizeRaw) ?? .normal }
+
+    // MARK: Derived — Exam Date
+    private static let iso8601: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withInternetDateTime]
+        return f
+    }()
+
+    var testDate: Date? {
+        testDateRaw.isEmpty ? nil : Self.iso8601.date(from: testDateRaw)
+    }
+    var planStartDate: Date? {
+        planStartDateRaw.isEmpty ? nil : Self.iso8601.date(from: planStartDateRaw)
+    }
+
+    func setTestDate(_ date: Date?) {
+        if let date {
+            testDateRaw = Self.iso8601.string(from: date)
+            // Only reset plan start if this is a new date being set
+            if planStartDateRaw.isEmpty {
+                planStartDateRaw = Self.iso8601.string(from: Date())
+            }
+        } else {
+            testDateRaw = ""
+            planStartDateRaw = ""
+        }
+    }
 
     // MARK: Derived — Boss
 

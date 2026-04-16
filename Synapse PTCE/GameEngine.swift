@@ -84,6 +84,36 @@ enum KnowledgeDomain: String, CaseIterable, Identifiable {
 
     /// Dimmed version of accentColor for locked / inactive states.
     var dimColor: Color { accentColor.opacity(0.30) }
+
+    /// SF Symbol icon for this domain — used in tvOS and future iOS contexts.
+    var icon: String {
+        switch self {
+        case .medications:         return "pills.fill"
+        case .federalRequirements: return "building.columns.fill"
+        case .patientSafety:       return "heart.text.square.fill"
+        case .orderEntry:          return "doc.text.magnifyingglass"
+        }
+    }
+
+    /// Short readable label (≤ 14 chars) for compact display.
+    var shortName: String {
+        switch self {
+        case .medications:         return "MEDICATIONS"
+        case .federalRequirements: return "FEDERAL REQ"
+        case .patientSafety:       return "PATIENT SAFETY"
+        case .orderEntry:          return "ORDER ENTRY"
+        }
+    }
+
+    /// 2-char domain code for micro-labels.
+    var shortCode: String {
+        switch self {
+        case .medications:         return "D1"
+        case .federalRequirements: return "D2"
+        case .patientSafety:       return "D3"
+        case .orderEntry:          return "D4"
+        }
+    }
 }
 
 // MARK: - Challenge Type
@@ -179,9 +209,12 @@ class GameEngine {
     var currentProbeXP: Int = 0
     var currentTheme: Theme = .amber
 
-    // Game mode + appearance
+    // Game mode, appearance & text size
     var currentGameMode: GameMode = .prodigy
     var currentAppearance: AppAppearance = .dark
+    var currentTextSize: TextSizeOption = .normal
+    var currentTestDate: Date? = nil
+    var currentPlanStartDate: Date? = nil
 
     // Story narrative
     var pendingStoryBeat: StoryBeat? = nil
@@ -190,7 +223,12 @@ class GameEngine {
 
     /// Semantic colour tokens for the active appearance + theme.
     var appTheme: AppTheme {
-        currentAppearance == .dark ? .dark : .warmLight
+        switch currentAppearance {
+        case .dark:      return .dark
+        case .warmLight: return .warmLight
+        case .ultraDark: return .ultraDark
+        case .midnight:  return .midnight
+        }
     }
 
     // MARK: - Private Persistence
@@ -234,6 +272,9 @@ class GameEngine {
         self.currentTheme          = stats.activeTheme
         self.currentGameMode       = stats.gameMode
         self.currentAppearance     = stats.appAppearance
+        self.currentTextSize       = stats.textSizeOption
+        self.currentTestDate       = stats.testDate
+        self.currentPlanStartDate  = stats.planStartDate
         // selectedNode = nil, progressMap = [:] (defaults)
 
         // ── 4. Load saved node state (safe to call now — all props set) ──────
@@ -258,6 +299,9 @@ class GameEngine {
         self.currentTheme          = stats.activeTheme
         self.currentGameMode       = stats.gameMode
         self.currentAppearance     = stats.appAppearance
+        self.currentTextSize       = stats.textSizeOption
+        self.currentTestDate       = stats.testDate
+        self.currentPlanStartDate  = stats.planStartDate
     }
 
     // MARK: - Computed
@@ -595,6 +639,31 @@ class GameEngine {
         currentTheme           = _userStats.activeTheme
         currentGameMode        = _userStats.gameMode
         currentAppearance      = _userStats.appAppearance
+        currentTextSize        = _userStats.textSizeOption
+        currentTestDate        = _userStats.testDate
+        currentPlanStartDate   = _userStats.planStartDate
+    }
+
+    // MARK: - Text Size
+
+    func setTextSize(_ size: TextSizeOption) {
+        _userStats.textSizeRaw = size.rawValue
+        syncDisplayStats()
+        try? modelContext.save()
+    }
+
+    // MARK: - Exam Date
+
+    func setTestDate(_ date: Date?) {
+        _userStats.setTestDate(date)
+        syncDisplayStats()
+        try? modelContext.save()
+    }
+
+    func clearTestDate() {
+        _userStats.setTestDate(nil)
+        syncDisplayStats()
+        try? modelContext.save()
     }
 
     /// Fire the next story beat if the stability score has crossed a new 5% milestone.
@@ -738,6 +807,8 @@ extension GameEngine {
             let errorMessage: String?
         }
 
+        let loadedNodes = DataNode.phaseOneDatabase
+
         let result: LoadResult = await Task.detached(priority: .userInitiated) {
             let schema      = Schema([NodeProgress.self, UserStats.self])
             // CloudKit config — enables automatic sync across all signed-in Apple devices.
@@ -779,8 +850,7 @@ extension GameEngine {
                 }
             }
 
-            let nodes = DataNode.phaseOneDatabase
-            return LoadResult(nodes: nodes, container: container,
+            return LoadResult(nodes: loadedNodes, container: container,
                               usingCloudKit: usingCloudKit,
                               storeRecreated: storeRecreated, errorMessage: errorMessage)
         }.value

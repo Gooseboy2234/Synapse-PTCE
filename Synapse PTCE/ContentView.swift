@@ -79,7 +79,7 @@ struct AppLaunchView: View {
                         .font(.system(size: 46, weight: .black, design: .monospaced))
                         .foregroundColor(accent)
                         .shadow(color: accent.opacity(0.65), radius: 16)
-                    Text("PTCE NETWORK  v10.0")
+                    Text("PTCE NETWORK  v13.0")
                         .font(.system(size: 11, weight: .bold, design: .monospaced))
                         .foregroundColor(accent.opacity(0.50))
                 }
@@ -197,7 +197,8 @@ struct MapView: View {
             EncounterView(
                 node: node,
                 gameMode: engine.currentGameMode,
-                probeAbility: engine.currentLogicProbe.activeAbility
+                probeAbility: engine.currentLogicProbe.activeAbility,
+                contentFontSize: engine.currentTextSize.fontSize
             ) { nodeId, answer in
                 engine.gradeAnswer(nodeId: nodeId, submitted: answer)
             } onDismiss: {
@@ -280,7 +281,7 @@ struct HubMapView: View {
                 // Watermark
                 VStack {
                     Spacer()
-                    Text("SYNAPSE // PTCE NETWORK v10.0 // MAIN BRANCH")
+                    Text("SYNAPSE // PTCE NETWORK v13.0 // MAIN BRANCH")
                         .font(.system(size: 9, design: .monospaced))
                         .foregroundColor(engine.currentTheme.accentColor.opacity(0.28))
                         .padding(.bottom, 8)
@@ -355,11 +356,14 @@ struct BottomCommandBar: View {
     let onShowReview: () -> Void
     let onShowExam: () -> Void
 
+    @State private var showCampaign = false
+
     @Environment(\.appTheme) private var theme
     private var accent: Color { engine.currentTheme.accentColor }
-    private let cyan = Color(red: 0.6, green: 0.9, blue: 1.0)
-    private let gold = Color(red: 1.0, green: 0.85, blue: 0.2)
-    private let red  = Color(red: 0.95, green: 0.30, blue: 0.30)
+    private let cyan    = Color(red: 0.6, green: 0.9, blue: 1.0)
+    private let gold    = Color(red: 1.0, green: 0.85, blue: 0.2)
+    private let red     = Color(red: 0.95, green: 0.30, blue: 0.30)
+    private let violet  = Color(red: 0.72, green: 0.52, blue: 1.0)
 
     var body: some View {
         VStack(spacing: 0) {
@@ -383,10 +387,12 @@ struct BottomCommandBar: View {
 
                     Spacer()
 
-                    // Action trio
+                    // Action buttons
                     HStack(spacing: 6) {
                         CommandButton(label: "INTEL", icon: "chart.bar.fill", color: cyan,
                                       action: onShowIntel)
+                        CommandButton(label: "CAMP", icon: "arrow.2.squarepath", color: violet,
+                                      action: { showCampaign = true })
                         CommandButton(label: "BREACH", icon: "exclamationmark.triangle.fill", color: red,
                                       badge: engine.breachNodes.isEmpty ? nil : "\(engine.breachNodes.count)",
                                       action: onShowReview)
@@ -460,6 +466,10 @@ struct BottomCommandBar: View {
             theme.surface
                 .opacity(theme.isDark ? 0.92 : 0.96)
                 .ignoresSafeArea(edges: .bottom)
+        }
+        .sheet(isPresented: $showCampaign) {
+            CampaignView(engine: engine)
+                .environment(\.appTheme, engine.appTheme)
         }
     }
 }
@@ -1129,6 +1139,8 @@ struct EncounterView: View {
     let gameMode: GameMode
     /// Active Logic Probe ability, if any (passed from MapView).
     let probeAbility: ProbeAbility?
+    /// Study note font size — driven by the text size setting.
+    var contentFontSize: CGFloat = 15
     let onSubmit: (UUID, String) -> GradeResult
     let onDismiss: () -> Void
 
@@ -1231,7 +1243,7 @@ struct EncounterView: View {
                         Divider().background(color.opacity(0.3)).padding(.bottom, 18)
 
                         // ── Study notes — teach before testing ───────────────────
-                        TeachPanel(loreText: node.loreText, color: color)
+                        TeachPanel(loreText: node.loreText, color: color, textSize: contentFontSize)
                             .padding(.bottom, 22)
 
                         // ── PTCB question ─────────────────────────────────────────
@@ -1592,6 +1604,7 @@ struct FeedbackBlock: View {
 struct TeachPanel: View {
     let loreText: String
     let color: Color
+    var textSize: CGFloat = 15
 
     @Environment(\.appTheme) private var theme
 
@@ -1639,7 +1652,7 @@ struct TeachPanel: View {
                             .foregroundColor(isHighlight(bullet) ? color : color.opacity(0.5))
                             .padding(.top, 1)
                         Text(bullet)
-                            .font(.system(size: 15,
+                            .font(.system(size: textSize,
                                           weight: isHighlight(bullet) ? .semibold : .regular,
                                           design: .rounded))
                             .foregroundColor(isHighlight(bullet)
@@ -2285,5 +2298,532 @@ struct ThemeStoreRow: View {
             .cornerRadius(10)
         }
         .disabled(!canAfford && !isOwned)
+    }
+}
+
+// MARK: - Nav Back Button (universal back navigation component)
+
+/// Consistent back button used in all navigation headers.
+/// Respects the active accent color and renders a chevron + label.
+struct NavBackButton: View {
+    let label: String
+    let color: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 11, weight: .bold))
+                Text(label)
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+            }
+            .foregroundColor(color)
+        }
+    }
+}
+
+// MARK: - Campaign View
+
+/// Interleaved study mode: cycles through all four PTCE domains in rotation
+/// (Federal Requirements → Medications → Patient Safety → Order Entry).
+/// Answers ARE saved to your Stability Score.
+struct CampaignView: View {
+    let engine: GameEngine
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.appTheme)  private var theme
+
+    private let domainOrder: [KnowledgeDomain] = [
+        .federalRequirements, .medications, .patientSafety, .orderEntry
+    ]
+
+    private var accent: Color { engine.currentTheme.accentColor }
+
+    @State private var phase: CampaignPhase = .briefing
+    @State private var questions: [DataNode] = []
+    @State private var currentIndex = 0
+    @State private var selected = ""
+    @State private var showFeedback = false
+    @State private var gradeResult: GradeResult? = nil
+    @State private var domainScores: [KnowledgeDomain: (correct: Int, total: Int)] = [:]
+
+    enum CampaignPhase { case briefing, active, complete }
+
+    private var currentNode: DataNode? {
+        currentIndex < questions.count ? questions[currentIndex] : nil
+    }
+    private var nodeColor: Color { currentNode?.domain.accentColor ?? accent }
+    private var totalQuestions: Int { questions.count }
+
+    var body: some View {
+        ZStack {
+            theme.background.ignoresSafeArea()
+            GridBackground().opacity(0.35).ignoresSafeArea()
+
+            switch phase {
+            case .briefing: briefingView
+            case .active:   activeView
+            case .complete: resultsView
+            }
+        }
+    }
+
+    // MARK: Briefing
+
+    private var briefingView: some View {
+        VStack(spacing: 0) {
+            HStack {
+                NavBackButton(label: "BACK", color: accent) { dismiss() }
+                Spacer()
+                Text("CAMPAIGN MODE")
+                    .font(.system(size: 14, weight: .black, design: .monospaced))
+                    .foregroundColor(accent)
+                    .shadow(color: theme.isDark ? accent.opacity(0.6) : .clear, radius: 5)
+                Spacer()
+                NavBackButton(label: "BACK", color: .clear) { }
+            }
+            .padding(.horizontal, 20).padding(.vertical, 14)
+            .background(theme.surface.opacity(0.9))
+            .overlay(Rectangle().fill(accent.opacity(0.25)).frame(height: 1), alignment: .bottom)
+
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("// INTERLEAVED STUDY PROTOCOL")
+                        .font(.system(size: 15, weight: .black, design: .monospaced))
+                        .foregroundColor(accent)
+                        .shadow(color: accent.opacity(0.5), radius: 5)
+
+                    Text("Campaign cycles through all four domains in sequence. Each round asks one question per domain to build balanced knowledge across the whole PTCE blueprint.")
+                        .font(.system(size: 13, design: .monospaced))
+                        .foregroundColor(theme.primaryText.opacity(0.82))
+                        .lineSpacing(5)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    // Domain rotation preview
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("ROTATION ORDER:")
+                            .font(.system(size: 9, weight: .bold, design: .monospaced))
+                            .foregroundColor(theme.secondaryText)
+                            .tracking(2)
+                        HStack(spacing: 10) {
+                            ForEach(Array(domainOrder.enumerated()), id: \.offset) { i, domain in
+                                VStack(spacing: 4) {
+                                    Circle()
+                                        .fill(domain.accentColor.opacity(0.9))
+                                        .frame(width: 20, height: 20)
+                                        .shadow(color: domain.accentColor.opacity(0.5), radius: 4)
+                                    Text("D\(KnowledgeDomain.allCases.firstIndex(of: domain)! + 1)")
+                                        .font(.system(size: 8, weight: .bold, design: .monospaced))
+                                        .foregroundColor(domain.accentColor)
+                                }
+                                if i < domainOrder.count - 1 {
+                                    Image(systemName: "arrow.right")
+                                        .font(.system(size: 9))
+                                        .foregroundColor(theme.secondaryText)
+                                }
+                            }
+                            Image(systemName: "arrow.uturn.left")
+                                .font(.system(size: 9))
+                                .foregroundColor(theme.secondaryText)
+                        }
+                    }
+                    .padding(14)
+                    .background(theme.surface)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(accent.opacity(0.22), lineWidth: 1))
+                    .cornerRadius(8)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        CampaignRule(icon: "checkmark.seal.fill",
+                                     text: "Answers save to your Stability Score", accent: accent, theme: theme)
+                        CampaignRule(icon: "timer.circle.fill",
+                                     text: "No time limit — study at your own pace", accent: accent, theme: theme)
+                        CampaignRule(icon: "arrow.2.squarepath",
+                                     text: "5 rounds × 4 domains = 20 questions", accent: accent, theme: theme)
+                    }
+
+                    let pool = buildQuestions()
+
+                    if pool.isEmpty {
+                        Text("// INSUFFICIENT DATA — unlock more nodes first.")
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundColor(Color.red)
+                            .padding(12)
+                            .background(Color.red.opacity(0.08))
+                            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.red.opacity(0.3), lineWidth: 1))
+                            .cornerRadius(6)
+                    } else {
+                        Text("// \(pool.count) QUESTIONS READY ACROSS ALL DOMAINS")
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundColor(accent.opacity(0.7))
+                    }
+
+                    HStack(spacing: 12) {
+                        Button {
+                            let q = buildQuestions()
+                            guard !q.isEmpty else { return }
+                            questions = q
+                            currentIndex = 0
+                            selected = ""
+                            showFeedback = false
+                            gradeResult = nil
+                            domainScores = [:]
+                            phase = .active
+                        } label: {
+                            Text("BEGIN CAMPAIGN")
+                                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(accent)
+                                .cornerRadius(8)
+                                .shadow(color: accent.opacity(0.5), radius: 8)
+                        }
+                        .disabled(pool.isEmpty)
+
+                        Button { dismiss() } label: {
+                            Text("CANCEL")
+                                .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                                .foregroundColor(accent.opacity(0.7))
+                                .padding(.vertical, 14).padding(.horizontal, 20)
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(accent.opacity(0.3), lineWidth: 1))
+                        }
+                    }
+                }
+                .padding(24)
+            }
+        }
+    }
+
+    // MARK: Active
+
+    private var activeView: some View {
+        VStack(spacing: 0) {
+            VStack(spacing: 6) {
+                HStack {
+                    // Domain indicator dots
+                    HStack(spacing: 5) {
+                        ForEach(domainOrder, id: \.self) { domain in
+                            let isActive = currentNode?.domain == domain
+                            Circle()
+                                .fill(domain.accentColor.opacity(isActive ? 1.0 : 0.22))
+                                .frame(width: isActive ? 9 : 5, height: isActive ? 9 : 5)
+                                .shadow(color: isActive ? domain.accentColor.opacity(0.8) : .clear, radius: 4)
+                                .animation(.easeInOut(duration: 0.25), value: isActive)
+                        }
+                    }
+                    Spacer()
+                    Text("\(currentIndex + 1) / \(totalQuestions)")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .foregroundColor(nodeColor)
+                    Spacer()
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(theme.secondaryText)
+                    }
+                }
+                .padding(.horizontal, 20)
+
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Rectangle().fill(nodeColor.opacity(0.12))
+                        Rectangle().fill(nodeColor)
+                            .frame(width: totalQuestions > 0
+                                   ? geo.size.width * Double(currentIndex) / Double(totalQuestions)
+                                   : 0)
+                            .animation(.easeInOut(duration: 0.3), value: currentIndex)
+                    }
+                }
+                .frame(height: 2)
+                .padding(.horizontal, 20)
+            }
+            .padding(.vertical, 10)
+            .background(theme.surface.opacity(0.9))
+            .overlay(Rectangle().fill(nodeColor.opacity(0.22)).frame(height: 1), alignment: .bottom)
+
+            if let node = currentNode {
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            Text(node.domain.terminalSectorLabel)
+                                .font(.system(size: 9, design: .monospaced))
+                                .foregroundColor(nodeColor.opacity(0.7))
+                            Spacer()
+                        }
+
+                        Text(node.nodeTitle)
+                            .font(.system(size: 16, weight: .bold, design: .monospaced))
+                            .foregroundColor(nodeColor)
+
+                        Divider().background(nodeColor.opacity(0.25))
+
+                        TeachPanel(loreText: node.loreText, color: nodeColor,
+                                   textSize: engine.currentTextSize.fontSize)
+
+                        Divider().background(nodeColor.opacity(0.25))
+
+                        Text(campaignQuestionText(for: node))
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(theme.primaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineSpacing(5)
+
+                        VStack(spacing: 8) {
+                            ForEach(node.options, id: \.self) { opt in
+                                OptionButton(
+                                    option: opt,
+                                    isSelected: selected == opt,
+                                    isCorrect: showFeedback ? (opt == node.correctAnswer ? true : nil) : nil,
+                                    color: nodeColor,
+                                    isLocked: showFeedback
+                                ) {
+                                    guard !showFeedback else { return }
+                                    selected = opt
+                                }
+                            }
+                        }
+
+                        if !showFeedback {
+                            Button {
+                                guard !selected.isEmpty else { return }
+                                let r = engine.gradeAnswer(nodeId: node.id, submitted: selected)
+                                gradeResult = r
+                                showFeedback = true
+                                var score = domainScores[node.domain] ?? (0, 0)
+                                score = (score.correct + (r.wasCorrect ? 1 : 0), score.total + 1)
+                                domainScores[node.domain] = score
+                            } label: {
+                                Text(selected.isEmpty ? "SELECT AN ANSWER" : "CONFIRM ANSWER")
+                                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                                    .foregroundColor(selected.isEmpty ? nodeColor.opacity(0.4) : .black)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .background(selected.isEmpty ? Color.clear : nodeColor)
+                                    .overlay(RoundedRectangle(cornerRadius: 6)
+                                        .stroke(nodeColor.opacity(selected.isEmpty ? 0.3 : 0), lineWidth: 1))
+                                    .cornerRadius(6)
+                            }
+                            .disabled(selected.isEmpty)
+                        } else {
+                            if let r = gradeResult {
+                                FeedbackBlock(result: r, correctAnswer: node.correctAnswer, color: nodeColor)
+                            }
+
+                            Button {
+                                if currentIndex + 1 < questions.count {
+                                    withAnimation(.easeInOut(duration: 0.25)) {
+                                        currentIndex += 1
+                                        selected = ""
+                                        showFeedback = false
+                                        gradeResult = nil
+                                    }
+                                } else {
+                                    withAnimation { phase = .complete }
+                                }
+                            } label: {
+                                let isLast = currentIndex + 1 >= questions.count
+                                Text(isLast ? "VIEW RESULTS →" : "NEXT QUESTION →")
+                                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                                    .foregroundColor(.black)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .background(nodeColor)
+                                    .cornerRadius(6)
+                            }
+                        }
+                    }
+                    .padding(20)
+                }
+                .id(currentIndex)   // force re-scroll to top on next question
+            }
+        }
+    }
+
+    // MARK: Results
+
+    private var resultsView: some View {
+        VStack(spacing: 0) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("// CAMPAIGN COMPLETE")
+                        .font(.system(size: 14, weight: .black, design: .monospaced))
+                        .foregroundColor(accent)
+                    Text("ALL SECTORS ENGAGED")
+                        .font(.system(size: 9, design: .monospaced))
+                        .foregroundColor(theme.secondaryText)
+                }
+                Spacer()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(theme.secondaryText)
+                }
+            }
+            .padding(.horizontal, 20).padding(.vertical, 16)
+            .background(theme.surface.opacity(0.9))
+            .overlay(Rectangle().fill(accent.opacity(0.25)).frame(height: 1), alignment: .bottom)
+
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 24) {
+                    let totalCorrect = domainScores.values.reduce(0) { $0 + $1.correct }
+                    let totalQ       = domainScores.values.reduce(0) { $0 + $1.total }
+                    let pct          = totalQ > 0 ? Double(totalCorrect) / Double(totalQ) : 0
+                    let green        = Color(red: 0.25, green: 0.95, blue: 0.55)
+
+                    HStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(String(format: "%.0f%%", pct * 100))
+                                .font(.system(size: 48, weight: .black, design: .monospaced))
+                                .foregroundColor(pct >= 0.78 ? green : accent)
+                                .shadow(color: (pct >= 0.78 ? green : accent).opacity(0.45), radius: 8)
+                            Text("\(totalCorrect) / \(totalQ) CORRECT")
+                                .font(.system(size: 11, design: .monospaced))
+                                .foregroundColor(theme.secondaryText)
+                        }
+                        Spacer()
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Text(pct >= 0.78 ? "ON TRACK" : "KEEP GOING")
+                                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                                .foregroundColor(pct >= 0.78 ? green : Color.orange)
+                            Text("Target: 78%")
+                                .font(.system(size: 9, design: .monospaced))
+                                .foregroundColor(theme.secondaryText)
+                        }
+                    }
+
+                    Divider().background(accent.opacity(0.2))
+
+                    Text("BY DOMAIN:")
+                        .font(.system(size: 9, weight: .bold, design: .monospaced))
+                        .foregroundColor(theme.secondaryText)
+                        .tracking(2)
+
+                    VStack(spacing: 10) {
+                        ForEach(domainOrder, id: \.self) { domain in
+                            if let score = domainScores[domain] {
+                                HStack(spacing: 12) {
+                                    Rectangle()
+                                        .fill(domain.accentColor)
+                                        .frame(width: 3, height: 40)
+                                        .cornerRadius(2)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(domain.displayName)
+                                            .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                                            .foregroundColor(theme.primaryText)
+                                        Text("\(score.correct)/\(score.total) correct")
+                                            .font(.system(size: 9, design: .monospaced))
+                                            .foregroundColor(theme.secondaryText)
+                                    }
+                                    Spacer()
+                                    let dp = score.total > 0 ? Double(score.correct) / Double(score.total) : 0
+                                    Text(String(format: "%.0f%%", dp * 100))
+                                        .font(.system(size: 15, weight: .bold, design: .monospaced))
+                                        .foregroundColor(domain.accentColor)
+                                }
+                                .padding(12)
+                                .background(theme.surface)
+                                .overlay(RoundedRectangle(cornerRadius: 8)
+                                    .stroke(domain.accentColor.opacity(0.25), lineWidth: 1))
+                                .cornerRadius(8)
+                            }
+                        }
+                    }
+
+                    HStack(spacing: 12) {
+                        Button {
+                            let q = buildQuestions()
+                            guard !q.isEmpty else { return }
+                            questions = q
+                            currentIndex = 0
+                            selected = ""
+                            showFeedback = false
+                            gradeResult = nil
+                            domainScores = [:]
+                            phase = .active
+                        } label: {
+                            Text("RUN AGAIN")
+                                .font(.system(size: 13, weight: .bold, design: .monospaced))
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(accent)
+                                .cornerRadius(8)
+                                .shadow(color: accent.opacity(0.5), radius: 6)
+                        }
+
+                        Button { dismiss() } label: {
+                            Text("RETURN TO HUB")
+                                .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                                .foregroundColor(accent.opacity(0.7))
+                                .padding(.vertical, 14).padding(.horizontal, 20)
+                                .overlay(RoundedRectangle(cornerRadius: 8)
+                                    .stroke(accent.opacity(0.3), lineWidth: 1))
+                        }
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.vertical, 24)
+            }
+        }
+    }
+
+    // MARK: Helpers
+
+    /// Build 5 rounds of 4 questions (one per domain per round), interleaved.
+    private func buildQuestions() -> [DataNode] {
+        var queues: [KnowledgeDomain: [DataNode]] = [:]
+        for domain in domainOrder {
+            queues[domain] = engine.nodes
+                .filter { $0.domain == domain && $0.isUnlocked && !$0.options.isEmpty }
+                .shuffled()
+        }
+        var result: [DataNode] = []
+        for _ in 0..<5 {
+            for domain in domainOrder {
+                if var q = queues[domain], !q.isEmpty {
+                    result.append(q.removeFirst())
+                    queues[domain] = q
+                }
+            }
+        }
+        return result
+    }
+
+    private func campaignQuestionText(for node: DataNode) -> String {
+        if !node.questionText.isEmpty { return node.questionText }
+        let raw = node.nodeTitle.replacingOccurrences(of: "\n", with: " ")
+        let name = node.baseConceptTitle ?? raw
+        if node.baseConceptTitle != nil {
+            switch node.angle {
+            case .classification: return "Which drug class does \(name) belong to?"
+            case .mechanism:      return "Which of the following best describes the mechanism of action of \(name)?"
+            case .indication:     return "\(name) is MOST commonly indicated for which of the following conditions?"
+            case .safety:         return "Which adverse effect is MOST commonly associated with \(name)?"
+            case .dosing:         return "Which of the following is correct regarding the dosing or administration of \(name)?"
+            }
+        }
+        return "Which of the following is correct regarding \(name)?"
+    }
+}
+
+// MARK: - Campaign Rule Row
+
+private struct CampaignRule: View {
+    let icon: String
+    let text: String
+    let accent: Color
+    let theme: AppTheme
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 12))
+                .foregroundColor(accent.opacity(0.8))
+                .frame(width: 18)
+            Text(text)
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundColor(theme.primaryText.opacity(0.8))
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 }

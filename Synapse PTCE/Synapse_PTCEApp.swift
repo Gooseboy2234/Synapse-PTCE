@@ -11,7 +11,11 @@ import SwiftUI
 struct Synapse_PTCEApp: App {
     var body: some Scene {
         WindowGroup {
+            #if os(tvOS)
+            TVContentView()
+            #else
             ContentView()
+            #endif
         }
     }
 }
