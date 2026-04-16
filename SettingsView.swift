@@ -177,6 +177,7 @@ struct SettingsView: View {
                             .foregroundColor(accent)
                     }
 
+                    #if !os(tvOS)
                     if showDatePicker {
                         DatePicker("Exam Date", selection: $pickedDate, in: Date()..., displayedComponents: .date)
                             .datePickerStyle(.graphical)
@@ -185,6 +186,7 @@ struct SettingsView: View {
                                 engine.setTestDate(newVal)
                             }
                     }
+                    #endif
 
                     Button {
                         engine.clearTestDate()
@@ -204,6 +206,7 @@ struct SettingsView: View {
                             .fixedSize(horizontal: false, vertical: true)
 
                         if showDatePicker {
+                            #if !os(tvOS)
                             DatePicker("Exam Date", selection: $pickedDate, in: Date()..., displayedComponents: .date)
                                 .datePickerStyle(.graphical)
                                 .tint(accent)
@@ -220,6 +223,7 @@ struct SettingsView: View {
                                     .background(accent)
                                     .cornerRadius(8)
                             }
+                            #endif
                         } else {
                             Button {
                                 pickedDate = Calendar.current.date(byAdding: .day, value: 60, to: Date()) ?? Date()

@@ -19,7 +19,6 @@ struct TVSettingsView: View {
     @State private var showResetConfirm = false
     @State private var resetPIN         = ""
     @State private var showResetDone    = false
-    @State private var showDatePicker   = false
     @State private var pickedDate       = Calendar.current.date(byAdding: .day, value: 60, to: Date()) ?? Date()
 
     private var accent: Color { engine.currentTheme.accentColor }
@@ -78,6 +77,7 @@ struct TVSettingsView: View {
                         VStack(alignment: .leading, spacing: 40) {
                             appearanceSection
                             examCountdownSection
+                            aboutSection
                             if showResetDone {
                                 resetDoneView
                             } else {
@@ -225,36 +225,10 @@ struct TVSettingsView: View {
                             .foregroundColor(theme.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)
 
-                        if showDatePicker {
-                            DatePicker("Exam Date", selection: $pickedDate, in: Date()..., displayedComponents: .date)
-                                .datePickerStyle(.graphical)
-                                .tint(accent)
-
-                            Button {
-                                engine.setTestDate(pickedDate)
-                                showDatePicker = false
-                            } label: {
-                                Text("CONFIRM DATE")
-                                    .font(.system(size: 18, weight: .bold, design: .monospaced))
-                                    .foregroundColor(.black)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 14)
-                                    .background(accent)
-                                    .cornerRadius(10)
-                            }
-                        } else {
-                            Button {
-                                withAnimation { showDatePicker = true }
-                            } label: {
-                                Label("SET EXAM DATE", systemImage: "calendar.badge.plus")
-                                    .font(.system(size: 18, weight: .bold, design: .monospaced))
-                                    .foregroundColor(.black)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 14)
-                                    .background(accent)
-                                    .cornerRadius(10)
-                            }
-                        }
+                        Text("To set your exam date, open Synapse on iPhone or iPad.")
+                            .font(.system(size: 16, design: .monospaced))
+                            .foregroundColor(theme.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(20)
                     .background(theme.surface)
@@ -276,6 +250,45 @@ struct TVSettingsView: View {
                 .tracking(1)
         }
         .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - About
+
+    private var aboutSection: some View {
+        TVSettingsSection(title: "ABOUT", accent: accent, theme: theme) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("SYNAPSE // PTCE NETWORK v13.0 // MAIN BRANCH")
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .foregroundColor(accent)
+                    .shadow(color: accent.opacity(0.4), radius: 3)
+
+                Divider().background(theme.divider)
+
+                Group {
+                    tvInfoRow(label: "DEVELOPER", value: "Ethan Bradley (Gooseboy2234)")
+                    tvInfoRow(label: "LOCATION",  value: "Hendersonville, TN")
+                    tvInfoRow(label: "EXAM",      value: "2026 PTCB Blueprint")
+                    tvInfoRow(label: "NODES",     value: "151 across 4 scored domains")
+                }
+            }
+            .padding(20)
+            .background(theme.surface)
+            .cornerRadius(14)
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(theme.divider, lineWidth: 1))
+        }
+    }
+
+    private func tvInfoRow(label: String, value: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Text(label)
+                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                .foregroundColor(theme.secondaryText)
+                .frame(width: 110, alignment: .leading)
+                .tracking(1)
+            Text(value)
+                .font(.system(size: 14, design: .monospaced))
+                .foregroundColor(theme.primaryText)
+        }
     }
 
     // MARK: - Reset

@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icon_1280x768.jpeg",
+      "idiom" : "tv"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

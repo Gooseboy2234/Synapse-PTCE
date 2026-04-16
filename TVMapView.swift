@@ -94,7 +94,7 @@ struct TVSectorView: View {
                 subtitle: quest.name.uppercased(),
                 progress: questProgress,
                 onBack: onBack,
-                trailingContent: bossButton
+                trailingContent: { bossButton }
             )
 
             // ── Node grid ─────────────────────────────────────────────────
