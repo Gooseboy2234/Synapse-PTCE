@@ -3,10 +3,7 @@
 //  Synapse PTCE
 //
 //  Phase 6 — Domain 1 Expansion: Medications (35% of 2026 PTCB Exam)
-//  16 additional nodes filling the critical gaps left by the original 28-drug set.
-//  Topics: insulin types, ADHD stimulants, antiepileptics, vancomycin, metronidazole,
-//          TMP/SMX, naloxone, buprenorphine, antihistamines, digoxin, nitrates,
-//          PDE5 inhibitors, bisphosphonates, major drug interactions, auxiliary labels.
+//  16 additional nodes — plain-English loreText rewrite for maximum readability.
 //
 
 import Foundation
@@ -23,29 +20,14 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "INSULIN TYPES",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Antidiabetic — Insulin analogs and human insulins
-            >
-            > RAPID-ACTING (onset 15 min | peak 30–90 min | duration 3–5 h):
-            >   lispro (Humalog), aspart (NovoLog), glulisine (Apidra)
-            >   — Inject within 15 MINUTES of starting a meal.
-            >
-            > SHORT-ACTING (onset 30 min | peak 2–4 h | duration 6–8 h):
-            >   Regular insulin (Humulin R, Novolin R)
-            >   — Inject 30 MINUTES before a meal.
-            >
-            > INTERMEDIATE-ACTING (onset 1–2 h | peak 4–12 h | duration 16–24 h):
-            >   NPH (Humulin N, Novolin N) — CLOUDY suspension.
-            >   — Can be mixed with regular insulin; draw regular first.
-            >
-            > LONG-ACTING (onset 1–2 h | NO peak | duration 20–24+ h):
-            >   glargine (Lantus, Basaglar, Toujeo), detemir (Levemir),
-            >   degludec (Tresiba) — CLEAR solution.
-            >   — CANNOT be mixed with any other insulin.
-            >
-            > STORAGE: Unopened = refrigerate 2–8°C.
-            >   In-use vials/pens = room temp per product labeling (up to 28–30 days).
-            >   Never freeze insulin; freezing destroys the protein structure.
+            > Insulin is the hormone your body uses to move sugar from your blood into cells for energy. In diabetes, either the body doesn't make enough (Type 1) or can't use it well (Type 2), so you inject it.
+            > There are FOUR speed categories — and knowing which is fastest vs. longest is the main exam point:
+            > RAPID-ACTING (fastest): lispro (Humalog), aspart (NovoLog), glulisine (Apidra) — start working in 15 minutes. Inject RIGHT BEFORE a meal.
+            > SHORT-ACTING: Regular insulin (Humulin R, Novolin R) — inject 30 minutes before a meal. Slower than rapid-acting.
+            > INTERMEDIATE-ACTING: NPH (Humulin N, Novolin N) — CLOUDY appearance. Can be mixed with Regular; always draw Regular first.
+            > LONG-ACTING (slowest, lasts all day): glargine (Lantus, Basaglar), detemir (Levemir), degludec (Tresiba) — CLEAR, NO peak effect, given once daily. CANNOT be mixed with anything.
+            > STORAGE: Unopened insulin → refrigerate. In-use vials/pens → room temperature per label (usually 28-30 days). Never freeze — freezing destroys insulin.
+            > KEY: Long-acting insulin (Lantus/glargine) has NO peak — it's steady all day. Cannot be mixed with other insulins.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -67,34 +49,15 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "ADHD STIMULANTS",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: CNS Stimulants — DEA Schedule II (CII)
-            >
-            > METHYLPHENIDATE products:
-            >   Ritalin (IR), Ritalin LA, Concerta (XR), Daytrana (patch),
-            >   Metadate CD, Quillivant XR (liquid)
-            >   MECHANISM: Blocks reuptake of dopamine and norepinephrine.
-            >
-            > AMPHETAMINE products:
-            >   Adderall (mixed amphetamine salts, IR),
-            >   Adderall XR, Vyvanse (lisdexamfetamine — prodrug, abuse-deterrent),
-            >   Dexedrine (dextroamphetamine)
-            >   MECHANISM: Blocks and reverses dopamine/NE transporters (also releases DA).
-            >
-            > NON-STIMULANT alternatives (NOT CII):
-            >   Strattera (atomoxetine) — SNRI mechanism; black box warning: suicidal ideation
-            >   Intuniv (guanfacine ER) — alpha-2A agonist
-            >   Kapvay (clonidine ER) — alpha-2 agonist
-            >
-            > SCHEDULE II DISPENSING RULES:
-            >   — No refills permitted; new Rx required each fill.
-            >   — Max 30-day supply (some states allow 90-day with restrictions).
-            >   — Written or EPCS Rx only; verbal/fax prohibited for new CII.
-            >
-            > ADVERSE EFFECTS: Decreased appetite, insomnia, elevated HR/BP, growth
-            >   suppression in children, potential for abuse and dependence.
-            > CONTRAINDICATIONS: MAOIs (within 14 days), uncontrolled hypertension,
-            >   structural cardiac abnormalities, narrow-angle glaucoma.
+            > ADHD stimulants are medications used to improve focus in people with Attention Deficit Hyperactivity Disorder. They work by boosting dopamine and norepinephrine — the brain chemicals that help you pay attention and control impulses.
+            > TWO main drug groups:
+            > Methylphenidate products: Ritalin (short-acting), Concerta (extended-release), Daytrana (patch), Quillivant XR (liquid)
+            > Amphetamine products: Adderall (mixed amphetamine salts), Adderall XR, Vyvanse (lisdexamfetamine — a "prodrug" designed to resist abuse), Dexedrine
+            > ALL of these are Schedule II (CII) controlled substances — the STRICTEST category for drugs with accepted medical use.
+            > What Schedule II means for the pharmacy: NO REFILLS allowed at all. Patient needs a brand-new prescription every single fill. Cannot call them in by phone (except true emergency). Must be written or electronic (EPCS).
+            > Non-stimulant options (NOT Schedule II): Strattera (atomoxetine), Intuniv (guanfacine), Kapvay (clonidine)
+            > WATCH FOR: Can raise heart rate and blood pressure, suppress appetite, and cause insomnia. Do NOT use with MAOIs.
+            > KEY: ADHD stimulants = Schedule II = ZERO refills, new Rx every time.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -116,32 +79,14 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "GABAPENTIN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > GENERIC: gabapentin   BRAND: Neurontin (IR), Gralise (ER), Horizant (ER)
-            > CLASS: Anticonvulsant / Neuropathic pain agent
-            >
-            > FDA-APPROVED INDICATIONS:
-            >   — Adjunctive therapy for partial-onset seizures (adults and children ≥3 yrs)
-            >   — Postherpetic neuralgia (PHN) — nerve pain after shingles
-            >
-            > COMMON OFF-LABEL uses (widely prescribed):
-            >   Diabetic neuropathy, fibromyalgia, anxiety, alcohol withdrawal,
-            >   restless legs syndrome, hot flashes
-            >
-            > MECHANISM: Binds to α2δ subunit of voltage-gated calcium channels.
-            >   NOTE: Despite the name, does NOT directly affect GABA receptors.
-            >
-            > PHARMACOKINETICS:
-            >   — Renally eliminated; dose MUST be reduced in renal impairment (eGFR < 60).
-            >   — Absorption is non-linear (dose-dependent; higher doses absorbed less efficiently).
-            >   — No significant protein binding; not hepatically metabolized.
-            >
-            > ADVERSE EFFECTS: Somnolence, dizziness, ataxia, peripheral edema,
-            >   weight gain, blurred vision. Respiratory depression risk with opioids.
-            >
-            > SCHEDULING: Federal law — NOT scheduled. However, several states
-            >   (KY, TN, MI, MN, etc.) have classified gabapentin as Schedule V.
-            >   Always check your state's current classification.
+            > Gabapentin (brand: Neurontin) — an anti-seizure drug that's now used more often for nerve pain than for seizures.
+            > What is "nerve pain"? It's pain caused by damaged nerves rather than injured tissue — like the burning, shooting pain people get after shingles (a painful rash caused by the chickenpox virus reactivating in adults).
+            > How it works: it calms overexcited nerve signals by blocking calcium channels in the nervous system. Despite the name, it does NOT directly work on GABA receptors.
+            > FDA-approved uses: nerve pain after shingles (called postherpetic neuralgia) and partial seizures in adults and children.
+            > Very commonly used OFF-LABEL for: diabetic nerve pain, fibromyalgia (widespread muscle pain), restless leg syndrome, anxiety, alcohol withdrawal.
+            > It leaves the body through the KIDNEYS — so the dose must be reduced when kidneys aren't working well (kidney disease patients).
+            > WATCH FOR: Dizziness and drowsiness are very common. Dangerous when combined with opioids — together they can stop breathing. Some states have classified it as Schedule V because of abuse potential.
+            > KEY: Gabapentin is used for postherpetic neuralgia (nerve pain after shingles) and partial seizures. Reduce dose in kidney disease.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -163,34 +108,17 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "PHENYTOIN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > GENERIC: phenytoin   BRAND: Dilantin, Phenytek
-            > PRODRUG IV form: fosphenytoin (Cerebyx) — safer IV, dosed in PE (phenytoin equiv.)
-            > CLASS: Anticonvulsant (hydantoin) — NARROW THERAPEUTIC INDEX (NTI)
-            >
-            > INDICATIONS: Tonic-clonic (grand mal) seizures, complex partial seizures,
-            >   status epilepticus (IV form), neurosurgery prophylaxis.
-            >
-            > MECHANISM: Blocks voltage-gated sodium channels; stabilizes neuronal membranes.
-            >
-            > THERAPEUTIC DRUG MONITORING (TDM):
-            >   Therapeutic range: 10–20 mcg/mL (total phenytoin)
-            >   Free phenytoin (unbound): 1–2 mcg/mL
-            >   — Must correct for albumin in hypoalbuminemic patients.
-            >   — Zero-order (saturation) kinetics: small dose increases can cause
-            >     disproportionately large serum level increases.
-            >
-            > TOXICITY SIGNS (level-dependent):
-            >   > 20 mcg/mL → Nystagmus (first sign)
-            >   > 30 mcg/mL → Ataxia, slurred speech
-            >   > 40 mcg/mL → Lethargy, cognitive impairment, seizures
-            >
-            > ADVERSE EFFECTS: Gingival hyperplasia (gum overgrowth), hirsutism,
-            >   acne, coarsening of facial features, hypersensitivity (SJS risk),
-            >   teratogenic (fetal hydantoin syndrome — Category D).
-            >
-            > DRUG INTERACTIONS: Strong CYP enzyme INDUCER (3A4, 2C9, 2C19).
-            >   Decreases levels of: warfarin, oral contraceptives, statins, many others.
+            > Phenytoin (brand: Dilantin) — an older anti-seizure medication that works by calming overexcited electrical signals in the brain (technically: blocks sodium channels in neurons).
+            > What's a seizure? A sudden burst of abnormal electrical activity in the brain. Phenytoin prevents these bursts from spreading.
+            > This is a NARROW THERAPEUTIC INDEX (NTI) drug — meaning the gap between "just right" dose and "too much / toxic" dose is VERY small. You need regular blood level checks.
+            > Therapeutic blood level: 10–20 mcg/mL (this is the range you must memorize).
+            > Signs of toxicity (too much phenytoin in the blood) — think of someone who appears drunk:
+            > At 20+ mcg/mL: NYSTAGMUS — the eyes move back and forth involuntarily on their own
+            > At 30+ mcg/mL: Ataxia (stumbling/loss of balance), slurred speech
+            > At 40+ mcg/mL: Confusion, then seizures (ironically, the seizure drug causes seizures)
+            > Long-term side effects: Gum overgrowth (gingival hyperplasia), acne, unwanted body hair. Also a strong CYP inducer — speeds up metabolism of many other drugs including warfarin and birth control pills.
+            > BIG RISK: Causes serious birth defects — avoid in pregnancy.
+            > KEY: Phenytoin therapeutic range = 10–20 mcg/mL. First sign of toxicity = nystagmus (eye movement). NTI drug.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -212,39 +140,16 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "TMP/SMX",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > GENERIC: sulfamethoxazole / trimethoprim
-            > BRAND: Bactrim, Bactrim DS, Septra, Septra DS
-            > CLASS: Sulfonamide antibiotic combination (folate synthesis inhibitor)
-            >
-            > COMMON INDICATIONS:
-            >   — Uncomplicated urinary tract infections (UTIs) — first-line
-            >   — Acute otitis media in children
-            >   — Community-acquired MRSA (methicillin-resistant S. aureus) skin infections
-            >   — PCP (Pneumocystis jirovecii pneumonia) prophylaxis and treatment
-            >   — Traveler's diarrhea (Shigella, E. coli)
-            >
-            > MECHANISM:
-            >   SMX inhibits dihydropteroate synthase (DHPS).
-            >   TMP inhibits dihydrofolate reductase (DHFR).
-            >   Together: sequential blockade of bacterial folate synthesis.
-            >
-            > KEY COUNSELING POINTS:
-            >   — Drink PLENTY of water (prevents crystalluria / kidney stones).
-            >   — AVOID PROLONGED SUN EXPOSURE (photosensitivity reaction).
-            >   — Take with or without food (food reduces GI upset).
-            >
-            > CONTRAINDICATIONS:
-            >   — Sulfa allergy (cross-reactivity with sulfonamide diuretics debated)
-            >   — Pregnancy (especially near term — kernicterus risk in neonate)
-            >   — Severe renal or hepatic impairment
-            >   — G6PD deficiency (hemolytic anemia risk)
-            >
-            > ADVERSE EFFECTS: Rash (including SJS risk), photosensitivity, nausea,
-            >   hyperkalemia, elevated SCr (blocks tubular secretion, not true CKD),
-            >   thrombocytopenia, leukopenia.
-            >
-            > DRUG INTERACTION: Inhibits CYP2C9 — increases warfarin levels (bleeding risk).
+            > Bactrim (generic: sulfamethoxazole/trimethoprim, or TMP/SMX) — a combination antibiotic that kills bacteria by blocking their ability to make folate. Without folate, bacteria can't replicate their DNA and die.
+            > Think of it as two drugs working together to hit the same target from two different angles — much more effective than either alone.
+            > Used for: Urinary tract infections (UTIs) — this is the #1 use. Also MRSA skin infections (the resistant staph bacteria), prevention of Pneumocystis pneumonia (PCP) in HIV patients, and traveler's diarrhea.
+            > CRITICAL — CHECK FOR SULFA ALLERGY FIRST: Bactrim contains a sulfa drug. Sulfa allergies can cause severe rashes — including Stevens-Johnson Syndrome (a life-threatening skin reaction). Always ask before dispensing.
+            > Key counseling — tell the patient:
+            > 1. Drink plenty of water — prevents kidney stones from forming
+            > 2. Avoid prolonged sun exposure — Bactrim causes sun sensitivity (photosensitivity)
+            > 3. Can raise INR in patients on warfarin — watch for bleeding
+            > NOT safe in pregnancy (especially near delivery) or in people with G6PD deficiency.
+            > KEY: Bactrim = TMP/SMX combo. Always screen for sulfa allergy. Drink lots of water, avoid sun.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -266,35 +171,16 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "METRONIDAZOLE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > GENERIC: metronidazole   BRAND: Flagyl, Flagyl ER, MetroGel (topical)
-            > CLASS: Nitroimidazole antibiotic / antiprotozoal
-            >
-            > INDICATIONS:
-            >   — Bacterial vaginosis (BV)
-            >   — Clostridioides difficile (C. diff) infections — oral PO preferred
-            >   — Anaerobic bacterial infections (intra-abdominal, skin/soft tissue)
-            >   — Helicobacter pylori (part of triple/quadruple therapy)
-            >   — Trichomoniasis — treat patient AND sexual partner
-            >   — Giardiasis, amebiasis
-            >
-            > MECHANISM: Prodrug; reduced in anaerobic organisms to a toxic free-radical
-            >   intermediate that damages bacterial/protozoal DNA.
-            >
-            > *** CRITICAL DRUG INTERACTION ***
-            >   ALCOHOL + METRONIDAZOLE = DISULFIRAM-LIKE REACTION:
-            >   Flushing, severe nausea/vomiting, headache, palpitations.
-            >   AVOID ALL alcohol (including mouthwash, cough syrups) during therapy
-            >   AND for at least 48 hours (72h for tinidazole) AFTER completing course.
-            >
-            > ADDITIONAL INTERACTIONS:
-            >   — Warfarin: inhibits CYP2C9 → increased INR / bleeding risk.
-            >   — Lithium: may increase lithium levels (toxicity risk).
-            >
-            > ADVERSE EFFECTS: Metallic taste (very common), nausea, headache,
-            >   peripheral neuropathy (with prolonged use), darkening of urine (harmless).
-            >
-            > NOTE: IV metronidazole contains significant sodium — monitor in CHF patients.
+            > Metronidazole (brand: Flagyl) — an antibiotic that also kills parasites. It works by entering bacteria and parasites and creating toxic chemicals that shred their DNA.
+            > Used for: bacterial vaginosis (BV — a common vaginal infection), C. diff infections (a dangerous gut infection that causes severe diarrhea), abdominal infections, H. pylori (stomach bacteria), Trichomonas (an STI), giardia.
+            > The #1 thing every pharmacy technician must know about Flagyl:
+            > ABSOLUTELY NO ALCOHOL during treatment AND for 48 hours after the last dose.
+            > What happens if you drink alcohol with Flagyl? A "disulfiram-like reaction" — your body can't break down alcohol properly, causing: severe flushing, intense nausea/vomiting, pounding headache, rapid heartbeat. It feels terrible and can be dangerous.
+            > This includes: wine, beer, spirits, mouthwash with alcohol, cough syrups with alcohol, cooking wine.
+            > Common side effect: metallic taste in the mouth (very common, harmless).
+            > Also darkens urine — this is harmless but warn the patient.
+            > Drug interaction: raises warfarin levels (increased bleeding risk).
+            > KEY: Flagyl + any alcohol = severe disulfiram-like reaction. No alcohol for 48 hours after last dose. This is the #1 Flagyl counseling point tested on the PTCB.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -316,35 +202,14 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "VANCOMYCIN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > GENERIC: vancomycin   BRAND: Vancocin (oral capsules — C. diff only)
-            > CLASS: Glycopeptide antibiotic — bactericidal
-            >
-            > KEY FACT: IV vancomycin does NOT absorb orally.
-            >   → IV form = systemic infections (MRSA, endocarditis, bacteremia, meningitis)
-            >   → Oral form (Vancocin PO) = ONLY for C. difficile colitis (gut-local action)
-            >
-            > INDICATIONS (IV):
-            >   — MRSA infections of any site (go-to anti-MRSA agent)
-            >   — Gram-positive infections in beta-lactam allergic patients
-            >   — Bacterial endocarditis
-            >   — CNS infections (meningitis) — high doses required (limited CNS penetration)
-            >
-            > THERAPEUTIC DRUG MONITORING (TDM):
-            >   AUC/MIC-guided dosing is now preferred (2020 ASHP/IDSA/SIDP consensus).
-            >   Trough target (traditional): 15–20 mcg/mL for serious infections.
-            >   Always ordered as actual dose in mg, administered over ≥ 60 minutes.
-            >
-            > *** RED MAN SYNDROME ***
-            >   NOT a true allergic reaction — an infusion-related reaction.
-            >   Caused by: TOO-RAPID IV INFUSION (mast cell degranulation).
-            >   Symptoms: Flushing, erythema (redness) of face/neck/upper torso,
-            >             pruritus, hypotension.
-            >   Treatment: Slow or stop infusion; pretreat with diphenhydramine.
-            >   Minimum infusion time: 60 minutes (longer for large doses).
-            >
-            > ADVERSE EFFECTS: Nephrotoxicity (especially with aminoglycosides),
-            >   ototoxicity (rare at normal levels), thrombophlebitis at IV site.
+            > Vancomycin (brand: Vancocin) — a powerful antibiotic used when regular antibiotics stop working, especially for MRSA (methicillin-resistant Staphylococcus aureus — a common drug-resistant bacteria).
+            > Think of it as the "antibiotic of last resort" for serious bacterial infections.
+            > TWO completely different forms — this is critical:
+            > IV vancomycin: Goes into the bloodstream — treats serious MRSA infections anywhere in the body (blood, lungs, bone, brain, heart).
+            > ORAL vancomycin (Vancocin capsules): Stays in the GUT — treats C. diff infection ONLY. Oral vancomycin is NOT absorbed into the bloodstream.
+            > RED MAN SYNDROME: If vancomycin IV is given too fast, it causes the skin of the face, neck, and upper chest to turn bright red and itchy. This is NOT an allergic reaction — it's a rate reaction (the drug causes mast cells to release histamine). Fix: slow down the infusion. Minimum infusion time = 60 minutes.
+            > WATCH FOR: Kidney damage (nephrotoxicity) and hearing damage (ototoxicity). Blood levels must be monitored — it's a narrow therapeutic index drug.
+            > KEY: IV vancomycin treats MRSA. Red Man Syndrome = infused too fast, not a true allergy. Monitor drug levels.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -366,33 +231,14 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "NALOXONE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > GENERIC: naloxone   BRAND: Narcan (nasal spray), Evzio (auto-injector),
-            >   Kloxxado (intranasal), Zimhi (IM injection)
-            > CLASS: Opioid antagonist — pure antagonist, no agonist activity
-            >
-            > PRIMARY USE: Emergency reversal of opioid overdose (respiratory depression).
-            >
-            > MECHANISM: Competitive antagonist at mu (μ), kappa (κ), and delta (δ) opioid
-            >   receptors. Displaces opioids from receptors, reversing CNS and respiratory
-            >   depression within 2–5 minutes (nasal spray) or 1–2 minutes (IV).
-            >
-            > ROUTES: IV/IM/SubQ (hospital), intranasal (Narcan spray — community),
-            >   IM auto-injector (Evzio — community). Intranasal is most common community use.
-            >
-            > IMPORTANT CLINICAL NOTES:
-            >   — Half-life is SHORTER than most opioids (30–90 min). Repeat doses often
-            >     needed; patient may re-narcotize after naloxone wears off.
-            >   — Call 911 even after naloxone administration — monitoring required.
-            >   — Precipitates acute opioid withdrawal in opioid-dependent patients
-            >     (agitation, nausea, vomiting, pain — not life-threatening).
-            >
-            > OTC AVAILABILITY:
-            >   Narcan 4 mg nasal spray is FDA-approved OTC (since March 2023).
-            >   Many states have standing orders allowing pharmacy dispensing without Rx.
-            >
-            > NALTREXONE (Vivitrol, ReVia): Related antagonist — used for MAINTENANCE
-            >   treatment of opioid or alcohol use disorder (NOT for acute reversal).
+            > Naloxone (brand: Narcan, Kloxxado, Evzio) — a medication that REVERSES opioid overdose. Think of it as an eraser for opioids.
+            > Opioids work by attaching to receptors in your brain and spinal cord. Naloxone works faster and grabs those same receptors first — physically knocking the opioids off and blocking them.
+            > What an opioid overdose looks like: person is unconscious, breathing very slowly or not at all, lips turning blue, unresponsive.
+            > Naloxone starts working within 2–5 minutes (nasal spray) and can bring a person back from overdose.
+            > Available forms: Narcan 4mg nasal spray (most common), Evzio auto-injector (talks you through the steps), IV form (hospitals).
+            > As of 2023: Narcan nasal spray is OVER-THE-COUNTER — no prescription needed. Available at pharmacies without an Rx.
+            > IMPORTANT: Naloxone wears off in 30–90 minutes — much faster than most opioids. The person can slip back into overdose. ALWAYS call 911 even after giving naloxone — the patient needs monitoring.
+            > KEY: Naloxone reverses opioid overdose by blocking opioid receptors. It's now OTC. Duration is SHORT — call 911 even after giving it.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -414,35 +260,15 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "BUPRENORPHINE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > COMBINATION PRODUCT: buprenorphine / naloxone
-            > BRAND: Suboxone (SL film), Zubsolv (SL tablet), Bunavail (buccal film)
-            > MONOTHERAPY: Subutex (buprenorphine SL tablet — used in pregnancy)
-            > CLASS: Partial opioid agonist (buprenorphine) + antagonist (naloxone)
-            > DEA SCHEDULE: CII (Schedule III in some older literature; reclassified to CII)
-            >   NOTE: As of October 2023, all buprenorphine products are CII.
-            >
-            > PRIMARY USE: Medication-Assisted Treatment (MAT) of Opioid Use Disorder (OUD).
-            >   Also: buprenorphine alone (Belbuca buccal, Butrans patch) for chronic pain.
-            >
-            > WHY THE COMBINATION?
-            >   Naloxone (NX) is poorly absorbed sublingually — it is present as an
-            >   ABUSE-DETERRENT. If the film is dissolved and injected IV, naloxone
-            >   absorbs systemically and precipitates withdrawal.
-            >
-            > MECHANISM (buprenorphine):
-            >   Partial agonist at mu (μ) receptor — high binding affinity, low intrinsic
-            >   activity. Ceiling effect on respiratory depression (safer than full agonists).
-            >   Very long half-life (~24–72 hours) — once-daily dosing.
-            >
-            > CLINICAL NOTES:
-            >   — Prescribers no longer need a waiver (DATA 2000 X-waiver eliminated 2023).
-            >   — Any licensed DEA-registered provider may now prescribe.
-            >   — Induction: Patient must be in MILD-MODERATE withdrawal before first dose
-            >     (to avoid precipitated withdrawal).
-            >
-            > ADVERSE EFFECTS: Headache, nausea, constipation, sweating, insomnia.
-            >   Hepatotoxicity (rare but monitor LFTs).
+            > Suboxone (buprenorphine/naloxone) — a medication used to treat opioid addiction. It helps people stop using heroin or prescription opioids by reducing cravings and withdrawal symptoms without producing a strong high.
+            > It's a treatment, not a cure — patients often take it long-term.
+            > BUPRENORPHINE is a "partial opioid agonist." Partial means it attaches to opioid receptors but only activates them partially — enough to prevent withdrawal and cravings, but not enough to get high (has a ceiling effect on euphoria).
+            > NALOXONE is added as an abuse-deterrent. If someone tries to inject Suboxone to get high, the naloxone becomes active and immediately causes withdrawal. But when taken correctly under the tongue, the naloxone is not absorbed and doesn't cause problems.
+            > This is called MAT — Medication-Assisted Treatment for Opioid Use Disorder (OUD).
+            > Subutex = buprenorphine alone (no naloxone) — used during pregnancy when naloxone is not appropriate.
+            > MUST be taken sublingually (under the tongue) — swallowing destroys it.
+            > Schedule II controlled substance (reclassified as of October 2023).
+            > KEY: Suboxone treats opioid use disorder. Naloxone in it prevents IV abuse. Must be dissolved under the tongue. Schedule CII.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -464,32 +290,19 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "ANTIHISTAMINES",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: H1-receptor antagonists — block histamine at H1 receptors
-            >
-            > FIRST-GENERATION (sedating — cross blood-brain barrier):
-            >   diphenhydramine (Benadryl) — also used for sleep, motion sickness
-            >   hydroxyzine (Vistaril, Atarax) — also for anxiety, pruritus
-            >   promethazine (Phenergan) — also for nausea/vomiting (antiemetic)
-            >   chlorpheniramine (Chlor-Trimeton) — OTC cold/allergy
-            >   meclizine (Antivert) — motion sickness, vertigo
-            >
-            >   ADVERSE EFFECTS (anticholinergic): Sedation, dry mouth, urinary retention,
-            >   constipation, blurred vision, confusion (especially in elderly).
-            >   BEERS CRITERIA: Diphenhydramine — AVOID in patients ≥ 65 years old.
-            >
-            > SECOND-GENERATION (non-sedating — minimal CNS penetration):
-            >   cetirizine (Zyrtec) — slightly more sedating than others in class
-            >   loratadine (Claritin) — least sedating; best choice for daytime use
-            >   fexofenadine (Allegra) — very non-sedating; does not cross BBB well
-            >   levocetirizine (Xyzal) — active enantiomer of cetirizine
-            >   desloratadine (Clarinex) — active metabolite of loratadine
-            >
-            >   ADVERSE EFFECTS: Minimal sedation, headache; cetirizine may cause
-            >   mild drowsiness at higher doses.
-            >
-            > KEY DISTINCTION: 1st gen = sedating + anticholinergic side effects.
-            >   2nd gen = non-sedating; preferred for daytime allergy management.
+            > Antihistamines block histamine — the chemical your body releases during an allergic reaction that causes itching, sneezing, runny nose, and watery eyes.
+            > There are TWO generations, and the key difference is whether they cause drowsiness:
+            > FIRST-GENERATION (cause drowsiness — cross into the brain):
+            > diphenhydramine (Benadryl) — also used as a sleep aid, for motion sickness
+            > hydroxyzine (Vistaril) — also used for anxiety
+            > promethazine (Phenergan) — also used for nausea
+            > These cause "anticholinergic" side effects: dry mouth, blurry vision, urinary retention (can't urinate), constipation, and confusion.
+            > AVOID in elderly patients (65+) — on the Beers List. Causes falls, confusion, and dangerous side effects in older adults.
+            > SECOND-GENERATION (non-drowsy — don't cross into the brain much):
+            > cetirizine (Zyrtec) — slightly sedating compared to others in class
+            > loratadine (Claritin) — least sedating; best for daytime use
+            > fexofenadine (Allegra) — very non-drowsy
+            > KEY: First-generation (Benadryl) = causes drowsiness + anticholinergic effects. Second-generation (Claritin, Zyrtec, Allegra) = non-drowsy. Benadryl is on the Beers List — avoid in elderly.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -511,36 +324,18 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "DIGOXIN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > GENERIC: digoxin   BRAND: Lanoxin
-            > CLASS: Cardiac glycoside — NARROW THERAPEUTIC INDEX (NTI)
-            >
-            > INDICATIONS:
-            >   — Heart failure with reduced ejection fraction (HFrEF) — symptom control
-            >   — Atrial fibrillation / atrial flutter — rate control (slows AV node)
-            >
-            > MECHANISM:
-            >   (1) Inhibits Na+/K+-ATPase pump → ↑ intracellular Na+ → ↑ intracellular Ca²+
-            >       → Increased myocardial contractility (positive inotropy).
-            >   (2) Increases vagal tone → slows SA node and AV conduction (rate control).
-            >
-            > THERAPEUTIC RANGE: 0.5–2.0 ng/mL (most labs; heart failure goal 0.5–0.9 ng/mL).
-            >
-            > *** DIGOXIN TOXICITY ***
-            >   Early signs: Nausea, vomiting, anorexia, fatigue.
-            >   Classic visual sign: YELLOW-GREEN halos / xanthopsia (yellow-tinged vision).
-            >   Cardiac: Bradycardia, heart block, PVCs, life-threatening arrhythmias.
-            >
-            >   PRECIPITATED BY HYPOKALEMIA (low K+):
-            >   Hypokalemia (and hypomagnesemia) increases digoxin binding affinity
-            >   at Na+/K+-ATPase → toxicity at "normal" levels.
-            >   Monitor electrolytes in patients on concurrent diuretics (thiazides, loop).
-            >
-            > ANTIDOTE: Digibind / DigiFab (digoxin-specific antibody fragments) —
-            >   used for life-threatening toxicity.
-            >
-            > INTERACTIONS: Amiodarone, verapamil, quinidine, macrolides — all increase
-            >   digoxin levels (reduce digoxin dose by 50%).
+            > Digoxin (brand: Lanoxin) — a heart medication derived from the foxglove plant. It's been used for centuries.
+            > Used for: Heart failure (makes the heart pump more strongly) and atrial fibrillation (slows down a fast, irregular heartbeat).
+            > How it works: blocks a pump in heart cells that moves sodium and potassium. This indirectly increases calcium inside the cells, making the heart squeeze harder and beat more slowly.
+            > NARROW THERAPEUTIC INDEX (NTI) — the gap between helpful dose and toxic dose is tiny. Therapeutic range: 0.5–2.0 ng/mL (for heart failure: aim for the lower half, 0.5–0.9).
+            > DIGOXIN TOXICITY — warning signs:
+            > Early: Nausea, vomiting, loss of appetite, fatigue
+            > Classic visual sign: Seeing YELLOW-GREEN HALOS around lights (called xanthopsia) — this is a famous PTCB exam sign
+            > Heart: Dangerously slow or irregular heartbeat
+            > BIG RISK — LOW POTASSIUM (hypokalemia) makes toxicity MUCH MORE LIKELY:
+            > Low potassium (often from diuretics like furosemide) causes the body to absorb digoxin more strongly. Always check potassium levels in patients taking both.
+            > Antidote for life-threatening toxicity: Digibind/DigiFab (digoxin antibody fragments).
+            > KEY: Digoxin toxicity = yellow-green halos + nausea. Low potassium makes it worse. Therapeutic range 0.5–2.0 ng/mL. NTI drug.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -562,42 +357,17 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "NITROGLYCERIN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > GENERIC: nitroglycerin (NTG)
-            > BRAND: Nitrostat (SL tablet), Nitro-Dur (transdermal patch),
-            >   Nitrolingual (SL spray), Nitro-Bid (ointment), NitroMist (spray)
-            > CLASS: Organic nitrate — vasodilator
-            >
-            > INDICATIONS:
-            >   — Acute angina (chest pain) relief — sublingual NTG
-            >   — Angina prophylaxis — long-acting formulations (patch, ointment)
-            >   — Acute heart failure / hypertensive emergency (IV NTG)
-            >
-            > MECHANISM: Prodrug → releases nitric oxide (NO) in vascular smooth muscle
-            >   → activates guanylate cyclase → ↑ cGMP → vasodilation.
-            >   Primarily VENODILATION (reduces preload); some arterial dilation.
-            >
-            > SUBLINGUAL NTG — KEY PATIENT INSTRUCTIONS:
-            >   1. Sit or lie down before taking (prevent fainting from hypotension).
-            >   2. Place tablet UNDER THE TONGUE; do not swallow.
-            >   3. May repeat every 5 minutes × 3 doses.
-            >   4. If no relief after 3 doses, call 911 — possible MI.
-            >
-            > *** CRITICAL STORAGE RULE ***
-            >   Keep in the ORIGINAL AMBER GLASS BOTTLE, tightly closed.
-            >   Store at room temperature — away from heat, light, and moisture.
-            >   Do NOT transfer to plastic (NTG absorbs into plastic and loses potency).
-            >   Discard opened bottles after 6 months.
-            >
-            > ADVERSE EFFECTS: Hypotension, reflex tachycardia, headache (very common —
-            >   due to vasodilation), dizziness, flushing.
-            >
-            > CONTRAINDICATION: PDE5 inhibitors (sildenafil, tadalafil, vardenafil) —
-            >   severe, potentially fatal hypotension (additive vasodilation).
-            >   WAIT: 24h after sildenafil/vardenafil; 48h after tadalafil before NTG.
-            >
-            > NITRATE TOLERANCE: Develops with continuous use; requires a 10–12h
-            >   nitrate-free interval daily (patch removed at bedtime).
+            > Nitroglycerin (NTG) — a medication used to treat angina, which is chest pain from the heart not getting enough blood flow.
+            > Think of your coronary arteries (the blood vessels feeding your heart) as pipes. Angina happens when those pipes are too narrow and the heart muscle isn't getting enough oxygen. Nitroglycerin relaxes those pipes so more blood can flow through.
+            > Available forms: Sublingual tablets or spray (for acute attack), patches and ointment (for prevention).
+            > HOW TO USE SUBLINGUAL (under the tongue) FOR CHEST PAIN:
+            > 1. Sit or lie down first (the drug drops blood pressure — standing can cause fainting)
+            > 2. Place ONE tablet under the tongue (do NOT swallow)
+            > 3. If pain continues after 5 minutes → take a 2nd tablet
+            > 4. After a 3rd tablet with no relief → CALL 911 immediately — this may be a heart attack
+            > CRITICAL STORAGE RULE: NTG sublingual tablets must stay in their ORIGINAL AMBER GLASS BOTTLE, tightly sealed. Don't put them in a pill organizer. Don't refrigerate. Keep away from heat and light. Discard opened bottles after 6 months.
+            > DANGEROUS COMBINATION: NEVER take with Viagra/Cialis/Levitra (PDE5 inhibitors) — together they drop blood pressure dangerously low and can be fatal.
+            > KEY: SL nitroglycerin for acute chest pain. Store in original amber glass bottle. Absolutely no Viagra/Cialis — potentially fatal.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -619,36 +389,14 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "PDE5 INHIBITORS",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Phosphodiesterase type-5 (PDE5) inhibitors
-            >
-            > DRUGS IN CLASS:
-            >   sildenafil (Viagra — erectile dysfunction; Revatio — pulmonary arterial HTN)
-            >   tadalafil (Cialis — ED and BPH; Adcirca — pulmonary arterial HTN)
-            >   vardenafil (Levitra) — ED only
-            >   avanafil (Stendra) — ED only, fastest onset (~15 min)
-            >
-            > MECHANISM: Inhibit PDE5 → prevent cGMP breakdown → prolonged smooth muscle
-            >   relaxation → vasodilation → increased blood flow to corpus cavernosum (ED)
-            >   or pulmonary vasculature (PAH).
-            >
-            > *** ABSOLUTE CONTRAINDICATION: NITRATES ***
-            >   NEVER combine with any nitrate (NTG, isosorbide mononitrate/dinitrate).
-            >   MECHANISM: Both increase cGMP → additive vasodilation → SEVERE HYPOTENSION,
-            >   syncope, myocardial infarction, death.
-            >   TIME RESTRICTION before giving nitrates:
-            >   — Sildenafil or vardenafil: wait ≥ 24 hours
-            >   — Tadalafil: wait ≥ 48 hours (long half-life ~17.5 h)
-            >
-            > ALSO AVOID WITH: Alpha-blockers (additive hypotension); HIV protease
-            >   inhibitors (CYP3A4 inhibitors increase PDE5i levels — reduce dose).
-            >
-            > ADVERSE EFFECTS: Headache, flushing, nasal congestion, dyspepsia,
-            >   visual disturbances (blue tinge — transient), hypotension.
-            >   Rare: NAION (non-arteritic anterior ischemic optic neuropathy).
-            >
-            > TADALAFIL: Unique — daily low-dose (2.5–5 mg) for BPH or daily ED use;
-            >   also treats lower urinary tract symptoms (LUTS) with BPH.
+            > PDE5 inhibitors are drugs that relax blood vessels — used for two very different conditions: erectile dysfunction (ED) and pulmonary arterial hypertension (high blood pressure in the lungs).
+            > The drugs: sildenafil (Viagra for ED, Revatio for lung condition), tadalafil (Cialis for ED and enlarged prostate, Adcirca for lungs), vardenafil (Levitra), avanafil (Stendra)
+            > How they work: Block a specific enzyme (PDE5) that normally breaks down a blood vessel relaxing chemical (cGMP). With more cGMP around, blood vessels stay relaxed and wide open → increased blood flow.
+            > ABSOLUTE CONTRAINDICATION — the most dangerous drug combination tested on the PTCB:
+            > NEVER combine with NITRATES (nitroglycerin, isosorbide). Both drugs widen blood vessels — together they cause a massive, dangerous drop in blood pressure that can be fatal.
+            > If a patient has taken Viagra or Levitra, they must wait at LEAST 24 hours before taking any nitrates.
+            > If a patient has taken Cialis (tadalafil), they must wait at LEAST 48 hours — Cialis stays active much longer (nicknamed "the weekend pill" for its 36-hour duration vs 4-6 hours for Viagra).
+            > KEY: PDE5 inhibitors + any nitrate (Nitrostat, isosorbide) = potentially fatal blood pressure drop. This is the #1 interaction tested for these drugs.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -670,39 +418,16 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "BISPHOSPHONATES",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Bisphosphonates — bone resorption inhibitors
-            >
-            > DRUGS:
-            >   alendronate (Fosamax) — weekly oral tablet (70 mg) or daily (10 mg)
-            >   risedronate (Actonel) — weekly or monthly oral
-            >   ibandronate (Boniva) — monthly oral or quarterly IV
-            >   zoledronic acid (Reclast) — annual IV infusion (most potent)
-            >   pamidronate (Aredia) — IV, oncology use
-            >
-            > INDICATIONS: Osteoporosis (prevention and treatment), Paget's disease,
-            >   hypercalcemia of malignancy, bone metastases, glucocorticoid-induced
-            >   osteoporosis.
-            >
-            > MECHANISM: Inhibit osteoclast activity → decreased bone resorption →
-            >   maintains or increases bone mineral density.
-            >
-            > *** CRITICAL ORAL ADMINISTRATION RULES (alendronate/risedronate) ***
-            >   1. Take FIRST THING IN THE MORNING on an empty stomach.
-            >   2. Take with a FULL glass of PLAIN WATER only (no juice, coffee, milk).
-            >      — Food/beverages reduce absorption by up to 60%.
-            >   3. Remain UPRIGHT (sit or stand) for at LEAST 30 MINUTES after taking.
-            >      — Prevents esophageal irritation, esophagitis, ulceration.
-            >   4. Do NOT lie down or eat for 30 minutes after taking.
-            >
-            > ADVERSE EFFECTS:
-            >   Oral: Esophagitis, esophageal ulcers, GI upset, heartburn.
-            >   Systemic: Osteonecrosis of the jaw (ONJ) — rare, more common with IV
-            >     and in cancer patients; atypical femur fractures (long-term use).
-            >   IV: Acute-phase reaction (flu-like symptoms — fever, myalgia — first infusion).
-            >
-            > CONTRAINDICATIONS: Esophageal abnormalities, inability to sit/stand for 30 min,
-            >   hypocalcemia, severe renal impairment (CrCl < 30–35 mL/min).
+            > Bisphosphonates are drugs that prevent bones from getting weaker. Your body constantly breaks down old bone and rebuilds new bone. In osteoporosis (weak, brittle bones), the breakdown happens faster than the rebuilding. Bisphosphonates slow down the breakdown.
+            > The drugs: alendronate (Fosamax — weekly 70mg pill), risedronate (Actonel — weekly or monthly), ibandronate (Boniva — monthly pill or quarterly IV), zoledronic acid (Reclast — once-a-year IV injection, most potent)
+            > Used for: Osteoporosis (preventing fractures), Paget's disease of bone, bone damage from cancer.
+            > CRITICAL ADMINISTRATION RULES for the oral versions (alendronate, risedronate):
+            > 1. Take FIRST THING IN THE MORNING before eating or drinking anything
+            > 2. Take with a FULL glass (8 oz) of plain water ONLY — no juice, coffee, milk, or other meds
+            > 3. STAY UPRIGHT (sitting or standing) for AT LEAST 30 MINUTES afterward — do not lie down
+            > Why? If you lie down after taking it, the tablet can stick in your esophagus (swallowing tube) and cause severe irritation, ulcers, or burns.
+            > WATCH FOR long-term: Rare risk of jaw bone death (osteonecrosis of jaw) and unusual hip fractures with very long-term use.
+            > KEY: Take bisphosphonates with full glass of water, stay upright for 30 minutes. This prevents esophageal damage — the #1 counseling point tested.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -724,35 +449,19 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "DRUG INTERACTIONS",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > TOPIC: Major clinically significant drug-drug interactions (DDIs)
-            >
-            > WARFARIN INTERACTIONS (CYP2C9 substrate — many DDIs):
-            >   Inhibitors (↑ warfarin → ↑ bleeding risk): fluconazole, amiodarone,
-            >   metronidazole, TMP/SMX, many antibiotics (alter gut flora → ↓ vit K).
-            >   Inducers (↓ warfarin → ↓ anticoagulant effect): rifampin, phenytoin,
-            >   carbamazepine, St. John's Wort, barbiturates.
-            >   MONITOR: INR; adjust dose; patient education on consistent vitamin K intake.
-            >
-            > SEROTONIN SYNDROME — MAOI + SEROTONERGIC DRUGS:
-            >   NEVER combine MAOIs (phenelzine, tranylcypromine, selegiline) with:
-            >   SSRIs, SNRIs, TCAs, meperidine (Demerol), linezolid, methylene blue.
-            >   WASHOUT: 14 days between MAOI and SSRI (or 5 weeks after fluoxetine).
-            >   SYMPTOMS: Agitation, hyperreflexia, diaphoresis, hyperthermia, tremor.
-            >
-            > STATIN + GRAPEFRUIT JUICE (CYP3A4 inhibition):
-            >   Grapefruit inhibits intestinal CYP3A4 → ↑ simvastatin, lovastatin,
-            >   atorvastatin levels → ↑ myopathy / rhabdomyolysis risk.
-            >   Safe statins with grapefruit: pravastatin, rosuvastatin, fluvastatin.
-            >
-            > FLUOROQUINOLONE + DIVALENT CATIONS:
-            >   Ciprofloxacin / levofloxacin absorption DECREASED by 50–90% when taken
-            >   with: antacids (Ca²+, Mg²+, Al³+), iron, zinc, sucralfate, dairy.
-            >   TIMING: Take fluoroquinolone 2h BEFORE or 6h AFTER these products.
-            >
-            > TETRACYCLINES + DAIRY / ANTACIDS:
-            >   Doxycycline / tetracycline chelated by Ca²+, Mg²+, Al³+, Fe²+.
-            >   → Avoid dairy, antacids, iron within 2–3 hours of tetracycline dose.
+            > Drug interactions happen when one drug changes how another drug works. The most important ones tested on the PTCB involve the liver's CYP450 enzyme system — the liver's drug-processing machinery.
+            > Think of CYP enzymes as factory workers that break down drugs. Some drugs SLOW DOWN these workers (inhibitors) and some SPEED THEM UP (inducers).
+            > CYP INHIBITORS (slow metabolism → drug builds up → stronger effect + more side effects):
+            > Fluconazole (Diflucan), clarithromycin, grapefruit juice, amiodarone, metronidazole
+            > Example: Fluconazole + warfarin = warfarin builds up → bleeding risk
+            > CYP INDUCERS (speed metabolism → drug eliminated faster → less effect):
+            > Rifampin (strongest inducer), phenytoin, carbamazepine, St. John's Wort
+            > Example: Rifampin + warfarin = warfarin eliminated too fast → clots
+            > THE MOST DANGEROUS COMBINATIONS to memorize:
+            > MAOIs + SSRIs/SNRIs = SEROTONIN SYNDROME (agitation, fever, rigid muscles, rapid heart — emergency). Must wait 14 days between stopping MAOI and starting SSRI.
+            > Opioids + Benzodiazepines = RESPIRATORY DEPRESSION (breathing slows to a stop — can be fatal). Black box warning on all prescriptions.
+            > Ciprofloxacin/tetracycline + antacids/dairy = antibiotic absorption blocked by calcium, iron, magnesium. Take 2 hours apart.
+            > KEY: CYP inhibitors increase drug levels. CYP inducers decrease drug levels. MAOIs + serotonergic drugs = serotonin syndrome. Opioids + benzos = respiratory depression.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -774,44 +483,16 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "AUXILIARY LABELS",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > TOPIC: Auxiliary (ancillary) labels — supplemental dispensing instructions
-            >
-            > PURPOSE: Provide additional counseling beyond the main prescription label.
-            >   Required for specific drug classes to ensure safe and effective use.
-            >
-            > COMMON AUXILIARY LABELS AND WHEN THEY APPLY:
-            >
-            > "REFRIGERATE — DO NOT FREEZE"
-            >   Amoxicillin suspension, insulin (unopened), metronidazole gel,
-            >   erythromycin suspension, azithromycin suspension (after reconstitution)
-            >
-            > "PROTECT FROM LIGHT"
-            >   Nitroprusside, furosemide IV, promethazine injection,
-            >   nitroglycerin tablets, tetracycline
-            >
-            > "AVOID PROLONGED EXPOSURE TO SUNLIGHT (PHOTOSENSITIVITY)"
-            >   Doxycycline, TMP/SMX (Bactrim), fluoroquinolones (ciprofloxacin),
-            >   amiodarone, voriconazole, chlorpromazine, thiazide diuretics
-            >
-            > "TAKE WITH FOOD OR MILK"
-            >   NSAIDs (ibuprofen, naproxen), metronidazole, prednisone,
-            >   potassium chloride (KCl), nitrofurantoin (improves absorption)
-            >
-            > "DO NOT DRINK ALCOHOL"
-            >   Metronidazole, tinidazole, disulfiram, sedatives/hypnotics,
-            >   methotrexate (hepatotoxicity), benzodiazepines (additive CNS depression)
-            >
-            > "SHAKE WELL"
-            >   Any suspension (amoxicillin, azithromycin, clindamycin, antacids),
-            >   topical lotions and suspensions
-            >
-            > "MAY CAUSE DROWSINESS — USE CAUTION WHEN DRIVING"
-            >   Benzodiazepines, opioids, first-generation antihistamines, muscle relaxants,
-            >   gabapentin, pregabalin, many antidepressants
-            >
-            > "SWALLOW WHOLE — DO NOT CRUSH OR CHEW"
-            >   Enteric-coated tablets (EC), extended-release (ER/XR/XL/SR) formulations
+            > Auxiliary labels are the colored warning stickers on prescription bottles — they add important safety instructions beyond what's on the main label. Knowing which drug gets which label is tested directly on the PTCB.
+            > "REFRIGERATE — DO NOT FREEZE": Reconstituted amoxicillin suspension, insulin (unopened), erythromycin suspension, some eye drops
+            > "PROTECT FROM LIGHT": IV furosemide, nitroglycerin tablets, nitroprusside, tetracycline, promethazine injection
+            > "AVOID PROLONGED SUN EXPOSURE" (photosensitivity): Doxycycline, Bactrim (TMP/SMX), ciprofloxacin, amiodarone, thiazide diuretics — skin burns easily in sunlight
+            > "TAKE WITH FOOD OR MILK" (prevent stomach upset): Ibuprofen/NSAIDs, metronidazole, prednisone/steroids, potassium chloride
+            > "DO NOT DRINK ALCOHOL": Metronidazole (Flagyl), tinidazole, methotrexate, benzodiazepines, sedatives
+            > "SHAKE WELL": All oral suspensions — amoxicillin, azithromycin, clindamycin, antacids
+            > "MAY CAUSE DROWSINESS — USE CAUTION WHEN DRIVING": Opioids, benzodiazepines, gabapentin, pregabalin, first-generation antihistamines, muscle relaxants
+            > "SWALLOW WHOLE — DO NOT CRUSH OR CHEW": Extended-release (ER/XR/XL/SR) tablets and enteric-coated tablets — crushing destroys the time-release mechanism
+            > KEY: Doxycycline → avoid sun. Metronidazole → no alcohol. Bisphosphonates → take with full glass of water. Extended-release → swallow whole, never crush.
             """,
             challengeType: .multipleChoice,
             options: [

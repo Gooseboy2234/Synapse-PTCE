@@ -3,8 +3,7 @@
 //  Synapse PTCE
 //
 //  Phase 3 — Domain 2: Federal Requirements (18.75% of 2026 PTCB Exam)
-//  12 nodes covering DEA schedules, DSCSA (2026 emphasis), REMS, controlled
-//  substance rules, OBRA '90, HIPAA, drug recalls, and disposal regulations.
+//  12 nodes — plain-English loreText rewrite for maximum readability.
 //
 
 import Foundation
@@ -21,15 +20,16 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "SCHEDULE I",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > AUTHORITY: Drug Enforcement Administration (DEA) — 21 CFR Part 1308
-            > SCHEDULE I DEFINITION:
-            >   High abuse potential
-            >   NO currently accepted medical use in the US
-            >   Lack of accepted safety for use under medical supervision
-            > EXAMPLES: Heroin, LSD, psilocybin, MDMA (ecstasy), marijuana (federal)
-            > NOTE: Despite state laws, marijuana remains Schedule I federally.
-            >       Research requires special DEA Schedule I researcher registration.
+            > The DEA (Drug Enforcement Administration) places controlled substances into 5 schedules (categories) based on two things: abuse potential and accepted medical use.
+            > Schedule I is the most restricted category — these are drugs with NO accepted medical use in the US and a HIGH potential for abuse.
+            > Examples of Schedule I drugs: Heroin, LSD, psilocybin (magic mushrooms), MDMA (ecstasy), and — importantly — marijuana at the FEDERAL level.
+            > Wait, isn't marijuana legal in many states? Yes. But under FEDERAL law, marijuana remains Schedule I. This means pharmacies cannot dispense it. Federal employees (VA, military) cannot use it. This distinction comes up on the PTCB.
+            > Schedule I drugs cannot be prescribed or dispensed by pharmacies. Researchers can only study them with a special DEA Schedule I researcher registration.
+            > The other schedules:
+            > Schedule II (CII): High abuse potential, but HAS accepted medical use (oxycodone, Adderall, fentanyl, morphine). Strictest dispensing rules.
+            > Schedule III-IV: Moderate-lower abuse potential, accepted medical use (Tylenol with codeine, benzodiazepines, tramadol)
+            > Schedule V: Lowest abuse potential among controlled substances (some cough preparations with small amounts of codeine)
+            > KEY: Schedule I = high abuse + NO accepted medical use (heroin, LSD, marijuana federally). Schedule II = high abuse + HAS medical use. CII has the strictest dispensing rules.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -50,15 +50,17 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "SCHEDULE II Rx",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > SCHEDULE II DISPENSING RULES (21 CFR 1306.12):
-            >   NO REFILLS — a new Rx is required each fill.
-            >   Written Rx required; prescriber must manually sign.
-            >   ELECTRONIC: Permitted via EPCS (Electronic Prescribing for Controlled Substances).
-            >   ORAL: Emergency dispensing by phone — quantity limited to emergency period;
-            >         written Rx must follow within 7 days (or 72h per DEA).
-            >   PARTIAL FILL: Permitted for LTCF patients and terminally ill patients.
-            >   FAXED: Accepted as "original" Rx for hospice/LTCF patients only.
+            > Schedule II (CII) drugs have the strictest dispensing rules of all prescribable medications. These include: oxycodone, hydrocodone, morphine, fentanyl, Adderall, Ritalin, and cocaine (used topically in ENT procedures).
+            > The rules exist because CII drugs have the highest abuse and diversion potential.
+            > RULE 1 — NO REFILLS EVER: Every time a patient needs their CII medication, they need a brand-new prescription. Unlike Schedule III-IV drugs, refills are never permitted — not even one.
+            > RULE 2 — HOW THE PRESCRIPTION MUST BE WRITTEN:
+            > Must be written on paper (manually signed by the prescriber) OR
+            > Sent electronically via EPCS (Electronic Prescribing of Controlled Substances) — a secure digital system
+            > A prescriber CANNOT call in a CII to the pharmacy for a routine fill (verbal order NOT allowed for routine CII)
+            > EXCEPTION — True Emergency: If a patient will suffer harm without the medication right now, the prescriber can call it in for a limited emergency supply. But the WRITTEN prescription must arrive at the pharmacy within 7 days.
+            > FAXED CII: A faxed prescription can only serve as the original for: hospice/terminally ill patients, long-term care facility (nursing home) residents, and compounded IV controlled substances.
+            > PARTIAL FILL: A pharmacist can dispense part of a CII if they don't have the full amount. The rest must be dispensed within 72 hours (or the prescriber must write a new Rx).
+            > KEY: CII = ZERO refills. Must be written or EPCS. Emergency verbal orders must be followed by written Rx within 7 days.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -79,16 +81,15 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "CIII-IV RULES",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > SCHEDULE III & IV DISPENSING RULES:
-            >   Refills: Up to 5 refills within 6 months of the date written.
-            >   After 6 months or 5 refills (whichever comes first): new Rx required.
-            >   May be called in verbally by the prescriber or authorized agent.
-            >   May be transferred between pharmacies (once for handwritten; CIII-IV
-            >     multiple times if pharmacies share a real-time database).
-            > SCHEDULE V RULES:
-            >   Up to 5 refills within 6 months.
-            >   Some CⅤ products sold OTC (varies by state) with logbook requirement.
+            > Schedule III (CIII) and Schedule IV (CIV) controlled substances have more flexible dispensing rules than Schedule II because they carry lower — though still real — abuse potential.
+            > Examples: CIII = Tylenol with codeine (acetaminophen/codeine), testosterone, anabolic steroids. CIV = alprazolam (Xanax), diazepam (Valium), zolpidem (Ambien), tramadol, lorazepam (Ativan).
+            > REFILL RULES — memorize these numbers:
+            > Up to 5 refills allowed (plus the original fill = 6 total fills)
+            > All refills must be used within 6 months of the DATE THE PRESCRIPTION WAS WRITTEN
+            > After 6 months or 5 refills — whichever comes FIRST — the prescription expires. Patient needs a new Rx.
+            > SCHEDULE V (CV): Same refill allowance (up to 5 within 6 months). Some CV products (like Robitussin AC — codeine cough syrup) may be sold OTC in certain states — but the pharmacist/tech must check ID, sign the logbook, and enforce quantity limits.
+            > CALLS-INS and TRANSFERS: Unlike CII, CIII-IV prescriptions CAN be called in verbally by a prescriber. They can also be transferred between pharmacies (once for handwritten; unlimited times if pharmacies share a real-time database system).
+            > KEY: CIII and CIV = up to 5 refills within 6 months of written date. CII = ZERO refills. These two numbers (5 refills, 6 months) must be memorized exactly.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -109,16 +110,16 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "DSCSA",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW — 2026 EXAM EMPHASIS
-            > DRUG SUPPLY CHAIN SECURITY ACT (DSCSA) — Enacted Nov. 27, 2013
-            > Title II of the Drug Quality and Security Act (DQSA)
-            > PRIMARY GOAL: Build a national, electronic, interoperable track-and-trace
-            >   system to identify and trace prescription drug packages through the
-            >   US drug supply chain.
-            > FULLY PHASED IN: Nov. 27, 2023 (Enhanced Drug Distribution Security)
-            > PROTECTS AGAINST: Counterfeit, stolen, contaminated, or otherwise
-            >   illegitimate prescription drugs from entering the supply chain.
-            > APPLIES TO: Prescription drugs in finished dosage form only.
+            > The Drug Supply Chain Security Act (DSCSA) is a federal law passed in 2013 that protects patients from counterfeit, stolen, or contaminated prescription drugs entering the US drug supply.
+            > Think of it as a tracking system — like how FedEx tracks your package at every step, DSCSA requires every prescription drug package to be electronically tracked from the moment it's manufactured to the moment it's dispensed to a patient.
+            > WHY IT MATTERS: Before DSCSA, counterfeit or diverted drugs could enter pharmacy shelves with little traceability. Patients received fake medications — some with no active ingredient, some with dangerous contaminants.
+            > The system became FULLY operational on November 27, 2023.
+            > WHO IS INVOLVED (called "Trading Partners"):
+            > Manufacturers (make the drug) → Wholesale Distributors (ship it) → Pharmacies/Dispensers (give it to patients)
+            > Each time the drug changes hands, an electronic record must be transferred.
+            > The system is "interoperable" — meaning all parties' computer systems can talk to each other to verify a product's legitimacy at any point.
+            > WHAT'S TRACKED: Only finished prescription drugs in their final dosage form. Not raw ingredients or OTC drugs.
+            > KEY: DSCSA = electronic track-and-trace system for prescription drugs through the supply chain. Protects against counterfeit/contaminated drugs. Fully implemented November 2023.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -139,17 +140,16 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "DSCSA SERIALS",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW — 2026 EXAM EMPHASIS
-            > DSCSA PRODUCT IDENTIFIER — 4 required elements on every saleable unit:
-            >   1. NDC (National Drug Code) — identifies the specific product
-            >   2. SERIAL NUMBER — unique to each individual package
-            >   3. LOT NUMBER — identifies the manufacturing batch
-            >   4. EXPIRATION DATE — in standardized format
-            > Encoded as a 2D data matrix barcode on each package.
-            > TRADING PARTNERS (authorized entities in the supply chain):
-            >   Manufacturers, Repackagers, Wholesale Distributors, Dispensers (pharmacies)
-            > TRANSACTION RECORDS (TI, TH, TS) must be maintained for 6 years.
-            > SUSPECT PRODUCT: Must quarantine, investigate, and notify FDA and trading partners.
+            > Under DSCSA, every individual prescription drug package (each bottle, each blister pack) must carry a unique identification code — think of it like a serial number on a car.
+            > This "product identifier" has FOUR required pieces of information:
+            > 1. NDC (National Drug Code): Identifies exactly what the product is — the drug name, strength, dosage form, and manufacturer
+            > 2. Serial Number: Unique to THAT specific package — no other package in the world has this same number
+            > 3. Lot Number: Identifies the manufacturing batch it came from (critical for recalls — "which packages were from the contaminated batch?")
+            > 4. Expiration Date: In a standardized format
+            > All four pieces are encoded in a 2D barcode (like a QR code) on the package label.
+            > TRANSACTION RECORDS: Every time a package changes hands between trading partners, three documents must be transferred: Transaction Information (TI), Transaction History (TH), and Transaction Statement (TS). These records must be kept for 6 years.
+            > SUSPECT PRODUCT: If a pharmacy receives a drug they think might be counterfeit or stolen, they must: quarantine it immediately (keep it separate), investigate, notify the FDA and the trading partner who sent it, and not dispense it until cleared.
+            > KEY: DSCSA product identifier = 4 elements: NDC + Serial Number + Lot Number + Expiration Date. Encoded in 2D barcode. Records kept 6 years.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -170,22 +170,19 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "REMS",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > RISK EVALUATION AND MITIGATION STRATEGY (REMS)
-            > AUTHORITY: FDA — required under the FDAAA (2007)
-            > PURPOSE: Ensure benefits of a drug outweigh its risks by imposing
-            >          specific requirements beyond standard labeling.
-            > REMS COMPONENTS may include:
-            >   Medication Guide (MedGuide) — most common REMS element
-            >   Communication Plan (letters to HCPs)
-            >   Elements to Assure Safe Use (ETASU):
-            >     — Certified prescribers/pharmacies only
-            >     — Patient enrollment/registry
-            >     — Mandatory monitoring (labs, imaging)
-            > EXAMPLES:
-            >   iPLEDGE — Isotretinoin (severe teratogen; monthly pregnancy tests)
-            >   TIRF REMS — Transmucosal immediate-release fentanyl
-            >   Clozapine REMS — Absolute neutrophil count (ANC) monitoring
+            > REMS stands for Risk Evaluation and Mitigation Strategy — a special FDA program for drugs whose risks are so serious that a normal prescription label isn't enough to keep patients safe.
+            > Think of REMS as extra layers of safety controls that the FDA requires ON TOP of regular prescribing for certain high-risk drugs.
+            > A REMS can include any combination of these requirements:
+            > Medication Guide: written patient information that must be given with every dispense (most basic/common REMS element)
+            > Certified prescribers only: only doctors who have completed special training can prescribe it
+            > Certified pharmacies only: only registered pharmacies can dispense it
+            > Patient enrollment: patient must register in a monitoring program
+            > Mandatory testing: lab tests (like pregnancy tests or blood counts) required before/during therapy
+            > EXAMPLES of REMS drugs — these appear on the PTCB:
+            > iPLED+ (isotretinoin/Accutane): Must have 2 negative pregnancy tests, 2 forms of contraception, monthly monitoring. Max 30-day supply.
+            > Clozapine REMS: Must monitor absolute neutrophil count (ANC) — clozapine can destroy white blood cells.
+            > TIRF REMS: For fentanyl lollipops and lozenges (immediate-release — extremely strong, only for opioid-tolerant patients). Certified prescribers/pharmacies only.
+            > KEY: REMS = special FDA safety program for high-risk drugs. Most common REMS requirement = Medication Guide. iPLED+ (isotretinoin) and Clozapine REMS are the most commonly tested examples.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -206,16 +203,14 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "DEA FORM 222",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > DEA CONTROLLED SUBSTANCE ORDERING FORMS:
-            > DEA FORM 222: Official order form for purchasing Schedule I & II substances.
-            >   Triplicate paper form (Copy 1 = supplier, Copy 2 = DEA, Copy 3 = pharmacy).
-            >   OR replaced by CSOS (Controlled Substance Ordering System) — electronic.
-            > DEA FORM 224: Registration for dispensers (pharmacies, practitioners).
-            > DEA FORM 106: Report of theft or significant loss of controlled substances.
-            > DEA FORM 41:  Record of destruction of controlled substances.
-            > KEY RULE: Only the DEA registrant (or authorized Power of Attorney)
-            >           may sign DEA Form 222 / submit CSOS orders.
+            > The DEA uses specific numbered forms for different controlled substance activities. On the PTCB, you need to know which form is used for which purpose.
+            > DEA FORM 222: Used to ORDER Schedule I and II controlled substances from a supplier (the paper order form). This is how a pharmacy reorders its oxycodone, morphine, Adderall, etc. from the wholesaler. Only the DEA registrant (the pharmacist-in-charge/owner) or an authorized Power of Attorney can sign this form.
+            > The modern electronic replacement: CSOS (Controlled Substance Ordering System) — same purpose as DEA 222 but done digitally.
+            > OTHER DEA FORMS — know these:
+            > DEA Form 224: The registration form a NEW pharmacy or prescriber fills out to get a DEA number (to be allowed to handle controlled substances)
+            > DEA Form 106: Report of theft or SIGNIFICANT LOSS of controlled substances — must be filed when a pharmacy discovers drugs were stolen or a significant quantity is unaccounted for
+            > DEA Form 41: Used when DESTROYING controlled substances (expired, damaged, or no longer needed drugs)
+            > KEY: DEA 222 = ordering Schedule I/II drugs. DEA 106 = theft/loss report. DEA 41 = destruction record. DEA 224 = new DEA registration. These four forms are all tested.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -236,18 +231,16 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "DRUG RECALLS",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > FDA DRUG RECALL CLASSIFICATIONS:
-            > CLASS I:   Reasonable probability that use will cause SERIOUS adverse
-            >            health consequences or DEATH.
-            >            (Most urgent — e.g., contaminated injectable drug)
-            > CLASS II:  Use may cause TEMPORARY or MEDICALLY REVERSIBLE adverse
-            >            health consequences; or probability of serious harm is remote.
-            >            (Moderate urgency — e.g., sub-potent antibiotic)
-            > CLASS III: Use is UNLIKELY to cause any adverse health consequences.
-            >            (Least urgent — e.g., labeling error with no safety impact)
-            > MARKET WITHDRAWAL: Minor violation not subject to legal action.
-            > MEDICAL DEVICE SAFETY ALERT: Not a recall but equivalent notification.
+            > When a drug is recalled, the FDA classifies the recall into one of three classes based on how dangerous the problem is to patients. Knowing these three classes is tested directly on the PTCB.
+            > CLASS I RECALL — Most Dangerous: There is a REASONABLE PROBABILITY that using this product WILL cause SERIOUS adverse health effects or DEATH.
+            > Example: Contaminated injectable drug that could cause a life-threatening infection. Or blood pressure medication found to contain a cancer-causing impurity at dangerous levels.
+            > Immediate action required — pull all affected product from shelves immediately.
+            > CLASS II RECALL — Moderately Serious: Use of this product MAY cause TEMPORARY or MEDICALLY REVERSIBLE adverse health effects, OR the probability of serious harm is remote.
+            > Example: An antibiotic that is slightly less potent than labeled — it might not work as well, but it's unlikely to cause serious harm.
+            > CLASS III RECALL — Least Serious: Using this product is UNLIKELY to cause any adverse health effects.
+            > Example: A labeling error that doesn't affect patient safety, like a minor printing mistake on the package.
+            > Market Withdrawal: Not an official recall — the drug is removed voluntarily for a minor violation that is not subject to legal action and poses no real safety risk.
+            > KEY: Class I = will likely cause death or serious harm (most urgent). Class II = may cause temporary harm (moderate). Class III = unlikely to cause harm (least urgent). These three must be memorized in order.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -268,18 +261,14 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "OBRA '90",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > OMNIBUS BUDGET RECONCILIATION ACT OF 1990 (OBRA '90)
-            > Applies to: Medicaid patients (states expanded to all patients)
-            > PHARMACIST REQUIREMENTS:
-            >   1. PROSPECTIVE DUR: Review each Rx for drug interactions, duplications,
-            >      incorrect dosing, contraindications, and misuse.
-            >   2. OFFER TO COUNSEL: Pharmacist must offer to counsel the patient
-            >      on each new Rx. Patient may refuse — must document.
-            >   3. PATIENT MEDICATION PROFILE: Maintain current medication records.
-            > COUNSELING ELEMENTS (what to cover): drug name/description, dosage/route,
-            >   duration, what to do if dose missed, special storage, refill info,
-            >   and action for adverse effects.
+            > OBRA '90 stands for the Omnibus Budget Reconciliation Act of 1990 — a federal law that created important requirements for pharmacies serving Medicaid patients.
+            > You don't need to know the budget part — just the pharmacy practice requirements it created.
+            > OBRA '90 created THREE key pharmacy obligations:
+            > 1. PROSPECTIVE DRUG UTILIZATION REVIEW (DUR): Before handing over any new prescription, the pharmacist MUST review it for potential problems. This includes checking for: drug-drug interactions, incorrect doses, allergies, duplicate medications, and drugs that shouldn't be used with certain diseases.
+            > "Prospective" means BEFORE dispensing — reviewing ahead of time. This is different from retrospective DUR (looking back at past records to find patterns).
+            > 2. OFFER TO COUNSEL: The pharmacist (or their designee) MUST offer to counsel the patient on every NEW prescription. The patient can refuse — but the offer must be made and documented. Many states have expanded this requirement to all patients (not just Medicaid).
+            > 3. PATIENT MEDICATION RECORDS: The pharmacy must maintain up-to-date records of all medications each patient is taking. This allows the pharmacist to check for interactions every time a new medication is added.
+            > KEY: OBRA '90 = three requirements: (1) prospective DUR, (2) offer to counsel on new Rxs, (3) maintain patient medication records. Applies to Medicaid patients (many states extended to all).
             """,
             challengeType: .multipleChoice,
             options: [
@@ -300,20 +289,15 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "HIPAA PHI",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > HEALTH INSURANCE PORTABILITY AND ACCOUNTABILITY ACT (HIPAA) — 1996
-            > PROTECTED HEALTH INFORMATION (PHI): Any individually identifiable health
-            >   information transmitted or maintained in ANY medium.
-            > 18 PHI IDENTIFIERS: Name, address, DOB, SSN, phone, email, MRN,
-            >   diagnoses, prescriptions, photos, IP addresses, and more.
-            > MINIMUM NECESSARY STANDARD: Disclose only the minimum PHI needed.
-            > PERMITTED DISCLOSURES WITHOUT AUTHORIZATION: TPO
-            >   Treatment — sharing with other providers for care
-            >   Payment — billing and insurance processing
-            >   Operations — quality assurance, training, auditing
-            > PATIENT RIGHTS: Access their records, request amendments, receive
-            >   accounting of disclosures, request restrictions.
-            > VIOLATION PENALTIES: $100–$50,000 per violation; criminal penalties for willful neglect.
+            > HIPAA is the Health Insurance Portability and Accountability Act (1996) — the federal law that protects patients' private health information. As a pharmacy technician, you handle private health information every single day, so this is critical.
+            > PHI stands for Protected Health Information — any information that could identify a specific patient AND relates to their health or healthcare. This includes: their name, address, date of birth, Social Security number, phone number, diagnosis, medication list, payment records, photos — basically anything that connects a person to their health status.
+            > The "Minimum Necessary" rule: you can only access or share the minimum amount of patient information needed to do your job. You cannot look up a coworker's medications out of curiosity, even though you have access.
+            > When CAN you share PHI without asking the patient first?
+            > TPO: Treatment (sharing with other providers caring for the patient), Payment (billing insurance), Operations (running the pharmacy — training, auditing, quality improvement)
+            > Outside of TPO: You need written authorization from the patient.
+            > PENALTIES: HIPAA violations range from $100 to $50,000 per violation (depending on intent), with criminal penalties for intentional violations.
+            > Common pharmacy HIPAA scenarios: Talking about a patient's medications loudly at the counter, giving a refill to an unauthorized person, looking up someone's records without a legitimate reason.
+            > KEY: HIPAA protects PHI. You can share without consent for Treatment, Payment, and Operations (TPO). Minimum necessary standard applies. Violations carry steep fines.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -334,20 +318,18 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "PSE / CMEA",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > COMBAT METHAMPHETAMINE EPIDEMIC ACT (CMEA) — 2005
-            > Applies to: pseudoephedrine (PSE), ephedrine, phenylpropanolamine
-            > PHARMACY REQUIREMENTS:
-            >   PLACEMENT: Behind the counter or in a locked cabinet (NOT on open shelves)
-            >   ID: Government-issued photo ID required for purchase
-            >   LOGBOOK: Electronic or paper log — name, address, date/time, amount
-            >   QUANTITY LIMITS (per purchaser):
-            >     Daily limit:   3.6 grams of PSE base
-            >     30-day limit:  9.0 grams of PSE base
-            >     (Equivalent to ~120 tablets of 30 mg PSE)
-            >   SELLER: Must be retrieved and sold by pharmacy employee
-            > NOTE: National Precursor Log Exchange (NPLEx) — real-time electronic
-            >       system used in many states for instant limit verification.
+            > Pseudoephedrine (PSE) is a decongestant found in cold medicines like Sudafed. It works great for stuffy noses — but it's also the main ingredient used to illegally manufacture methamphetamine.
+            > To fight meth production, Congress passed the Combat Methamphetamine Epidemic Act (CMEA) in 2005, which placed strict limits on how much pseudoephedrine a person can buy.
+            > WHERE IT'S KEPT: Pseudoephedrine products must be stored BEHIND the pharmacy counter or in a locked cabinet — NOT on open shelves where anyone can grab them.
+            > WHO SELLS IT: Must be retrieved and sold by a pharmacy employee (not self-service).
+            > ID REQUIREMENT: Every buyer must show a valid government-issued photo ID (driver's license, passport).
+            > LOGBOOK: The pharmacy keeps an electronic or paper log with: buyer's name and address, date and time of purchase, and amount purchased.
+            > PURCHASE LIMITS (memorize these):
+            > Daily limit: 3.6 grams of PSE base
+            > 30-day limit: 9.0 grams of PSE base
+            > (For reference: a 30mg Sudafed tablet contains 30mg PSE, so 3.6g = 120 tablets per day — practically that's a lot, but the limit exists for bulk purchases)
+            > Many states use NPLEx — a real-time electronic database that tracks purchases across all pharmacies to prevent buying up the limit at multiple stores.
+            > KEY: PSE = behind the counter, ID required, logbook required. Daily limit = 3.6 g. Monthly limit = 9.0 g. These exact numbers are tested.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -368,19 +350,15 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "DRUG DISPOSAL",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > DEA-APPROVED DRUG DISPOSAL METHODS:
-            > 1. TAKE-BACK PROGRAMS: DEA-authorized collection sites
-            >    (pharmacies, hospitals, clinics); "National Prescription Drug Take Back Day"
-            > 2. AUTHORIZED MAIL-BACK ENVELOPES: DEA-approved prepaid mailers
-            > 3. DRUG DEACTIVATION POUCHES: Rendered non-retrievable at home
-            > 4. HOUSEHOLD TRASH (modified): Mix with undesirable substance (coffee grounds,
-            >    dirt), place in sealed container, remove personal info from label.
-            > 5. FDA FLUSH LIST: Certain high-risk drugs (fentanyl patches, oxycodone, APAP
-            >    with codeine) MAY be flushed if no take-back available.
-            >    (Flushing is preferred over leaving available for misuse — environmental
-            >     risk is low per FDA analysis)
-            > CONTROLLED SUBSTANCE DESTRUCTION IN PHARMACY: DEA Form 41.
+            > Properly disposing of medications is important for two reasons: preventing drug misuse (especially for opioids and controlled substances) and protecting the environment.
+            > The BEST method for controlled substances: DRUG TAKE-BACK PROGRAMS at DEA-authorized collection sites. Many pharmacies, hospitals, and police departments have permanent drug drop boxes. The DEA also organizes a "National Prescription Drug Take Back Day" twice a year.
+            > OTHER APPROVED METHODS — from best to last resort:
+            > Authorized mail-back envelopes: DEA-approved prepaid mailers — drop your medications in and mail to a destruction facility.
+            > Drug deactivation pouches: Special pouches that use activated charcoal to destroy the medication at home — then goes in regular trash.
+            > Household trash (modified): ONLY if no take-back option exists. Mix medications with something unpleasant like coffee grounds or kitty litter, seal in a container, scratch out personal info from label, then throw away. This discourages people from retrieving it from trash.
+            > FDA FLUSH LIST: A short list of specific high-risk medications (like fentanyl patches, oxycodone) that CAN be flushed down the toilet if NO take-back is available. FDA determined the environmental risk of flushing is less dangerous than leaving opioids accessible.
+            > PHARMACY DESTRUCTION: When a pharmacy destroys controlled substances, they must use DEA Form 41 and have DEA authorization.
+            > KEY: Best disposal = DEA take-back programs. Can flush FDA Flush List drugs if no take-back available. Pharmacy destruction requires DEA Form 41.
             """,
             challengeType: .multipleChoice,
             options: [

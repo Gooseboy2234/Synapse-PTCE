@@ -3,9 +3,7 @@
 //  Synapse PTCE
 //
 //  Phase 6 — Domain 2 Expansion: Federal Requirements (18.75% of 2026 PTCB Exam)
-//  8 additional nodes covering the federal law gaps most likely to appear on the PTCE:
-//  valid Rx elements, DEA number validation, refill rules by schedule, CII partial fills,
-//  Orange Book / generic substitution, MedGuides, biennial inventory, and prior authorization.
+//  8 nodes — plain-English loreText rewrite for maximum readability.
 //
 
 import Foundation
@@ -22,41 +20,18 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "VALID RX ELEMENTS",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > AUTHORITY: 21 CFR § 1306 (controlled substances); state pharmacy practice acts
-            >
-            > REQUIRED ELEMENTS ON A VALID PRESCRIPTION:
-            >
-            >   [1] PATIENT information:
-            >       Full name, address (required for controlled substances)
-            >
-            >   [2] DATE written (not the fill date — the date the Rx was issued)
-            >
-            >   [3] DRUG information:
-            >       Drug name (generic or brand), strength, dosage form
-            >
-            >   [4] QUANTITY to dispense (#, mL, units)
-            >       CII: quantity written out in BOTH numbers AND words recommended
-            >       e.g., "30 (thirty)" — to prevent alterations
-            >
-            >   [5] DIRECTIONS (SIG): Complete instructions for the patient
-            >
-            >   [6] REFILLS:
-            >       Must be stated (CII = 0 refills; if blank on non-controlled = 0)
-            >
-            >   [7] PRESCRIBER information:
-            >       Full name, address, phone number, DEA number (for CS),
-            >       NPI number (for billing)
-            >
-            >   [8] PRESCRIBER SIGNATURE:
-            >       Manual signature (CII); electronic signature (EPCS compliant)
-            >
-            > CONTROLLED SUBSTANCE REQUIREMENT:
-            >   Prescriber's DEA registration number is MANDATORY on all C-II through C-V Rx.
-            >   DEA # is NOT required on non-controlled prescriptions.
-            >
-            > PHARMACIST DUTY: Verify prescription legitimacy before dispensing.
-            >   A pharmacist may REFUSE to fill a suspicious or altered prescription.
+            > A prescription is a legal document — and for it to be valid, it must contain specific required elements. As a pharmacy technician, you are the first line of defense: if a prescription is missing key information, you must flag it before it's filled.
+            > REQUIRED ELEMENTS ON A VALID PRESCRIPTION — think of it as 8 essential pieces:
+            > 1. Patient name and address (address required for controlled substances)
+            > 2. Date the prescription was written (not the fill date — the date issued by the doctor)
+            > 3. Drug name (generic or brand), strength, and dosage form (e.g., "metformin 500 mg tablets")
+            > 4. Quantity to dispense (how many tablets, mL, etc.). For Schedule II, quantity is written in BOTH numbers AND words — e.g., "30 (thirty) tablets" — to prevent alterations.
+            > 5. Directions (SIG): how the patient takes it — "1 tablet by mouth twice daily with meals"
+            > 6. Number of refills: must be written out. If left blank on a non-controlled drug = 0 refills. Schedule II always = 0.
+            > 7. Prescriber name, address, phone number, and DEA number (DEA number ONLY required for controlled substances — NOT required on non-controlled prescriptions)
+            > 8. Prescriber's signature (manual for CII; electronic for EPCS)
+            > KEY DISTINCTION: The prescriber's DEA number is ONLY required for controlled substance prescriptions (Schedule II–V). It is not needed for regular prescriptions like blood pressure medications or antibiotics.
+            > KEY: DEA number required only for controlled substance Rxs (not regular non-controlled prescriptions). If refills are blank = 0 refills.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -78,36 +53,19 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "DEA # VALIDATION",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > TOPIC: DEA Registration Number — Validation Formula
-            >
-            > FORMAT: Two letters + Seven digits  (e.g., AB1234563)
-            >
-            > FIRST LETTER (registrant type):
-            >   A or B = older practitioner registration
-            >   C = practitioner (most common for physicians)
-            >   D = teaching institution
-            >   E = manufacturer
-            >   F = distributor
-            >   G = researcher
-            >   M = mid-level practitioner (NP, PA, CRNA)
-            >
-            > SECOND LETTER: First letter of prescriber's LAST NAME
-            >   e.g., Dr. Smith → second letter = S
-            >
-            > *** VALIDATION FORMULA (7-digit portion) ***
-            >   Example DEA number: AB1234563  → digits: 1 2 3 4 5 6 3
-            >
-            >   STEP 1: ADD the 1st + 3rd + 5th digits:   1 + 3 + 5 = 9
-            >   STEP 2: ADD the 2nd + 4th + 6th digits:   2 + 4 + 6 = 12
-            >   STEP 3: MULTIPLY Step 2 result by 2:       12 × 2 = 24
-            >   STEP 4: ADD Steps 1 and 3:                 9 + 24 = 33
-            >   STEP 5: The LAST DIGIT of Step 4 = the 7th digit of the DEA number.
-            >           Last digit of 33 = 3 ✓ (matches the 7th digit above)
-            >
-            > USE: Pharmacists use this to verify a DEA number is mathematically valid
-            >   before dispensing a controlled substance prescription.
-            >   A failed check is grounds to question legitimacy.
+            > Every prescriber who can write controlled substance prescriptions has a DEA registration number. This number has a specific format AND a built-in mathematical check — meaning you can verify if a DEA number is mathematically valid.
+            > FORMAT: Two letters followed by 7 digits. Example: AB1234563
+            > FIRST LETTER = registrant type: A or B = older practitioners, C = current physician/prescriber, M = mid-level (nurse practitioner, physician assistant), F = distributor, etc.
+            > SECOND LETTER = first letter of the prescriber's LAST NAME. So "Dr. Smith" should have DEA starting with "CS" if they're a physician.
+            > VALIDATION FORMULA — memorize these 5 steps:
+            > Using the 7-digit portion (1234563):
+            > Step 1: Add the 1st + 3rd + 5th digits: 1 + 3 + 5 = 9
+            > Step 2: Add the 2nd + 4th + 6th digits: 2 + 4 + 6 = 12
+            > Step 3: Multiply Step 2 by 2: 12 × 2 = 24
+            > Step 4: Add Steps 1 and 3: 9 + 24 = 33
+            > Step 5: The LAST DIGIT of Step 4 should equal the 7th digit of the DEA number. Last digit of 33 = 3 ✓ (matches the "3" at the end of AB1234563)
+            > If the check fails — the DEA number is INVALID. This is grounds to question whether the prescription is legitimate and to contact the prescriber before dispensing.
+            > KEY: DEA validation formula — add odd positions (1+3+5), then double the sum of even positions (2+4+6), add them together. Last digit must equal 7th digit of DEA number.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -129,38 +87,23 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "REFILL RULES",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > AUTHORITY: 21 CFR § 1306 (federal minimum; states may be MORE restrictive)
-            >
-            > REFILLS BY DEA SCHEDULE:
-            >
-            >   SCHEDULE II (CII):
-            >     — ZERO refills permitted (federal law, no exceptions).
-            >     — A new written Rx required for each fill.
-            >     — Prescriber may issue multiple post-dated CII Rxs for legitimate
-            >       medical purpose (allowed federally; some states restrict).
-            >
-            >   SCHEDULE III & IV (CIII / CIV):
-            >     — Up to 5 refills allowed.
-            >     — Prescription expires 6 months from DATE WRITTEN.
-            >     — No refills may be dispensed after 6 months; new Rx required.
-            >
-            >   SCHEDULE V (CV):
-            >     — No federal refill restriction (follow state law).
-            >     — Some CVs (e.g., cough preparations) may be OTC in some states.
-            >
-            >   NON-CONTROLLED prescriptions:
-            >     — Valid for up to 1 YEAR from date written (state law may vary).
-            >     — Refills as written by prescriber; if none stated = 0 refills.
-            >
-            > VALIDITY (when Rx must be filled):
-            >   CII: No federal time limit on filling (some states: 6 months).
-            >   CIII–CV: Must be filled within 6 months of issue date.
-            >
-            > PARTIAL FILLS (CIII–CV): Allowed; remainder filled within 6 months / 5-refill limit.
-            >
-            > EARLY REFILLS: No federal rule defining "too early" for non-CS.
-            >   However, third-party payers (insurance) typically enforce fill intervals.
+            > Refill rules for controlled substances depend entirely on which DEA schedule the drug belongs to. This comparison is directly tested on the PTCB — you need the exact numbers.
+            > SCHEDULE II (CII) — strictest:
+            > ZERO refills — ever. Every single fill requires a brand-new prescription from the prescriber.
+            > Examples: oxycodone, morphine, Adderall, Ritalin, fentanyl.
+            > A prescriber CAN write multiple CII prescriptions on the same day for future use — but each one is still a "new" prescription, not a refill.
+            > SCHEDULE III and IV (CIII / CIV):
+            > Up to 5 refills allowed (plus the original = 6 total fills possible)
+            > Must be used within 6 months of the DATE THE RX WAS WRITTEN
+            > After 6 months or 5 refills (whichever comes first) — expired. Need a new prescription.
+            > Examples: Tylenol with codeine (CIII), Xanax/Valium/Ambien/tramadol (CIV)
+            > SCHEDULE V (CV):
+            > Federal law doesn't set a specific refill limit — follow state law
+            > Some CV cough preparations may be purchased OTC in certain states
+            > NON-CONTROLLED PRESCRIPTIONS:
+            > Valid for 1 YEAR from the date written (in most states)
+            > Number of refills = whatever the prescriber writes. If blank = 0 refills.
+            > KEY: CII = 0 refills. CIII/CIV = 5 refills in 6 months. These are the two numbers tested most often — memorize them cold.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -182,37 +125,17 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "CII PARTIAL FILLS",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > AUTHORITY: 21 CFR § 1306.13 — Partial filling of prescriptions
-            >
-            > CII PARTIAL DISPENSING — WHEN ALLOWED:
-            >
-            >   STANDARD RULE: Pharmacist may partially fill a CII if unable to supply
-            >     full quantity. Remainder must be dispensed within 72 HOURS.
-            >     If unavailable after 72h, pharmacist notifies prescriber; new Rx required.
-            >
-            >   LONG-TERM CARE FACILITY (LTCF) PATIENTS:
-            >     CII prescriptions may be filled in partial quantities.
-            >     Total quantity dispensed may not exceed the quantity prescribed.
-            >     All partial fills must be dispensed within 60 DAYS of the issue date.
-            >
-            >   TERMINALLY ILL PATIENTS:
-            >     Same 60-day rule as LTCF.
-            >     Prescriber must note "terminally ill" on the prescription.
-            >
-            > EMERGENCY ORAL CII AUTHORIZATION (21 CFR § 1306.11(d)):
-            >   In a bona fide emergency, a prescriber may ORALLY authorize a CII.
-            >   Pharmacist may dispense a LIMITED quantity (sufficient for emergency period).
-            >   Prescriber must provide a WRITTEN Rx (with "Authorization for Emergency
-            >   Dispensing" notation) within 7 DAYS of the oral authorization.
-            >   If Rx not received within 7 days, pharmacist must notify the DEA.
-            >
-            > FACSIMILE (FAX) CII:
-            >   Fax serves as the original written Rx ONLY for:
-            >   — LTCF patients
-            >   — Hospice / terminally ill patients
-            >   — Compounded parenteral CS
-            >   Otherwise, original Rx required at time of dispensing.
+            > There are special situations where a Schedule II prescription can be filled in pieces or in an emergency without the usual written prescription rules.
+            > PARTIAL FILLS — when the pharmacy can't fill the full quantity:
+            > Normal rule: If the pharmacy has 60 tablets but the prescription is for 90, they can give 60 now. The remaining 30 must be picked up within 72 HOURS. If the pharmacy still can't supply the rest after 72 hours, they must contact the prescriber — a new prescription is required for the remainder.
+            > For NURSING HOME (Long-Term Care Facility) patients: Partial fills can be done over a longer period — up to 60 DAYS from when the prescription was written. Total amount dispensed can never exceed what was originally prescribed.
+            > For TERMINALLY ILL patients: Same 60-day rule. The prescriber must write "terminally ill" on the prescription.
+            > EMERGENCY ORAL AUTHORIZATION (phone-in):
+            > In a genuine emergency (patient will suffer if they don't get the medication right now and there's no time for a written Rx), a prescriber CAN call in a CII prescription verbally.
+            > The pharmacist dispenses ONLY enough for the emergency period.
+            > The prescriber MUST send a written prescription (or EPCS) within 7 DAYS with "Authorization for Emergency Dispensing" written on it.
+            > If the written Rx doesn't arrive within 7 days, the pharmacist must notify the DEA.
+            > KEY: Normal partial fill = rest must be dispensed within 72 hours. LTCF/terminally ill partial fill = 60 days. Emergency phone-in CII = written Rx must follow within 7 days.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -234,39 +157,20 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "ORANGE BOOK",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > AUTHORITY: FDA — Approved Drug Products with Therapeutic Equivalence Evaluations
-            >
-            > THE ORANGE BOOK:
-            >   Published by the FDA; lists all approved drug products and their
-            >   THERAPEUTIC EQUIVALENCE (TE) ratings relative to reference-listed drugs (RLDs).
-            >   Available online at accessdata.fda.gov/scripts/cder/ob
-            >
-            > THERAPEUTIC EQUIVALENCE CODES:
-            >
-            >   "A" CODES = Therapeutically equivalent (can be substituted):
-            >     AB — Most common; bioequivalent in vivo (actual bioequivalence study).
-            >     AA — Conventional dosage forms with no known bioequivalence concerns.
-            >     AN — Solutions, powders for reconstitution.
-            >     AO — Injectable oil solutions.
-            >     AP — Injectable aqueous solutions.
-            >     AT — Topical products meeting standards.
-            >
-            >   "B" CODES = NOT therapeutically equivalent (do NOT substitute):
-            >     Bioequivalence data insufficient or not established.
-            >
-            > DAW (Dispense As Written) CODES — used in pharmacy billing:
-            >   DAW 0 = No product selection indicated (generic substitution OK)
-            >   DAW 1 = Substitution not allowed by PRESCRIBER (brand necessary)
-            >   DAW 2 = Substitution allowed, but PATIENT requests brand
-            >   DAW 3 = Substitution allowed, but pharmacist selects brand
-            >   DAW 4–9 = Less common (plan-mandated, generic unavailable, etc.)
-            >
-            > GENERIC SUBSTITUTION LAWS:
-            >   States may require OR permit substitution with AB-rated generics.
-            >   Pharmacist must substitute unless DAW 1 or state law prohibits.
-            >   Narrow Therapeutic Index (NTI) drugs: some states RESTRICT substitution
-            >   (e.g., levothyroxine, warfarin, digoxin, phenytoin, cyclosporine).
+            > The Orange Book is an FDA publication — its official name is "Approved Drug Products with Therapeutic Equivalence Evaluations." Pharmacists use it to determine whether a generic drug can safely replace a brand-name drug for a patient.
+            > A generic drug is approved as "therapeutically equivalent" when it's proven to deliver the same amount of drug into the bloodstream at the same rate as the brand (called "bioequivalence").
+            > THERAPEUTIC EQUIVALENCE CODES — the letters on the Orange Book rating:
+            > "A" codes = therapeutically equivalent — it's SAFE TO SUBSTITUTE with the generic:
+            > AB = most common rating; proven equivalent through bioequivalence studies
+            > AA, AN, AO, AP, AT = equivalent for specific dosage forms (solutions, topicals, etc.)
+            > "B" codes = NOT therapeutically equivalent — do NOT substitute without extra care
+            > DAW CODES (Dispense As Written) — printed on the pharmacy claim for every fill:
+            > DAW 0: No instructions from prescriber — generic substitution is OK (most common)
+            > DAW 1: Prescriber writes "brand medically necessary" — NO substitution allowed
+            > DAW 2: Prescriber allows substitution, but the PATIENT requests the brand
+            > DAW 3: Pharmacist selects brand (patient is neutral)
+            > NARROW THERAPEUTIC INDEX (NTI) drugs: Some states restrict generic substitution for NTI drugs (warfarin, levothyroxine, digoxin, phenytoin) — changing brands can cause dangerous level swings.
+            > KEY: "AB" rated generic = therapeutically equivalent = can substitute. DAW 1 = prescriber says brand only. DAW 2 = patient wants brand.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -288,38 +192,21 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "MEDGUIDES",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > AUTHORITY: 21 CFR § 208 — FDA Medication Guide regulations
-            >
-            > MEDICATION GUIDE (MedGuide):
-            >   FDA-required written patient information for certain drugs.
-            >   Must be DISTRIBUTED to patient with EVERY dispensing of the medication.
-            >   If patient declines, pharmacist may dispense — document the refusal.
-            >
-            > WHEN IS A MEDGUIDE REQUIRED?
-            >   The FDA mandates a MedGuide when:
-            >   1. The drug has SERIOUS risks that could affect patient compliance or safety.
-            >   2. Patient labeling could PREVENT serious adverse effects.
-            >   3. The product has known SERIOUS RISKS that the FDA determines require
-            >      a specific written communication.
-            >
-            > EXAMPLES of drugs requiring MedGuides:
-            >   All antidepressants (SSRIs, SNRIs) — suicidality black box warning
-            >   All NSAIDs — cardiovascular and GI bleeding risk
-            >   Isotretinoin (Accutane) — via iPLED+ REMS program
-            >   Fluoroquinolone antibiotics — tendon rupture, peripheral neuropathy
-            >   Antipsychotics — increased mortality in elderly dementia patients
-            >   Warfarin (Coumadin) — bleeding risk
-            >   Blood thinners (DOACs) — bleeding risk
-            >
-            > PATIENT PACKAGE INSERT (PPI) vs. MEDGUIDE:
-            >   PPI = older format; required for estrogen-containing products and
-            >         oral contraceptives; content is less specific.
-            >   MedGuide = FDA-mandated; contains standardized risk information.
-            >
-            > REMS vs. MEDGUIDE:
-            >   A MedGuide may be part of a REMS program, but REMS is broader (may include
-            >   prescriber enrollment, patient enrollment, controlled distribution, etc.).
+            > A Medication Guide (MedGuide) is an FDA-required written information sheet that pharmacies must give to patients for certain medications. These are drugs where the FDA determined that written patient information is critical for safe use.
+            > Unlike regular patient package inserts that come in the drug packaging, MedGuides are specifically required by the FDA and must be dispensed BY THE PHARMACY with every fill.
+            > WHEN IS A MEDGUIDE REQUIRED? The FDA requires one when:
+            > The drug has serious risks that patients need to know about to use it safely
+            > Patient knowledge of the risk could prevent or reduce a serious adverse event
+            > EXAMPLES of drugs that require MedGuides — these come up on the PTCB:
+            > All antidepressants (SSRIs, SNRIs): Suicidality warning in young adults and teenagers
+            > All NSAIDs (ibuprofen, naproxen): Heart attack, stroke, and GI bleeding risk
+            > Isotretinoin (Accutane): Birth defect risk via iPLED+ REMS
+            > Fluoroquinolone antibiotics (ciprofloxacin, levofloxacin): Tendon rupture, nerve damage
+            > Antipsychotics: Increased mortality in elderly patients with dementia
+            > Warfarin: Serious bleeding risk
+            > HOW OFTEN: The MedGuide must be given EVERY time the medication is dispensed — including every refill, not just the first fill.
+            > If the patient declines — you can still dispense, but document that the patient refused.
+            > KEY: MedGuides are required by FDA for high-risk medications. Must be given at EVERY dispensing (including refills). Antidepressants, NSAIDs, warfarin, fluoroquinolones are classic examples.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -341,35 +228,19 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "BIENNIAL INVENTORY",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > AUTHORITY: 21 CFR § 1304.11 — Inventories of registrants
-            >
-            > BIENNIAL INVENTORY REQUIREMENT:
-            >   Every DEA registrant (pharmacy, prescriber, etc.) must take a COMPLETE
-            >   physical inventory of ALL controlled substances every 2 YEARS (biennially).
-            >   — Must be taken within 2 years of the previous inventory date.
-            >   — May be taken on ANY date (not necessarily exact 2-year anniversary).
-            >   — Must be performed at the OPENING or CLOSING of business on inventory day.
-            >
-            > INITIAL INVENTORY: Required upon first day of business (new DEA registration).
-            >
-            > COUNTING REQUIREMENTS BY SCHEDULE:
-            >   CII: EXACT COUNT required (count every tablet, capsule, mL).
-            >   CIII–CV: ESTIMATED count acceptable if container holds ≤ 1,000 units.
-            >           Exact count required if container holds > 1,000 units.
-            >
-            > RECORD RETENTION:
-            >   CII records: Must be maintained SEPARATELY from CIII–CV records.
-            >   All controlled substance records: Kept for MINIMUM 2 YEARS.
-            >   (Some states require longer — follow the stricter standard.)
-            >   Records must be readily retrievable for DEA inspection within 2 business days.
-            >
-            > WHAT RECORDS MUST BE KEPT:
-            >   — Biennial inventory records
-            >   — CII order forms (DEA Form 222 or CSOS electronic)
-            >   — Dispensing records (CII separate)
-            >   — DEA 106 (theft/significant loss report) — within 1 business day
-            >   — DEA 41 (destruction record)
+            > Every pharmacy that has a DEA registration (which is any pharmacy that dispenses controlled substances) is required by federal law to physically COUNT all of its controlled substances every 2 YEARS. This is called the biennial inventory.
+            > "Biennial" = every two years (bi = two, ennial = years).
+            > The count must be taken at either the OPENING or CLOSING of business on the chosen inventory day.
+            > An INITIAL inventory must be taken on the first day a new pharmacy opens or first starts handling controlled substances.
+            > HOW EXACT DOES THE COUNT NEED TO BE?
+            > Schedule II: EXACT count required — count every single tablet, capsule, or mL.
+            > Schedule III-V: An estimated count is acceptable IF the container holds 1,000 units or fewer. If a container holds MORE than 1,000 units → you must do an exact count too.
+            > RECORD RETENTION RULES:
+            > All controlled substance records must be kept for a MINIMUM of 2 YEARS.
+            > Schedule II records must be stored SEPARATELY from Schedule III-V records.
+            > Records must be available for DEA inspection within 2 BUSINESS DAYS if requested.
+            > Note: Some states require longer retention (5-7 years) → always follow the MORE restrictive standard.
+            > KEY: Biennial inventory = every 2 years. CII requires exact count. CIII-CV allows estimated count for containers ≤1,000 units. Records kept minimum 2 years.
             """,
             challengeType: .multipleChoice,
             options: [
@@ -391,40 +262,22 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "PRIOR AUTH",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > TOPIC: Prior Authorization (PA) — Insurance/Formulary Process
-            >
-            > PRIOR AUTHORIZATION (PA):
-            >   A requirement by an insurance plan that the prescriber obtain APPROVAL
-            >   BEFORE a specific medication will be covered (reimbursed) by the plan.
-            >
-            > WHEN IS PA REQUIRED?
-            >   — Non-formulary (Tier 3–4) or specialty drugs
-            >   — Brand drugs when a generic is available (unless DAW 1)
-            >   — High-cost or high-risk medications (biologics, antipsychotics, stimulants)
-            >   — After step therapy requirements are not met
-            >
-            > STEP THERAPY ("Fail First"):
-            >   Insurance requires patient to TRY (and fail) lower-cost alternatives
-            >   BEFORE approving the preferred drug.
-            >   Example: Must try generic SSRI before authorizing brand-name SNRI.
-            >
-            > THE PA PROCESS (pharmacy technician's role):
-            >   1. Rx submitted → REJECTED by insurance (e.g., PA required reject code 75).
-            >   2. Tech notifies pharmacist and/or prescriber's office.
-            >   3. Prescriber's office submits PA request to insurance with clinical data.
-            >   4. Insurance reviews → APPROVES or DENIES.
-            >   5. If approved: PA authorization number entered; claim reprocessed.
-            >   6. If denied: Prescriber may appeal or change drug to covered alternative.
-            >
-            > FORMULARY TIERS (typical):
-            >   Tier 1 = Generic (lowest copay)
-            >   Tier 2 = Preferred brand
-            >   Tier 3 = Non-preferred brand (higher copay)
-            >   Tier 4/Specialty = Specialty/biologic (highest copay; may require PA)
-            >
-            > NOTE: PA is primarily a pharmacy billing/workflow issue — not DEA/federal law.
-            >   However, it appears frequently on the PTCE in Domain 2 (regulatory/workflow).
+            > Prior Authorization (PA) is when an insurance company requires ADVANCE APPROVAL before it will pay for a specific medication. Without this approval, the claim gets rejected and the patient either pays full price or goes without the medication.
+            > Why does insurance require PA? To control costs by making sure expensive or high-risk medications are truly necessary before they pay for them.
+            > WHEN IS PA TYPICALLY REQUIRED?
+            > Brand-name drugs when a generic exists (unless the prescriber writes "DAW 1")
+            > Expensive specialty medications (biologics, brand-name ADHD drugs)
+            > Drugs on higher formulary tiers (Tier 3 or higher)
+            > Medications that require step therapy — see below
+            > STEP THERAPY (also called "fail first"): Insurance requires the patient to TRY a cheaper drug first, and prove it didn't work, before they'll pay for the more expensive drug.
+            > Example: Insurance says try a generic SSRI for depression first. If it fails → then they'll approve the brand-name SNRI.
+            > WHAT HAPPENS AT THE PHARMACY WHEN A PA IS NEEDED:
+            > 1. The prescription is submitted to insurance → claim is REJECTED (reject code 75 = "Prior Authorization Required")
+            > 2. The pharmacy tech notifies the pharmacist and the prescriber's office
+            > 3. The prescriber's office submits clinical documentation to the insurance company
+            > 4. Insurance approves or denies → if approved, the pharmacy gets an authorization number and reprocesses the claim
+            > IMPORTANT: It is NOT the tech's or pharmacist's job to approve a PA — that's between the prescriber and insurance. The pharmacy's role is to notify and facilitate.
+            > KEY: PA required = insurance rejects claim with code 75. Tech notifies pharmacist and prescriber's office. Prescriber submits PA request. Tech cannot approve PA.
             """,
             challengeType: .multipleChoice,
             options: [

@@ -3,8 +3,7 @@
 //  Synapse PTCE
 //
 //  Phase 7a — Domain 2 Gap Fill: Federal Requirements (18.75% of 2026 PTCB Exam)
-//  1 node covering the foundational principle that the PTCB tests on nearly every exam:
-//  the relationship between state and federal pharmacy law (stricter law applies).
+//  1 node — plain-English loreText rewrite for maximum readability.
 //
 
 import Foundation
@@ -21,46 +20,17 @@ extension DataNode {
             domain: .federalRequirements,
             nodeTitle: "STATE vs FEDERAL LAW",
             loreText: """
-            > SECTOR-02 // FEDERAL_LAW
-            > TOPIC: Relationship Between State and Federal Pharmacy Law
-            >
-            > THE FOUNDATIONAL PRINCIPLE:
-            >   Federal law establishes the MINIMUM national standard.
-            >   States may enact MORE RESTRICTIVE laws — and when they do,
-            >   the STRICTER (more restrictive) law ALWAYS applies.
-            >
-            >   Federal law = the floor (minimum requirement)
-            >   State law = may build higher than the floor, but not lower
-            >
-            > EXAMPLES WHERE STATE IS STRICTER (follow state law):
-            >   Record Retention:
-            >     Federal minimum: 2 years for CS records
-            >     Some states: 5–7 years → follow state's longer requirement
-            >
-            >   Refill Limitations:
-            >     Federal: CIII/CIV up to 5 refills within 6 months
-            >     Some states: limit CIV to 4 refills → follow state
-            >
-            >   Schedule V OTC Sales:
-            >     Federal: certain CV cough preparations may be sold OTC
-            >     Some states: require Rx for ALL controlled substances → follow state
-            >
-            >   Pharmacist-to-Technician Ratios:
-            >     Federal: no specific ratio mandated
-            >     States specify ratios (e.g., 1:2 or 1:3) → follow state
-            >
-            >   Marijuana (Cannabis):
-            >     Federal: Schedule I — no accepted medical use (federal law)
-            >     Many states: legal medically and/or recreationally
-            >     Pharmacists in federally regulated settings (VA, federal hospitals)
-            >     MUST follow federal law regardless of state legalization.
-            >
-            > KEY EXAM RULE:
-            >   When a question presents a conflict between state and federal law,
-            >   the answer is ALWAYS: follow the MORE RESTRICTIVE (stricter) standard.
-            >
-            > EXCEPTION CONCEPT: A state CANNOT have a law LESS restrictive than federal
-            >   law in controlled substance regulation. (Supremacy Clause limits this.)
+            > Federal pharmacy law sets the MINIMUM national standard — the rules every state must follow at a bare minimum. But states can go further and be MORE restrictive than federal law. When they do, the stricter rule wins.
+            > Think of it like a building code: the federal code sets the minimum safety standards. A state can say "we require even stronger standards here." But a state CANNOT lower the bar below the federal minimum.
+            > THE KEY EXAM RULE: When state law is MORE restrictive than federal law → FOLLOW THE STATE LAW.
+            > REAL EXAMPLES where state law is stricter:
+            > Record Retention: Federal minimum = 2 years for controlled substance records. Some states require 5–7 years → follow state's longer requirement.
+            > Refill Limits: Federal: CIII/CIV up to 5 refills within 6 months. Some states allow only 4 refills for CIV medications → follow state's lower limit.
+            > Schedule V OTC: Federal law allows some CV cough preparations without a prescription. Some states require a Rx for ALL controlled substances → follow state.
+            > Pharmacist-to-Tech Ratios: Federal law sets no specific ratio. States set their own (e.g., 1 pharmacist per 2 technicians) → follow state.
+            > MARIJUANA: Federal = Schedule I. Many states have legalized it. But pharmacies operating in federally regulated settings (VA hospitals, military facilities, federal prisons) MUST follow federal law — marijuana is still Schedule I there.
+            > WHAT IF STATE IS LESS RESTRICTIVE THAN FEDERAL? Federal law wins. A state cannot legalize something that federal law prohibits at the federal level of enforcement.
+            > KEY: Stricter law always applies. State can be MORE restrictive than federal, never less. On any PTCB question presenting a conflict → choose the more restrictive standard.
             """,
             challengeType: .multipleChoice,
             options: [

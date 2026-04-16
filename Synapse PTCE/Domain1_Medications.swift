@@ -22,14 +22,12 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "METFORMIN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Biguanide — First-line antidiabetic (Type 2 DM)
-            > BRAND: Glucophage, Glucophage XR
-            > MECHANISM: Decreases hepatic glucose output; improves peripheral insulin sensitivity.
-            > WARNINGS: Hold if eGFR < 30 mL/min (lactic acidosis risk).
-            >           Hold 48h before iodinated contrast procedures.
-            > CLINICAL: Does NOT cause hypoglycemia as monotherapy.
-            >           GI side effects (nausea, diarrhea) — take with food.
+            > A pill used to treat Type 2 diabetes — usually the first medication a doctor prescribes
+            > Brand names: Glucophage, Glucophage XR — Drug class: Biguanide
+            > How it works: tells your liver to release less sugar into your blood, and helps your body use insulin more effectively
+            > KEY FACT: Used by itself, it will NOT cause low blood sugar — this is a major exam point
+            > Common side effects: nausea, diarrhea, upset stomach — always take WITH food to reduce these
+            > CAUTION: Must be stopped before X-ray tests that use contrast dye, and if kidneys are severely damaged (measured by a lab value called eGFR < 30)
             """,
             challengeType: .multipleChoice,
             options: [
@@ -50,14 +48,12 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "GLIPIZIDE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Sulfonylurea (2nd generation) — Antidiabetic
-            > BRAND: Glucotrol, Glucotrol XL
-            > MECHANISM: Stimulates pancreatic beta cells to secrete insulin.
-            > WARNINGS: HYPOGLYCEMIA is the primary risk — especially in elderly,
-            >           renal/hepatic impairment, or missed meals.
-            > CLINICAL: Take 30 min before meals. Monitor blood glucose closely.
-            >           Sulfa allergy cross-sensitivity is controversial but noted.
+            > A diabetes pill that makes your pancreas release more insulin into your blood
+            > Brand names: Glucotrol, Glucotrol XL — Drug class: Sulfonylurea (2nd generation)
+            > Take it 30 minutes BEFORE a meal so the insulin surge matches when food is digested
+            > BIG RISK: Low blood sugar (hypoglycemia) — this is the #1 danger of the entire sulfonylurea class
+            > Low blood sugar risk is highest in elderly patients, those who skip meals, and those with kidney or liver problems
+            > KEY: Sulfonylurea = makes more insulin = the drug class most likely to cause low blood sugar
             """,
             challengeType: .multipleChoice,
             options: [
@@ -78,15 +74,14 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "LISINOPRIL",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: ACE Inhibitor (ACEI) — Antihypertensive
-            > BRAND: Zestril, Prinivil
-            > MECHANISM: Inhibits angiotensin-converting enzyme (ACE)
-            >            → prevents conversion of Ang I → Ang II → vasodilation.
-            > WARNINGS: CONTRAINDICATED in pregnancy (teratogen — fetal renal toxicity).
-            >           Monitor potassium (hyperkalemia risk).
-            >           Angioedema — life-threatening swelling of face/airway.
-            > CLINICAL: First-line for hypertension + diabetes (renoprotective).
+            > A blood pressure pill from the ACE inhibitor family — one of the most prescribed drugs in the US
+            > Brand names: Zestril, Prinivil — Drug class: ACE Inhibitor (ACEI)
+            > How it works: blocks a chain of reactions in the body that cause blood vessels to tighten, so they relax and blood pressure drops
+            > Most famous side effect: a dry, nagging cough that won't go away — affects about 1 in 10 patients
+            > NEVER give to a pregnant patient — it causes serious kidney damage to the developing baby
+            > Also watch for: potassium levels rising too high, and swelling of the face or throat (called angioedema — a medical emergency requiring immediate care)
+            > Best use: high blood pressure in patients who also have diabetes — it protects their kidneys
+            > KEY: ACE inhibitor = dry cough is the #1 side effect, NEVER use in pregnancy
             """,
             challengeType: .multipleChoice,
             options: [
@@ -107,15 +102,13 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "LOSARTAN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Angiotensin Receptor Blocker (ARB) — Antihypertensive
-            > BRAND: Cozaar
-            > MECHANISM: Directly blocks AT1 angiotensin II receptors.
-            > KEY DIFFERENCE vs ACE Inhibitors:
-            >   ARBs do NOT inhibit bradykinin breakdown → NO dry cough.
-            >   Both classes are CONTRAINDICATED in pregnancy.
-            > USES: Hypertension, diabetic nephropathy, heart failure.
-            > MONITORING: Serum potassium (hyperkalemia), renal function.
+            > A blood pressure pill similar to ACE inhibitors — but without the cough
+            > Brand name: Cozaar — Drug class: ARB (Angiotensin Receptor Blocker)
+            > How it works: blocks the same tightening reaction as ACE inhibitors, but one step later — so no cough side effect
+            > Key difference from ACE inhibitors: ARBs do NOT cause the dry cough
+            > But just like ACE inhibitors: NEVER use during pregnancy (same risk of fetal harm), and potassium can rise too high
+            > Used for: high blood pressure, protecting kidneys in diabetics, heart failure
+            > KEY: ARB = same benefits as ACE inhibitors, but NO cough — still NOT safe in pregnancy
             """,
             challengeType: .multipleChoice,
             options: [
@@ -136,15 +129,16 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "METOPROLOL",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Selective Beta-1 Adrenergic Blocker — Antihypertensive/Anti-anginal
-            > BRANDS: Lopressor (tartrate — IR), Toprol-XL (succinate — ER)
-            > MECHANISM: Selectively blocks beta-1 receptors → ↓ HR, ↓ contractility, ↓ BP.
-            > FORMULATION NOTE: Tartrate vs. Succinate are NOT interchangeable.
-            > WARNINGS: Do NOT abruptly discontinue (rebound hypertension/angina).
-            >           Masks hypoglycemia symptoms in diabetics.
-            >           Use with caution in asthma/COPD (though beta-1 selective).
-            > USES: HTN, angina, heart failure (HFrEF), post-MI, rate control.
+            > A "beta blocker" — slows your heart rate and lowers blood pressure
+            > Drug class: Beta-1 selective adrenergic blocker
+            > Two very different versions with two different brand names — NOT interchangeable:
+            >   Lopressor (metoprolol tartrate) = immediate release
+            >   Toprol-XL (metoprolol succinate) = extended release — lasts all day
+            > How it works: blocks the nerve signals that make the heart beat faster and harder
+            > NEVER stop suddenly — must be slowly reduced over time or blood pressure can dangerously spike back (rebound effect)
+            > Caution in diabetics: masks the warning signs of low blood sugar (like rapid heartbeat and shakiness)
+            > Used for: high blood pressure, chest pain (angina), heart failure, irregular heartbeat, post-heart attack recovery
+            > KEY: Two formulations are NOT interchangeable; NEVER stop metoprolol abruptly
             """,
             challengeType: .multipleChoice,
             options: [
@@ -165,15 +159,14 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "AMLODIPINE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Dihydropyridine Calcium Channel Blocker (CCB) — Antihypertensive
-            > BRAND: Norvasc
-            > MECHANISM: Blocks L-type Ca²⁺ channels in vascular smooth muscle
-            >            → vasodilation → reduced peripheral resistance → ↓ BP.
-            > WARNINGS: Peripheral edema (ankle/leg swelling) — most common SE.
-            >           Reflex tachycardia possible.
-            > CLINICAL: Long half-life → once daily dosing. Preferred in elderly HTN.
-            >           Does NOT negatively affect heart rate (unlike non-DHP CCBs).
+            > A blood pressure pill called a calcium channel blocker (CCB)
+            > Brand name: Norvasc — Drug class: Dihydropyridine Calcium Channel Blocker
+            > How it works: calcium makes blood vessel walls contract and tighten. This drug blocks calcium from entering the vessel walls, so they relax and widen — blood pressure drops
+            > Most common side effect: swollen ankles and feet (peripheral edema) — the #1 tested side effect for this drug
+            > Taken once daily — stays in the body a long time (long half-life)
+            > Works well in elderly patients with high blood pressure
+            > Does NOT significantly slow the heart rate (unlike some other blood pressure drugs)
+            > KEY: Amlodipine (CCB) = ankle/leg swelling is the most common side effect
             """,
             challengeType: .multipleChoice,
             options: [
@@ -194,16 +187,15 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "HCTZ",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Thiazide Diuretic — Antihypertensive
-            > BRAND: Microzide (also combined: Zestoretic, Hyzaar, etc.)
-            > MECHANISM: Inhibits Na⁺/Cl⁻ cotransporter in distal convoluted tubule
-            >            → ↑ Na⁺ and water excretion → ↓ blood volume → ↓ BP.
-            > METABOLIC EFFECTS (exam-critical):
-            >   ↓ K⁺ (HYPOKALEMIA — most common)
-            >   ↑ Uric acid (HYPERURICEMIA → gout exacerbation)
-            >   ↑ Glucose (HYPERGLYCEMIA)
-            >   ↓ Na⁺ (HYPONATREMIA)
+            > A "water pill" (diuretic) used to lower blood pressure by removing extra fluid from the body
+            > Full name: Hydrochlorothiazide — Brand: Microzide — Drug class: Thiazide Diuretic
+            > How it works: tells the kidneys to release more salt and water into the urine, which lowers blood volume and blood pressure
+            > Critical electrolyte side effects — these are heavily tested on the PTCB exam:
+            >   LOW potassium (hypokalemia) — the most common electrolyte problem
+            >   HIGH uric acid — can trigger a painful gout attack
+            >   HIGH blood sugar — worsens diabetes control
+            >   LOW sodium (hyponatremia)
+            > KEY: HCTZ causes LOW potassium (hypokalemia) — memorize this for the exam
             """,
             challengeType: .multipleChoice,
             options: [
@@ -224,16 +216,16 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "ATORVASTATIN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: HMG-CoA Reductase Inhibitor (Statin) — Lipid-Lowering Agent
-            > BRAND: Lipitor
-            > MECHANISM: Inhibits HMG-CoA reductase → ↓ hepatic cholesterol synthesis
-            >            → upregulates LDL receptors → ↓ serum LDL.
-            > WARNINGS: RHABDOMYOLYSIS (muscle breakdown) — monitor CK if muscle pain.
-            >           Hepatotoxicity — monitor liver function tests (LFTs).
-            >           CONTRAINDICATED in pregnancy (teratogen).
-            > CLINICAL: High-intensity statin. Take at any time (long half-life).
-            >           Drug interaction: avoid grapefruit juice (CYP3A4).
+            > A "statin" — the most common type of cholesterol-lowering medication
+            > Brand name: Lipitor — Drug class: HMG-CoA Reductase Inhibitor (Statin)
+            > How it works: blocks an enzyme your liver uses to make cholesterol, so less "bad" LDL cholesterol gets into your blood
+            > MOST SERIOUS RISK: Rhabdomyolysis — the muscles start breaking down (feels like severe muscle pain or weakness)
+            >   Patients must report muscle pain immediately; a blood test checks for muscle damage (CK level)
+            > Also monitor liver function periodically
+            > NEVER give to a pregnant patient — harms the developing baby
+            > FOOD INTERACTION: Grapefruit juice raises atorvastatin levels dangerously high — avoid it completely
+            > Can be taken at any time of day (long half-life, works 24 hours)
+            > KEY: Statin = muscle breakdown risk (rhabdomyolysis), no grapefruit, never in pregnancy
             """,
             challengeType: .multipleChoice,
             options: [
@@ -254,15 +246,14 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "AMOXICILLIN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Aminopenicillin (Beta-Lactam Antibiotic) — Bactericidal
-            > BRAND: Amoxil
-            > MECHANISM: Binds penicillin-binding proteins (PBPs)
-            >            → inhibits bacterial cell wall (peptidoglycan) synthesis → cell lysis.
-            > WARNINGS: CONTRAINDICATED in penicillin allergy.
-            >           ~1-2% cross-reactivity with cephalosporins.
-            >           Maculopapular rash common in patients with infectious mononucleosis (EBV).
-            > USES: Otitis media, strep throat, H. pylori (triple therapy), UTIs.
+            > One of the most commonly prescribed antibiotics in the world — in the penicillin family
+            > Brand name: Amoxil — Drug class: Aminopenicillin (Beta-Lactam Antibiotic)
+            > How it works: bacteria need a tough outer wall to survive. Amoxicillin destroys that wall — the bacteria falls apart and dies (kills bacteria directly = bactericidal)
+            > ABSOLUTE RULE: DO NOT give to anyone with a penicillin allergy — serious allergic reaction risk
+            > Slight cross-reactivity with cephalosporin antibiotics (another antibiotic family)
+            > Exam fact: patients who have mono (EBV virus) and take amoxicillin often develop a widespread rash — this is not an allergy, just a viral reaction
+            > Used for: ear infections, strep throat, H. pylori stomach ulcers, urinary tract infections
+            > KEY: Penicillin allergy = absolute contraindication; kills bacteria by destroying the cell wall
             """,
             challengeType: .multipleChoice,
             options: [
@@ -283,14 +274,14 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "AZITHROMYCIN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Macrolide Antibiotic — Bacteriostatic
-            > BRAND: Zithromax; commonly dispensed as "Z-Pak" (5-day course)
-            > MECHANISM: Binds 50S ribosomal subunit → inhibits bacterial protein synthesis.
-            > PHARMACOKINETICS: Long tissue half-life (~68h) — drug persists after last dose.
-            > WARNINGS: QT prolongation — avoid in patients with QT-prolonging drugs.
-            >           CYP3A4 inhibitor — multiple drug interactions.
-            > USES: Community-acquired pneumonia, sinusitis, STIs (chlamydia), MAC prophylaxis.
+            > A popular antibiotic most patients know as the "Z-Pak" (5-day course)
+            > Brand name: Zithromax — Drug class: Macrolide Antibiotic
+            > How it works: bacteria use tiny protein-building machines (ribosomes) to grow and multiply. Azithromycin jams the 50S part of this machine — bacteria stop reproducing and die off (bacteriostatic = slows them, doesn't always kill directly)
+            > Stays active in body tissues for a long time after the last dose — drug is still working even after the 5 days are done
+            > HEART RISK: Can cause a dangerous heart rhythm problem called QT prolongation — avoid in patients already on heart rhythm medications
+            > Inhibits liver enzymes (CYP3A4) so it can interact with many other drugs
+            > Used for: respiratory infections, STIs (like chlamydia), ear and sinus infections
+            > KEY: Z-Pak = macrolide, QT prolongation risk, works by blocking the 50S ribosomal subunit
             """,
             challengeType: .multipleChoice,
             options: [
@@ -311,18 +302,17 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "CIPROFLOXACIN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Fluoroquinolone Antibiotic — Bactericidal
-            > BRAND: Cipro
-            > MECHANISM: Inhibits bacterial DNA gyrase (topoisomerase II) and topoisomerase IV
-            >            → disrupts DNA replication and repair → cell death.
-            > BLACK BOX WARNINGS:
-            >   1. Tendinitis / Tendon rupture (especially with corticosteroids, elderly)
-            >   2. Peripheral neuropathy
-            >   3. CNS effects (seizures)
-            >   4. Aortic aneurysm/dissection
-            > AVOID: Pregnancy, pediatric patients (cartilage toxicity).
-            > INTERACTION: Antacids/dairy/iron chelate → ↓ absorption (take 2h apart).
+            > A powerful antibiotic from the fluoroquinolone family
+            > Brand name: Cipro — Drug class: Fluoroquinolone Antibiotic
+            > How it works: bacteria need to copy their DNA to multiply. Ciprofloxacin damages the machine bacteria use to copy DNA (called DNA gyrase and topoisomerase IV) — bacteria can't replicate and die
+            > BLACK BOX WARNINGS — the most serious safety warnings the FDA can issue (4 of them):
+            >   Tendon rupture — the Achilles tendon (back of ankle) can actually tear, especially in older patients or steroid users
+            >   Nerve damage in hands/feet (peripheral neuropathy)
+            >   Seizures and serious mental effects
+            >   Damage to the aorta (the body's main blood vessel)
+            > AVOID in: children (damages growing cartilage), pregnancy
+            > IMPORTANT: Don't take with antacids, milk, or iron — they bind the drug in your gut and block it from being absorbed; separate by 2 hours
+            > KEY: Cipro = fluoroquinolone, tendon rupture is the #1 exam black box warning, separate from antacids
             """,
             challengeType: .multipleChoice,
             options: [
@@ -343,18 +333,16 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "DOXYCYCLINE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Tetracycline Antibiotic — Bacteriostatic
-            > BRAND: Vibramycin, Doryx, Oracea
-            > MECHANISM: Binds 30S ribosomal subunit → inhibits aminoacyl-tRNA binding
-            >            → blocks bacterial protein synthesis.
-            > CONTRAINDICATIONS:
-            >   Children < 8 years: causes permanent yellow-gray TOOTH DISCOLORATION
-            >                       and impairs bone growth.
-            >   Pregnancy (Category D).
-            > COUNSELING: PHOTOSENSITIVITY — use sunscreen; avoid prolonged sun exposure.
-            >             Take with FULL glass of water; remain upright 30 min (esophageal ulcer).
-            >             Avoid dairy, antacids, iron within 2h (chelation → ↓ absorption).
+            > An antibiotic in the tetracycline family — treats a wide range of infections including acne, Lyme disease, and malaria prevention
+            > Brand names: Vibramycin, Doryx, Oracea — Drug class: Tetracycline Antibiotic
+            > How it works: blocks the same ribosome (protein-building machine) that bacteria need to grow — slows them down (bacteriostatic)
+            > CRITICAL AGE RESTRICTION: Never give to children under 8 years old — permanently stains teeth yellow-gray and interferes with bone growth
+            > Also never use during pregnancy
+            > Patient counseling points (important for dispensing):
+            >   Sun sensitivity — patient MUST use sunscreen; their skin burns much more easily
+            >   Take with a FULL glass of water and stay sitting/standing upright for 30 minutes — lying down can cause a painful throat ulcer
+            >   Separate from dairy, antacids, and iron supplements by 2 hours — they block absorption
+            > KEY: Doxycycline = NO children under 8 (stains teeth), sun sensitivity, stay upright after taking
             """,
             challengeType: .multipleChoice,
             options: [
@@ -375,16 +363,18 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "HYDROCODONE\n/APAP",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Opioid Combination Analgesic — DEA Schedule II
-            > BRAND: Norco, Vicodin (Vicodin discontinued; Norco most common)
-            > COMPONENTS: Hydrocodone (opioid) + Acetaminophen (APAP)
-            > MECHANISM: Hydrocodone → mu-opioid receptor agonist → analgesia, sedation.
-            >             APAP → inhibits prostaglandin synthesis (COX) → analgesia.
-            > CRITICAL WARNINGS:
-            >   DEA SCHEDULE II — no refills; new Rx required each time.
-            >   MAX APAP: 4,000 mg/day (3,000 mg/day in high-risk patients).
-            >   Respiratory depression; addiction potential; avoid with alcohol.
+            > A combination pain pill: hydrocodone (an opioid) + acetaminophen (regular Tylenol)
+            > Brand names: Norco, Vicodin — Drug class: Opioid Combination Analgesic
+            > DEA Schedule II = the most restricted controlled substance category
+            >   This means: absolutely NO refills, ever — a brand new prescription is required every single time
+            >   Prescriptions cannot be called in by phone (must be written)
+            > Hydrocodone works by activating opioid receptors in the brain and spinal cord to reduce pain
+            > CRITICAL ACETAMINOPHEN (APAP) LIMIT — this is heavily tested:
+            >   Maximum: 4,000 mg of acetaminophen per day total from ALL sources
+            >   Reduced to 3,000 mg/day for elderly patients and heavy alcohol users
+            >   Too much acetaminophen causes liver failure — always check patient's other medications
+            > Never combine with alcohol — increases sedation and liver damage
+            > KEY: Schedule II = no refills ever, watch the total daily acetaminophen dose limit
             """,
             challengeType: .multipleChoice,
             options: [
@@ -405,16 +395,14 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "OXYCODONE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Opioid Analgesic — DEA Schedule II
-            > BRAND: OxyContin (ER), Roxicodone (IR), Oxaydo
-            > MECHANISM: Full agonist at mu-opioid (and kappa) receptors in the CNS
-            >            → analgesia, euphoria, sedation, respiratory depression.
-            > ABUSE-DETERRENT FORMULATIONS: OxyContin reformulated with physical barriers
-            >                               to resist crushing/extraction.
-            > ADVERSE EFFECTS: Respiratory depression (most dangerous), constipation
-            >                  (does NOT develop tolerance), nausea, sedation, miosis.
-            > REVERSAL AGENT: Naloxone (Narcan) — opioid antagonist.
+            > A strong opioid pain medication — DEA Schedule II (no refills allowed)
+            > Brand names: OxyContin (extended release, all day), Roxicodone (immediate release, fast acting)
+            > How it works: activates opioid receptors in the brain and spinal cord — reduces how intensely pain is felt and creates sedation
+            > MOST DANGEROUS side effect: respiratory depression — the drug slows breathing to a dangerous level or stops it completely — this is the primary cause of opioid overdose deaths
+            > Constipation is a guaranteed side effect — and unlike most other opioid side effects, patients never build tolerance to it (it stays constant)
+            > OxyContin is specially designed to resist crushing or dissolving to prevent people from misusing it
+            > ANTIDOTE/REVERSAL: Naloxone (brand name: Narcan) — blocks opioid receptors and reverses an overdose within minutes
+            > KEY: Opioid = breathing slows (respiratory depression), naloxone reverses it, constipation never goes away
             """,
             challengeType: .multipleChoice,
             options: [
@@ -435,16 +423,15 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "SERTRALINE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Selective Serotonin Reuptake Inhibitor (SSRI) — Antidepressant
-            > BRAND: Zoloft
-            > MECHANISM: Selectively inhibits serotonin (5-HT) reuptake at presynaptic
-            >            transporter → ↑ synaptic serotonin concentration.
-            > BLACK BOX WARNING: Increased risk of suicidal thinking and behavior
-            >                    in patients ≤ 24 years of age.
-            > ADVERSE EFFECTS: Insomnia, GI upset, sexual dysfunction (most common SSRI AE),
-            >                  weight gain, serotonin syndrome (with other serotonergic drugs).
-            > USES: MDD, anxiety, OCD, PTSD, panic disorder, PMDD.
+            > An antidepressant from the SSRI family — one of the most commonly prescribed antidepressants in the US
+            > Brand name: Zoloft — Drug class: SSRI (Selective Serotonin Reuptake Inhibitor)
+            > Background: serotonin is a brain chemical linked to mood and wellbeing. After your brain uses it, it normally gets pulled back in. SSRIs block that "pull back" process — so more serotonin stays active and improves mood
+            > BLACK BOX WARNING: Increased risk of suicidal thoughts and behavior in patients 24 years old and YOUNGER
+            >   These patients must be closely monitored — especially in the first few weeks of treatment
+            > Common side effects: difficulty sleeping, nausea, sexual dysfunction (very common with all SSRIs), weight changes
+            > DANGER: Serotonin syndrome — combining SSRIs with other serotonin-boosting drugs causes dangerously high serotonin levels (medical emergency)
+            > Used for: depression, anxiety, OCD, PTSD, panic disorder
+            > KEY: SSRI = suicide risk warning in patients 24 and under, serotonin syndrome risk with other drugs
             """,
             challengeType: .multipleChoice,
             options: [
@@ -465,15 +452,13 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "ESCITALOPRAM",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: SSRI (most selective) — Antidepressant/Anxiolytic
-            > BRAND: Lexapro
-            > NOTE: S-enantiomer of citalopram (Celexa) — improved selectivity and tolerability.
-            > MECHANISM: Same as all SSRIs — inhibits presynaptic serotonin reuptake transporter.
-            > SPECIAL WARNING: QT prolongation (dose-dependent) — FDA warning for doses > 20 mg/day.
-            >                  Avoid in congenital long QT syndrome.
-            > BLACK BOX WARNING: Suicidal ideation in patients ≤ 24 years of age.
-            > USES: Major depressive disorder (MDD), generalized anxiety disorder (GAD).
+            > Another SSRI antidepressant — works the same way as sertraline (keeps serotonin active in the brain)
+            > Brand name: Lexapro — Drug class: SSRI — considered the most targeted/selective of all SSRIs
+            > Closely related to citalopram (Celexa) — think of it as a more refined version
+            > BLACK BOX WARNING: Increased suicidal thoughts and behavior in patients 24 years and younger — same black box warning as ALL SSRIs
+            > ADDITIONAL RISK unique to escitalopram: high doses (over 20 mg/day) cause a dangerous heart rhythm problem (QT prolongation — the heart takes too long to reset between beats)
+            > FDA has approved it specifically for: depression and generalized anxiety disorder (a state of chronic, excessive worry)
+            > KEY: Lexapro = SSRI, suicide black box warning ≤24 years, QT prolongation risk at high doses
             """,
             challengeType: .multipleChoice,
             options: [
@@ -494,17 +479,16 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "BUPROPION",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Norepinephrine-Dopamine Reuptake Inhibitor (NDRI) — Antidepressant
-            > BRAND: Wellbutrin (depression), Zyban (smoking cessation), Aplenzin
-            > MECHANISM: Inhibits neuronal reuptake of norepinephrine and dopamine.
-            > KEY CONTRAINDICATIONS (exam-critical):
-            >   1. Seizure disorder — lowers seizure threshold (dose-dependent)
-            >   2. Eating disorders (anorexia nervosa, bulimia) — seizure risk
-            >   3. Concurrent MAOI use (hypertensive crisis)
-            >   4. Abrupt alcohol/benzo/sedative discontinuation
-            > ADVANTAGES vs SSRIs: No sexual dysfunction, no weight gain.
-            > USES: MDD, seasonal affective disorder, smoking cessation (Zyban).
+            > An antidepressant that works differently from SSRIs — also used to help people quit smoking
+            > Brand names: Wellbutrin (for depression), Zyban (for smoking cessation)
+            > How it works: boosts two brain chemicals — norepinephrine and dopamine — instead of serotonin like SSRIs do
+            > BIG ADVANTAGE over SSRIs: does NOT cause sexual problems or weight gain — two major reasons patients prefer it
+            > CONTRAINDICATIONS — do NOT give bupropion to patients who have:
+            >   A seizure disorder — this drug lowers the body's seizure threshold (most critical exam point)
+            >   An eating disorder (anorexia or bulimia) — also raises seizure risk significantly
+            >   Recently taken an MAOI antidepressant (within 14 days) — dangerous interaction
+            >   Just abruptly stopped alcohol, benzodiazepines, or sedatives
+            > KEY: Bupropion = seizure risk, absolutely contraindicated in seizure disorders and eating disorders
             """,
             challengeType: .multipleChoice,
             options: [
@@ -525,17 +509,16 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "ALPRAZOLAM",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Benzodiazepine (BZD) — Anxiolytic — DEA Schedule IV
-            > BRAND: Xanax, Xanax XR
-            > MECHANISM: Positive allosteric modulator of GABA-A receptors
-            >            → ↑ frequency of Cl⁻ channel opening → CNS depression.
-            > BLACK BOX WARNING: Concomitant use with opioids → profound sedation,
-            >                    respiratory depression, coma, and death.
-            > WARNINGS: Physical dependence; withdrawal can be LIFE-THREATENING
-            >           (seizures) — MUST taper slowly.
-            > CLINICAL: Short-acting BZD. NOT for long-term use. High abuse potential.
-            > REVERSAL AGENT: Flumazenil (competitive BZD antagonist).
+            > An anti-anxiety drug from the benzodiazepine (benzo) family
+            > Brand name: Xanax — Drug class: Benzodiazepine — DEA Schedule IV controlled substance
+            > How it works: your brain has a "calm down" chemical called GABA. Benzos boost GABA's effects — creating sedation and reducing anxiety quickly
+            > CRITICAL DANGER: The body becomes physically dependent on benzos quickly
+            >   Stopping suddenly can trigger life-threatening seizures — this is a medical emergency
+            >   MUST taper the dose down slowly under medical supervision
+            > BLACK BOX WARNING: Combining benzodiazepines with opioid pain medications can cause coma or death from combined respiratory depression
+            > Short-acting drug — works fast but doesn't last long. NOT meant for long-term use due to high dependence risk
+            > ANTIDOTE: Flumazenil — a drug that blocks benzodiazepine receptors and reverses overdose
+            > KEY: Xanax = Schedule IV, NEVER stop suddenly (withdrawal seizures), flumazenil is the reversal agent
             """,
             challengeType: .multipleChoice,
             options: [
@@ -556,15 +539,15 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "ALBUTEROL",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Short-Acting Beta-2 Agonist (SABA) — Bronchodilator
-            > BRAND: ProAir HFA, Ventolin HFA, Proventil HFA, AccuNeb (neb solution)
-            > MECHANISM: Stimulates beta-2 adrenergic receptors in bronchial smooth muscle
-            >            → relaxation → bronchodilation → ↑ airflow.
-            > ROLE: RESCUE inhaler — rapid onset (5 min), short duration (4-6 hours).
-            >       NOT for long-term control. If using > 2 days/week → step up therapy.
-            > ADVERSE EFFECTS: Tachycardia, tremor, hypokalemia (high doses), nervousness.
-            > FORMS: MDI (metered dose inhaler), nebulizer solution.
+            > The classic "rescue inhaler" — used during asthma attacks or sudden breathing difficulty
+            > Brand names: ProAir HFA, Ventolin HFA, Proventil HFA
+            > Drug class: Short-Acting Beta-2 Agonist (SABA) — think "S = Sudden/Speedy relief"
+            > How it works: the airways in your lungs are surrounded by muscle. Albuterol relaxes those muscles so the airways open wide and air flows freely — works within 5 minutes
+            > Lasts 4-6 hours — use it as needed when symptoms occur, not on a regular schedule
+            > IMPORTANT: If you need it more than 2 days per week, the asthma is NOT well controlled and the treatment plan needs to be stepped up
+            > This is NOT a daily controller medication — it only treats symptoms in the moment, doesn't fix the underlying inflammation
+            > Side effects: fast heartbeat (tachycardia), shakiness/tremors, feeling jittery or nervous
+            > KEY: Albuterol = rescue inhaler (SABA), fast onset, not a daily controller — more than 2x/week = step up therapy
             """,
             challengeType: .multipleChoice,
             options: [
@@ -585,17 +568,16 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "FLUTICASONE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Inhaled Corticosteroid (ICS) — Anti-inflammatory
-            > BRAND: Flovent HFA/Diskus (asthma), Flonase (allergic rhinitis)
-            > MECHANISM: Binds glucocorticoid receptors → reduces airway inflammation,
-            >            mucus secretion, and bronchial hyperresponsiveness.
-            > ROLE: CONTROLLER medication — NOT for acute bronchospasm.
-            > CRITICAL COUNSELING:
-            >   RINSE MOUTH with water and GARGLE after each inhalation.
-            >   Prevents ORAL CANDIDIASIS (thrush) caused by local steroid deposition.
-            > ADVERSE EFFECTS: Oral candidiasis, dysphonia (hoarse voice), adrenal
-            >                  suppression (high doses).
+            > A steroid inhaler used to PREVENT asthma symptoms — NOT for emergency or sudden attacks
+            > Brand names: Flovent (asthma inhaler), Flonase (nasal spray for allergies)
+            > Drug class: Inhaled Corticosteroid (ICS) — think "controller medication" — used every day
+            > How it works: steroids reduce inflammation. When inhaled daily, they slowly calm down the inflammation in the airways so attacks happen less often. Takes days to weeks for full effect
+            > THIS IS NOT A RESCUE INHALER — it won't help during an acute attack
+            > MOST IMPORTANT COUNSELING POINT (guaranteed to be on the exam):
+            >   After EVERY single use, rinse your mouth with water and gargle
+            >   The steroid powder that lands in your mouth causes a fungal infection called oral thrush (white patches in the mouth and throat)
+            >   Simply rinsing prevents this completely
+            > KEY: Fluticasone = inhaled steroid (controller, daily use), MUST rinse mouth after every use
             """,
             challengeType: .multipleChoice,
             options: [
@@ -616,17 +598,15 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "MONTELUKAST",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Leukotriene Receptor Antagonist (LTRA) — Anti-inflammatory
-            > BRAND: Singulair
-            > MECHANISM: Selectively blocks CysLT1 leukotriene receptors
-            >            → inhibits leukotriene-mediated inflammation, bronchoconstriction,
-            >              mucus secretion, and vascular permeability.
-            > FDA BLACK BOX WARNING (2020): Serious neuropsychiatric events including
-            >   agitation, depression, suicidal ideation — advise patients to watch for
-            >   behavior/mood changes.
-            > USES: Asthma maintenance (≥ 12 months), exercise-induced bronchoconstriction,
-            >        seasonal and perennial allergic rhinitis.
+            > A daily pill for asthma and allergy prevention — works through a completely different pathway than inhalers
+            > Brand name: Singulair — Drug class: Leukotriene Receptor Antagonist (LTRA)
+            > How it works: when you have asthma or allergies, your immune system releases chemicals called leukotrienes that tighten airways and cause inflammation. Montelukast blocks the receptor these chemicals attach to — so they can't cause symptoms
+            > FDA BLACK BOX WARNING added in 2020 — the most serious safety concern:
+            >   Can cause serious mental health side effects: mood swings, depression, anxiety, nightmares, aggressive behavior, and suicidal thoughts
+            >   Patients and their families must watch for any personality or behavior changes
+            >   Prescribers should consider switching drugs if this occurs
+            > Used for: daily asthma control, exercise-induced asthma, seasonal and year-round allergies
+            > KEY: Montelukast = blocks leukotrienes, 2020 black box warning for serious psychiatric side effects
             """,
             challengeType: .multipleChoice,
             options: [
@@ -647,16 +627,13 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "OMEPRAZOLE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Proton Pump Inhibitor (PPI) — Gastric Acid Suppressor
-            > BRAND: Prilosec, Prilosec OTC
-            > MECHANISM: Irreversibly inhibits H⁺/K⁺-ATPase (proton pump) in gastric
-            >            parietal cells → profound and prolonged acid suppression.
-            > CLINICAL: Take 30-60 min BEFORE a meal for best efficacy.
-            >           Full effect may take 1-4 days (irreversible — needs new pump synthesis).
-            > RISKS (long-term use): C. difficile infection, hypomagnesemia, bone fractures,
-            >                        vitamin B12 deficiency, iron malabsorption.
-            > INTERACTION: Reduces clopidogrel (Plavix) activation (both use CYP2C19).
+            > An acid-reducer used for heartburn, acid reflux, and stomach ulcers
+            > Brand name: Prilosec — Drug class: Proton Pump Inhibitor (PPI)
+            > How it works: your stomach has acid pumps that produce stomach acid. Omeprazole permanently shuts those pumps down — so the stomach produces much less acid. Takes 1-4 days for full effect because the body has to make brand new pumps to replace them
+            > TIMING IS CRITICAL: Take 30-60 minutes BEFORE a meal (usually breakfast) — it only works when the pumps are active and preparing to secrete acid
+            > DRUG INTERACTION to know: reduces the effectiveness of clopidogrel (Plavix), a blood thinner used by heart patients — this can be dangerous
+            > Long-term use risks: low magnesium levels, increased bone fracture risk, C. difficile infection, low vitamin B12
+            > KEY: PPI = take before a meal, major interaction with clopidogrel (Plavix)
             """,
             challengeType: .multipleChoice,
             options: [
@@ -677,16 +654,13 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "ONDANSETRON",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: 5-HT3 (Serotonin Type 3) Receptor Antagonist — Antiemetic
-            > BRAND: Zofran, Zuplenz (ODT/oral film)
-            > MECHANISM: Blocks 5-HT3 receptors in the GI tract and in the
-            >            chemoreceptor trigger zone (CTZ) of the CNS
-            >            → prevents serotonin-mediated nausea and vomiting signals.
-            > USES: Chemotherapy-induced N/V (CINV), post-operative N/V,
-            >       radiation-induced N/V, pregnancy-related N/V (off-label).
-            > WARNINGS: QT prolongation — avoid in patients with long QT.
-            >           Serotonin syndrome with other serotonergic drugs (rare).
+            > The #1 anti-nausea medication used in hospitals, clinics, and outpatient care
+            > Brand name: Zofran — also available as a dissolving tablet (ODT) that melts on your tongue without water
+            > Drug class: 5-HT3 Serotonin Receptor Antagonist (Antiemetic)
+            > How it works: nausea is triggered when serotonin signals in your gut and brain activate the vomiting reflex. Ondansetron blocks the serotonin receptor (called 5-HT3) that starts this signal — nausea and vomiting stop
+            > Used for: nausea from chemotherapy (cancer treatment), surgery recovery, radiation therapy, and sometimes pregnancy nausea
+            > WARNING: Can cause a heart rhythm problem (QT prolongation) — caution in patients with existing heart conditions or on other QT-prolonging drugs
+            > KEY: Zofran = anti-nausea drug (blocks 5-HT3 serotonin receptors), QT prolongation risk
             """,
             challengeType: .multipleChoice,
             options: [
@@ -707,17 +681,16 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "WARFARIN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Vitamin K Antagonist (VKA) — Oral Anticoagulant
-            > BRAND: Coumadin, Jantoven
-            > MECHANISM: Inhibits vitamin K epoxide reductase → depletes active Vitamin K
-            >            → reduces synthesis of clotting factors II, VII, IX, X (and proteins C/S).
-            > NARROW THERAPEUTIC INDEX — requires routine INR monitoring.
-            >   Target INR 2.0-3.0 for most indications (2.5-3.5 for mechanical heart valves).
-            > INTERACTIONS: MANY drug-drug and drug-food interactions.
-            >   ↑ Effect (↑ bleed risk): NSAIDs, antibiotics, antifungals, vitamin E.
-            >   ↓ Effect: Vitamin K (leafy greens), rifampin, St. John's Wort.
-            > REVERSAL: Vitamin K (phytonadione), FFP, 4-factor PCC (Kcentra).
+            > An oral blood thinner — one of the most complex and high-risk drugs to manage
+            > Brand names: Coumadin, Jantoven — Drug class: Vitamin K Antagonist (Anticoagulant)
+            > How it works: your body needs vitamin K to make blood clotting proteins. Warfarin blocks the vitamin K cycle — so fewer clotting proteins are made, and blood clots form much more slowly
+            > VERY NARROW THERAPEUTIC RANGE — too little = dangerous blood clot; too much = dangerous bleeding
+            >   Must be monitored with a routine blood test called INR (International Normalized Ratio)
+            >   Target INR: 2.0-3.0 for most uses; 2.5-3.5 for mechanical heart valves
+            > Has more drug and food interactions than almost any other medication:
+            >   Vitamin K foods (spinach, kale, broccoli) DECREASE the drug's effect — patients must eat consistent amounts
+            >   Many antibiotics, aspirin, and NSAIDs INCREASE bleeding risk
+            > KEY: Warfarin = monitor with INR, vitamin K foods weaken it, MANY interactions — high alert drug
             """,
             challengeType: .multipleChoice,
             options: [
@@ -738,17 +711,14 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "APIXABAN",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Direct Oral Anticoagulant (DOAC) — Factor Xa Inhibitor
-            > BRAND: Eliquis
-            > MECHANISM: Directly and selectively inhibits Factor Xa → ↓ thrombin generation
-            >            → ↓ fibrin clot formation.
-            > ADVANTAGES over warfarin: No routine INR monitoring, fewer food interactions,
-            >                          predictable pharmacokinetics, rapid onset.
-            > REVERSAL AGENT: Andexanet alfa (Andexxa) — recombinant Factor Xa decoy.
-            > USES: DVT/PE treatment and prevention, stroke prevention in non-valvular A-fib,
-            >       post-surgical VTE prophylaxis.
-            > NOTE: Renal dosing required — reduce dose if ≥2 of: age≥80, weight≤60kg, SCr≥1.5
+            > A newer, easier-to-manage blood thinner — no routine blood tests needed
+            > Brand name: Eliquis — Drug class: DOAC (Direct Oral Anticoagulant), Factor Xa Inhibitor
+            > How it works: blood clotting is a chain reaction. Apixaban directly blocks one specific step in that chain (a clotting protein called Factor Xa) — clots can't form as easily
+            > MAJOR ADVANTAGE over warfarin: no routine INR monitoring needed, predictable dosing, fewer food interactions, faster onset
+            > Reversal agent (if patient bleeds badly or needs emergency surgery): Andexanet alfa (brand: Andexxa) — a specific antidote developed just for this drug
+            > Used for: preventing and treating blood clots (DVT/PE), preventing strokes in patients with atrial fibrillation (irregular heartbeat)
+            > Dose reduction required in certain elderly, low-weight, or reduced kidney function patients
+            > KEY: Eliquis = DOAC (no INR monitoring), reversal agent = andexanet alfa
             """,
             challengeType: .multipleChoice,
             options: [
@@ -769,17 +739,15 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "LEVOTHYROXINE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Thyroid Hormone Replacement (synthetic T4)
-            > BRAND: Synthroid, Levoxyl, Unithroid, Tirosint
-            > MECHANISM: Synthetic T4 → peripherally converted to active T3 (triiodothyronine)
-            >            → binds thyroid hormone nuclear receptors → regulates metabolism.
-            > NARROW THERAPEUTIC INDEX: Do NOT interchange brands without physician guidance
-            >                           (bioequivalence varies).
-            > CRITICAL ADMINISTRATION:
-            >   Take on EMPTY STOMACH, 30-60 min before breakfast.
-            >   Separate by ≥ 4h from: calcium, antacids, iron supplements, dairy (↓ absorption).
-            > MONITORING: TSH (primary marker), Free T4.
+            > A thyroid hormone replacement pill — used when the thyroid gland doesn't produce enough hormone on its own (hypothyroidism)
+            > Brand names: Synthroid, Levoxyl, Unithroid, Tirosint — Drug class: Synthetic Thyroid Hormone (T4)
+            > CRITICAL DISPENSING RULE: Different brands of levothyroxine are NOT automatically interchangeable — even tiny differences in absorption can over- or under-treat the patient
+            >   Always keep patients on the same brand unless their doctor specifically approves a switch
+            > HOW TO TAKE — this counseling is frequently tested:
+            >   Take on an EMPTY STOMACH, 30-60 minutes BEFORE breakfast
+            >   Keep CALCIUM supplements, iron supplements, antacids, and dairy products at least 4 hours away — they bind to the drug in the gut and block it from being absorbed
+            > Monitored with a TSH blood test — TSH is a signal the brain sends to the thyroid; low TSH = thyroid is working well
+            > KEY: Levothyroxine = empty stomach before breakfast, separate calcium and iron by 4 hours, brands NOT interchangeable
             """,
             challengeType: .multipleChoice,
             options: [
@@ -800,18 +768,15 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "PREDNISONE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Systemic Glucocorticoid (Corticosteroid) — Anti-inflammatory
-            > BRAND: Deltasone, Rayos (delayed-release)
-            > MECHANISM: Binds intracellular glucocorticoid receptors → translocates to nucleus
-            >            → regulates gene transcription → ↓ inflammation and immune response.
-            > LONG-TERM ADVERSE EFFECTS (exam-critical):
-            >   HPA axis suppression → adrenal insufficiency
-            >   Osteoporosis, hyperglycemia, hypertension
-            >   Cushing's syndrome, increased infection risk
-            >   Cataracts, myopathy, mood changes
-            > CRITICAL: NEVER abruptly stop long-term therapy — must TAPER.
-            >           Abrupt discontinuation → ADRENAL CRISIS (life-threatening).
+            > A powerful steroid pill that reduces inflammation and suppresses the immune system
+            > Brand name: Deltasone — Drug class: Systemic Corticosteroid
+            > Used for: severe allergic reactions, autoimmune diseases, asthma flare-ups, inflammation, organ transplant rejection prevention
+            > THE #1 MOST IMPORTANT RULE — heavily tested: NEVER stop prednisone suddenly after more than a few days of use
+            >   When you take steroid pills, your adrenal glands (which normally make your own steroids) get "lazy" and slow down production
+            >   If you stop suddenly, the glands can't recover fast enough — this causes adrenal crisis: a life-threatening drop in essential body hormones
+            >   The dose MUST be slowly tapered (reduced gradually) over days to weeks
+            > Long-term side effects (also heavily tested): high blood sugar, high blood pressure, weight gain, bone loss (osteoporosis), weakened immune system (infection risk), eye problems (cataracts), mood changes, round face and belly
+            > KEY: Prednisone = NEVER stop suddenly (taper it down), suppresses immune system, raises blood sugar
             """,
             challengeType: .multipleChoice,
             options: [
@@ -832,16 +797,16 @@ extension DataNode {
             domain: .medications,
             nodeTitle: "CYCLOBENZAPRINE",
             loreText: """
-            > SECTOR-01 // PHARMACOLOGY
-            > CLASS: Skeletal Muscle Relaxant (centrally-acting)
-            > BRAND: Flexeril (5 mg IR), Amrix (ER capsule)
-            > MECHANISM: Acts on brainstem (locus coeruleus) to reduce tonic motor neuron activity.
-            >            STRUCTURALLY RELATED TO TRICYCLIC ANTIDEPRESSANTS (TCAs).
-            > ADVERSE EFFECTS: Sedation (CNS depression), dry mouth, blurred vision,
-            >                  urinary retention, constipation — classic ANTICHOLINERGIC effects.
-            > CONTRAINDICATIONS: Concurrent or within 14 days of MAOI use (serotonin syndrome).
-            >                    Hyperthyroidism, acute MI, arrhythmias, heart block.
-            > USES: Short-term (≤ 2-3 weeks) adjunct for acute musculoskeletal pain/spasm.
+            > A muscle relaxer pill — used for short-term relief of painful muscle spasms
+            > Brand names: Flexeril, Amrix — Drug class: Centrally-Acting Skeletal Muscle Relaxant
+            > How it works: acts in the brainstem to reduce the nerve signals that cause muscles to stay tight and spasm
+            > STRUCTURALLY VERY SIMILAR to TCA antidepressants (tricyclic antidepressants) — chemically related, causes similar side effects
+            > Side effects are classic anticholinergic effects (your body's "cholinergic" system handles digestion and secretions — blocking it causes these predictable effects):
+            >   Drowsiness, dry mouth, blurry vision, difficulty urinating, constipation
+            >   Same side effect pattern as antihistamines (Benadryl) and certain antidepressants
+            > CONTRAINDICATION: Do NOT use within 14 days of an MAOI antidepressant — can cause a dangerous serotonin reaction
+            > Only meant for short-term use (2-3 weeks maximum) — not for chronic pain
+            > KEY: Cyclobenzaprine = muscle relaxer structurally related to TCAs, causes anticholinergic side effects
             """,
             challengeType: .multipleChoice,
             options: [

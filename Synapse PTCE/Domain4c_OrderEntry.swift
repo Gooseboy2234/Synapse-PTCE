@@ -22,46 +22,41 @@ extension DataNode {
             domain: .orderEntry,
             nodeTitle: "SPECIFIC GRAVITY",
             loreText: """
-            > SECTOR-04 // ORDER_PROC
-            > TOPIC: Specific Gravity — Weight/Volume Conversions in Compounding
+            > When you compound a medication, a formula might say "use 40 grams
+            > of glycerin." But glycerin is a liquid — how do you measure 40 grams
+            > in a graduated cylinder marked in milliliters?
             >
-            > DEFINITION:
-            >   Specific gravity (SG) is the ratio of a substance's density to the density
-            >   of water at the same temperature.
-            >   Water at 4°C = 1.0 g/mL (the reference standard).
+            > The answer is specific gravity (SG): a number that tells you how
+            > dense a liquid is compared to water. Water = 1.0 g/mL exactly.
             >
-            >   SG = mass (g) ÷ volume (mL)
+            > A liquid denser than water has SG > 1.0 (like glycerin at 1.25).
+            > A liquid lighter than water has SG < 1.0 (like alcohol at 0.816).
             >
-            >   For pharmaceutical liquids, SG ≈ density in g/mL
-            >   (since water = 1.0 g/mL exactly at reference conditions).
+            > WHAT SG MEANS PRACTICALLY:
+            >   If SG = 1.25, then every 1 mL of that liquid weighs 1.25 grams.
+            >   If SG = 0.816, then every 1 mL weighs only 0.816 grams.
             >
-            > COMMON SPECIFIC GRAVITIES:
-            >   Water:              SG = 1.000 g/mL
-            >   Glycerin:           SG = 1.250 g/mL  (denser than water)
-            >   Ethanol (alcohol):  SG = 0.816 g/mL  (less dense than water)
-            >   Syrup USP:          SG = 1.313 g/mL
-            >   Castor oil:         SG = 0.960 g/mL
-            >   Isopropyl alcohol:  SG = 0.785 g/mL
+            > THE TWO FORMULAS:
+            >   Weight (g) = Volume (mL) × SG      ← volume → weight
+            >   Volume (mL) = Weight (g) ÷ SG      ← weight → volume
             >
-            > CONVERSION FORMULAS:
-            >   Weight (g) = Volume (mL) × SG
-            >   Volume (mL) = Weight (g) ÷ SG
-            >
-            > WORKED EXAMPLE 1 (volume → weight):
-            >   How many grams does 80 mL of glycerin (SG 1.25) weigh?
+            > WORKED EXAMPLE (volume → weight):
+            >   How much does 80 mL of glycerin (SG 1.25) weigh?
             >   Weight = 80 mL × 1.25 g/mL = 100 g
             >
-            > WORKED EXAMPLE 2 (weight → volume):
-            >   A formula requires 50 g of glycerin (SG 1.25). What volume should be measured?
+            > WORKED EXAMPLE (weight → volume):
+            >   A formula calls for 50 g of glycerin (SG 1.25). How many mL?
             >   Volume = 50 g ÷ 1.25 g/mL = 40 mL
             >
-            > WHY IT MATTERS:
-            >   Compounding formulas often call for ingredients BY WEIGHT (grams),
-            >   but measuring equipment is often VOLUMETRIC (mL graduates).
-            >   SG bridges the two measurement systems.
+            > COMMON VALUES TO KNOW:
+            >   Water: 1.000    Glycerin: 1.250    Ethanol: 0.816
+            >   Syrup USP: 1.313    Isopropyl alcohol: 0.785
             >
-            > > QUERY: A compounding formula calls for 37.5 g of glycerin (SG = 1.25).
-            > > How many mL should the technician measure?
+            > NOW YOU TRY:
+            >   Formula calls for 37.5 g of glycerin (SG = 1.25).
+            >   Volume = 37.5 g ÷ 1.25 g/mL = 30 mL
+            >
+            > KEY: Volume = Weight ÷ SG. Weight = Volume × SG.
             """,
             challengeType: .proceduralMath,
             options: [
@@ -83,45 +78,41 @@ extension DataNode {
             domain: .orderEntry,
             nodeTitle: "BSA CALCULATIONS",
             loreText: """
-            > SECTOR-04 // ORDER_PROC
-            > TOPIC: Body Surface Area (BSA) — Chemotherapy and Pediatric Dosing
+            > For most medications, the dose is based on body weight (mg/kg).
+            > But chemotherapy drugs and some pediatric medications are dosed
+            > based on Body Surface Area (BSA) — measured in square meters (m²).
             >
-            > WHY BSA?
-            >   BSA-based dosing is used for chemotherapy and some pediatric medications
-            >   because it better accounts for patient size and correlates with
-            >   cardiac output, renal/hepatic clearance, and drug distribution volume.
+            > WHY USE BSA INSTEAD OF WEIGHT?
+            >   Drug clearance through the kidneys and liver correlates better
+            >   with body surface area than weight alone. A tall, lean person and
+            >   a short, stocky person might weigh the same but have very different
+            >   surface areas — and very different drug metabolism.
             >
-            > MOSTELLER FORMULA (most commonly used in pharmacy):
+            > THE MOSTELLER FORMULA (most common on the PTCE):
             >   BSA (m²) = √ [ Height (cm) × Weight (kg) ÷ 3600 ]
             >
-            >   Or equivalently using square root:
-            >   BSA = SQRT( (ht_cm × wt_kg) / 3600 )
+            >   Both measurements MUST be in metric units:
+            >   height in CENTIMETERS and weight in KILOGRAMS.
             >
             > WORKED EXAMPLE:
             >   Patient: 170 cm tall, 70 kg
-            >   BSA = √ (170 × 70 ÷ 3600)
-            >       = √ (11,900 ÷ 3600)
-            >       = √ 3.306
-            >       = 1.82 m²
+            >   Step 1: 170 × 70 = 11,900
+            >   Step 2: 11,900 ÷ 3600 = 3.306
+            >   Step 3: √3.306 = 1.82 m²
             >
-            > CALCULATING THE DOSE:
-            >   Dose = (mg/m²) × BSA (m²)
-            >
-            >   Example: Carboplatin ordered at 300 mg/m² for a patient with BSA 1.8 m²
-            >   Dose = 300 mg/m² × 1.8 m² = 540 mg
+            > CALCULATING THE DOSE FROM BSA:
+            >   Dose (mg) = Ordered dose (mg/m²) × Patient's BSA (m²)
+            >   Example: carboplatin 300 mg/m² for BSA 1.8 m² → 300 × 1.8 = 540 mg
             >
             > AVERAGE ADULT BSA: approximately 1.7–1.8 m²
             >
-            > TECHNICIAN ROLE IN BSA DOSING:
-            >   — Verify patient height and weight are recorded in the correct units
-            >     (cm and kg — not inches and pounds)
-            >   — Calculate BSA using the formula; confirm pharmacist verification
-            >   — Flag any significant changes in weight that would change the BSA
-            >     and potentially the dose
+            > NOW YOU TRY:
+            >   Patient: 160 cm, 64 kg. What is their BSA (Mosteller)?
+            >   Step 1: 160 × 64 = 10,240
+            >   Step 2: 10,240 ÷ 3,600 = 2.844
+            >   Step 3: √2.844 ≈ 1.69 m²
             >
-            > > QUERY: A patient is 160 cm tall and weighs 64 kg.
-            > > Using the Mosteller formula, what is their approximate BSA?
-            > > [Hint: √(160 × 64 ÷ 3600)]
+            > KEY: BSA = √(height_cm × weight_kg ÷ 3600). Average adult ≈ 1.7–1.8 m²
             """,
             challengeType: .proceduralMath,
             options: [

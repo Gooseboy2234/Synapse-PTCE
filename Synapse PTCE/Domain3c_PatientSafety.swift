@@ -3,8 +3,7 @@
 //  Synapse PTCE
 //
 //  Phase 7a — Domain 3 Gap Fill: Patient Safety & Quality Assurance (23.75% of 2026 PTCB Exam)
-//  1 node covering the FMEA vs. RCA distinction — a specific PTCB favorite that tests
-//  whether students know the difference between proactive and reactive quality tools.
+//  1 node — plain-English loreText rewrite for maximum readability.
 //
 
 import Foundation
@@ -21,41 +20,23 @@ extension DataNode {
             domain: .patientSafety,
             nodeTitle: "FMEA vs RCA",
             loreText: """
-            > SECTOR-03 // SAFETY_OPS
-            > TOPIC: Quality Improvement Tools — FMEA vs. Root Cause Analysis
-            >
-            > *** THE KEY DISTINCTION: PROACTIVE vs. REACTIVE ***
-            >
+            > FMEA and RCA are both quality improvement tools used in healthcare — but they answer completely different questions at completely different times.
+            > THE KEY DISTINCTION: one looks FORWARD (before problems happen), the other looks BACKWARD (after something went wrong).
             > FMEA — FAILURE MODE AND EFFECTS ANALYSIS:
-            >   WHEN USED: PROACTIVELY — BEFORE a problem occurs.
-            >   PURPOSE: Identify all the ways a process COULD fail and assess the
-            >     potential impact of each failure — then implement safeguards.
-            >   TRIGGER: New process implementation, system redesign, new technology,
-            >     identified high-risk workflow (e.g., going live with a new IV pump).
-            >   PROCESS:
-            >     1. Map out every step of the process.
-            >     2. For each step: identify potential failure modes ("what could go wrong?")
-            >     3. Assess: Severity × Probability × Detectability = Risk Priority Number (RPN)
-            >     4. Address failures with the highest RPN scores first.
-            >   THINK: "Let's find the holes BEFORE something goes wrong."
-            >
-            > ROOT CAUSE ANALYSIS (RCA):
-            >   WHEN USED: REACTIVELY — AFTER an error or adverse event has occurred.
-            >   PURPOSE: Identify the UNDERLYING system causes of an error (NOT to
-            >     blame individuals) and implement changes to prevent recurrence.
-            >   TRIGGER: Sentinel event, serious medication error, near-miss, patient harm.
-            >   TOOLS:
-            >     "5 Whys" — ask "why?" repeatedly until the root cause is found
-            >     Fishbone diagram (Ishikawa/cause-and-effect) — categories: people,
-            >     process, equipment, environment, policies
-            >     Timeline analysis
-            >   THINK: "What went wrong and why did the system allow it to happen?"
-            >
-            > MEMORY AID:
-            >   FMEA = Future / Forward-looking = Proactive
-            >   RCA  = Retrospective / Rear-looking = Reactive
-            >
-            > Both are mandated by The Joint Commission (TJC) as quality improvement tools.
+            > Used PROACTIVELY — BEFORE an error has occurred
+            > Ask yourself: "What COULD go wrong with this process?"
+            > When do you use it? When implementing a new system, redesigning a workflow, bringing in a new piece of equipment, or when you identify a high-risk process that hasn't caused harm yet but looks dangerous.
+            > HOW FMEA WORKS: You map out every step of a process. For each step, you ask: What are all the ways this could fail? For each failure mode, you score three things: How BAD would it be (severity)? How LIKELY is it to happen (probability)? How EASY would it be to catch before it hurts someone (detectability)? Multiply these three scores together → Risk Priority Number (RPN). Address the highest RPN failure modes first.
+            > Memory hook: FMEA = Future-looking = Forward-thinking = Proactive. "Find problems BEFORE they find patients."
+            > RCA — ROOT CAUSE ANALYSIS:
+            > Used REACTIVELY — AFTER a serious error or adverse event has already occurred
+            > Ask yourself: "What actually went wrong and WHY did the system allow it?"
+            > Triggered by: a sentinel event, a serious medication error, a patient injury, or a significant near-miss.
+            > TOOLS used in RCA: The "5 Whys" (keep asking "why?" until you reach the root cause), Fishbone/Ishikawa diagrams (organize causes into categories: people, process, equipment, environment, policies).
+            > RCA focuses on SYSTEMS, not individuals — the goal is fixing the system so the same error can't happen again.
+            > Memory hook: RCA = Rear-looking = Reactive = Retrospective. "Figure out what went wrong AFTER it happened."
+            > Both tools are required by The Joint Commission (TJC) as part of a hospital or pharmacy's quality improvement program.
+            > KEY: FMEA = proactive (before errors happen). RCA = reactive (after errors happen). FMEA prevents, RCA investigates.
             """,
             challengeType: .multipleChoice,
             options: [

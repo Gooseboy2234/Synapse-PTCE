@@ -1188,74 +1188,63 @@ struct EncounterView: View {
 
             if bootComplete {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 0) {
 
-                        // Header
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
+                        // ── Compact header ───────────────────────────────────────
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading, spacing: 3) {
                                 Text(node.domain.terminalSectorLabel)
-                                    .font(.system(size: 10, design: .monospaced))
-                                    .foregroundColor(color.opacity(0.6))
-                                Spacer()
-                                // Timed mode countdown
-                                if gameMode == .timed {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: "timer")
-                                            .font(.system(size: 10))
-                                        Text(String(format: "%02d", timeRemaining))
-                                            .font(.system(size: 12, weight: .bold, design: .monospaced))
-                                    }
-                                    .foregroundColor(timeRemaining <= 10 ? .red : color)
-                                    .shadow(color: timeRemaining <= 10 ? Color.red.opacity(0.7) : .clear, radius: 4)
-                                    .padding(.horizontal, 8).padding(.vertical, 3)
-                                    .background((timeRemaining <= 10 ? Color.red : color).opacity(0.1))
-                                    .overlay(RoundedRectangle(cornerRadius: 5)
-                                        .stroke((timeRemaining <= 10 ? Color.red : color).opacity(0.4), lineWidth: 1))
-                                    .cornerRadius(5)
-                                }
-                            }
-                            HStack(spacing: 6) {
-                                Text(node.nodeTitle)
-                                    .font(.system(size: 17, weight: .bold, design: .monospaced))
-                                    .foregroundColor(color)
-                                // Node angle badge
-                                if node.angle != .classification {
-                                    Text(node.angle.badge)
-                                        .font(.system(size: 8, weight: .bold, design: .monospaced))
+                                    .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                                    .foregroundColor(color.opacity(0.55))
+                                HStack(spacing: 6) {
+                                    Text(node.nodeTitle.replacingOccurrences(of: "\n", with: " "))
+                                        .font(.system(size: 13, weight: .bold, design: .monospaced))
                                         .foregroundColor(color)
-                                        .padding(.horizontal, 5).padding(.vertical, 2)
-                                        .background(color.opacity(0.15))
-                                        .cornerRadius(3)
+                                    if node.angle != .classification || node.baseConceptTitle != nil {
+                                        Text(node.angle.badge)
+                                            .font(.system(size: 8, weight: .bold, design: .monospaced))
+                                            .foregroundColor(color)
+                                            .padding(.horizontal, 5).padding(.vertical, 2)
+                                            .background(color.opacity(0.15))
+                                            .cornerRadius(3)
+                                    }
                                 }
                             }
-                        }
-
-                        Divider().background(color.opacity(0.3))
-
-                        // Lore text — tints red on wrong answer
-                        ZStack(alignment: .topLeading) {
-                            Text(node.loreText)
-                                .font(.system(size: 12, design: .monospaced))
-                                .foregroundColor(loreCorrupted ? .red.opacity(0.55) : theme.primaryText.opacity(0.82))
-                                .lineSpacing(4)
-                            if loreCorrupted {
-                                Text("// CRITICAL BREACH — DATA CORRUPTION DETECTED")
-                                    .font(.system(size: 10, weight: .bold, design: .monospaced))
-                                    .foregroundColor(.red.opacity(0.9))
+                            Spacer()
+                            if gameMode == .timed {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "timer").font(.system(size: 10))
+                                    Text(String(format: "%02d", timeRemaining))
+                                        .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                }
+                                .foregroundColor(timeRemaining <= 10 ? .red : color)
+                                .shadow(color: timeRemaining <= 10 ? Color.red.opacity(0.7) : .clear, radius: 4)
+                                .padding(.horizontal, 8).padding(.vertical, 3)
+                                .background((timeRemaining <= 10 ? Color.red : color).opacity(0.1))
+                                .overlay(RoundedRectangle(cornerRadius: 5)
+                                    .stroke((timeRemaining <= 10 ? Color.red : color).opacity(0.4), lineWidth: 1))
+                                .cornerRadius(5)
                             }
                         }
+                        .padding(.bottom, 14)
 
-                        Divider().background(color.opacity(0.3))
+                        Divider().background(color.opacity(0.3)).padding(.bottom, 18)
 
-                        // Question prompt
-                        Text(questionPrompt)
-                            .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                            .foregroundColor(color)
+                        // ── Study notes — teach before testing ───────────────────
+                        TeachPanel(loreText: node.loreText, color: color)
+                            .padding(.bottom, 22)
 
-                        // Logic Probe: Redundant Check button
+                        // ── PTCB question ─────────────────────────────────────────
+                        Text(effectiveQuestion)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(theme.primaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineSpacing(5)
+                            .padding(.bottom, 20)
+
+                        // ── Logic Probe: Redundant Check ─────────────────────────
                         if let ability = probeAbility, !probeAbilityUsed, !showFeedback {
                             Button {
-                                // Eliminate one wrong answer
                                 if let wrong = node.options.first(where: { $0 != node.correctAnswer && $0 != eliminatedOption }) {
                                     withAnimation(.easeInOut(duration: 0.3)) {
                                         eliminatedOption = wrong
@@ -1277,9 +1266,10 @@ struct EncounterView: View {
                                 .cornerRadius(6)
                                 .shadow(color: gold.opacity(0.4), radius: 5)
                             }
+                            .padding(.bottom, 14)
                         }
 
-                        // Options
+                        // ── Answer options ───────────────────────────────────────
                         VStack(spacing: 10) {
                             ForEach(visibleOptions, id: \.self) { opt in
                                 OptionButton(
@@ -1294,8 +1284,9 @@ struct EncounterView: View {
                                 }
                             }
                         }
+                        .padding(.bottom, 18)
 
-                        // Submit
+                        // ── Submit button ────────────────────────────────────────
                         if !showFeedback {
                             Button {
                                 guard !selected.isEmpty else { return }
@@ -1312,7 +1303,7 @@ struct EncounterView: View {
                                     triggerGlitch()
                                 }
                             } label: {
-                                Text(selected.isEmpty ? "SELECT AN ANSWER" : "TRANSMIT ANSWER")
+                                Text(selected.isEmpty ? "SELECT AN ANSWER" : "CONFIRM ANSWER")
                                     .font(.system(size: 13, weight: .bold, design: .monospaced))
                                     .foregroundColor(selected.isEmpty ? color.opacity(0.4) : .black)
                                     .frame(maxWidth: .infinity)
@@ -1327,28 +1318,31 @@ struct EncounterView: View {
                             .disabled(selected.isEmpty)
                         }
 
-                        // Feedback block
+                        // ── Post-answer: result + key terms ──────────────────────
                         if showFeedback, let r = result {
-                            FeedbackBlock(result: r, correctAnswer: node.correctAnswer, color: color)
+                            VStack(alignment: .leading, spacing: 14) {
+                                Divider().background(color.opacity(0.3))
 
-                            if !r.wasCorrect {
-                                Button { onDismiss() } label: {
-                                    Text("ACKNOWLEDGE ERROR — RETURN")
-                                        .font(.system(size: 12, weight: .bold, design: .monospaced))
-                                        .foregroundColor(color)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 12)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 6)
-                                                .stroke(color.opacity(0.5), lineWidth: 1)
-                                        )
+                                FeedbackBlock(result: r, correctAnswer: node.correctAnswer, color: color)
+
+                                if !r.wasCorrect {
+                                    Button { onDismiss() } label: {
+                                        Text("REVIEW & CONTINUE →")
+                                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                            .foregroundColor(color)
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, 12)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 6)
+                                                    .stroke(color.opacity(0.5), lineWidth: 1)
+                                            )
+                                    }
+                                }
+
+                                if !glossaryTerms.isEmpty {
+                                    GlossaryPanel(terms: glossaryTerms, color: color)
                                 }
                             }
-                        }
-
-                        // ── Terminology panel ────────────────────────────────────
-                        if !glossaryTerms.isEmpty {
-                            GlossaryPanel(terms: glossaryTerms, color: color)
                         }
                     }
                     .padding(20)
@@ -1387,15 +1381,54 @@ struct EncounterView: View {
 
     // MARK: - Helpers
 
-    private var questionPrompt: String {
-        let lines = node.loreText.components(separatedBy: "\n")
-        if let q = lines.reversed().first(where: { $0.contains("QUERY") }) {
-            return q.trimmingCharacters(in: .whitespaces)
+    private var effectiveQuestion: String {
+        if !node.questionText.isEmpty { return node.questionText }
+        let rawTitle = node.nodeTitle.replacingOccurrences(of: "\n", with: " ")
+        let displayName = node.baseConceptTitle ?? rawTitle
+        // For multi-angle nodes use angle-specific template
+        if node.baseConceptTitle != nil {
+            switch node.angle {
+            case .classification: return "Which drug class does \(displayName) belong to?"
+            case .mechanism:      return "Which of the following best describes the mechanism of action of \(displayName)?"
+            case .indication:     return "\(displayName) is MOST commonly indicated for which of the following conditions?"
+            case .safety:         return "Which adverse effect is MOST commonly associated with \(displayName)?"
+            case .dosing:         return "Which of the following is correct regarding the dosing or administration of \(displayName)?"
+            }
         }
-        if let q = lines.first(where: { $0.contains("FORMULA") || $0.contains("EXAMPLE") }) {
-            return q.trimmingCharacters(in: .whitespaces)
+        // Auto-detect from option content
+        let optsLower = node.options.map { opt -> String in
+            let s = opt
+            guard s.count > 3, s[s.index(s.startIndex, offsetBy: 1)] == "." else { return s.lowercased() }
+            return String(s[s.index(s.startIndex, offsetBy: 3)...]).lowercased()
+        }.joined(separator: " | ")
+        if optsLower.contains("inhibit") || optsLower.contains("ribosom") || optsLower.contains("cell wall") || optsLower.contains("reuptake") || optsLower.contains("receptor") || optsLower.contains("enzyme") {
+            return "Which of the following correctly describes the mechanism of action of \(displayName)?"
         }
-        return "> SELECT THE CORRECT ANSWER TO PROCEED:"
+        if optsLower.contains("class") || optsLower.contains("generation") || optsLower.contains("category") || optsLower.contains("type of") || optsLower.contains("belong") {
+            return "Which drug class does \(displayName) belong to?"
+        }
+        if optsLower.contains("adverse") || optsLower.contains("side effect") || optsLower.contains("toxicit") || optsLower.contains("nephrotox") || optsLower.contains("hepatotox") || optsLower.contains("ototox") {
+            return "Which adverse effect is MOST commonly associated with \(displayName)?"
+        }
+        if optsLower.contains("contraindic") || optsLower.contains("avoid") || optsLower.contains("allerg") {
+            return "Which of the following is a contraindication for \(displayName)?"
+        }
+        if optsLower.contains("monitor") || optsLower.contains("lab") || optsLower.contains("therapeutic range") {
+            return "Which parameter requires monitoring in a patient taking \(displayName)?"
+        }
+        if optsLower.contains("indicat") || optsLower.contains("treat") || optsLower.contains("used for") || optsLower.contains("therapy") {
+            return "\(displayName) is MOST commonly indicated for which of the following conditions?"
+        }
+        if optsLower.contains("schedul") || optsLower.contains("dea") || optsLower.contains("controlled") {
+            return "Which DEA schedule is assigned to \(displayName)?"
+        }
+        if optsLower.contains("days supply") || optsLower.contains("sig") || optsLower.contains("dose") || optsLower.contains("mg") || optsLower.contains("frequency") {
+            return "Which of the following is correct regarding the dosing of \(displayName)?"
+        }
+        if optsLower.contains("law") || optsLower.contains("regulation") || optsLower.contains("requirement") || optsLower.contains("must") {
+            return "Which of the following correctly states the federal requirement regarding \(displayName)?"
+        }
+        return "Which of the following is correct regarding \(displayName)?"
     }
 
     private func startCountdown() {
@@ -1551,6 +1584,122 @@ struct FeedbackBlock: View {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(result.wasCorrect ? Color.green.opacity(0.35) : Color.red.opacity(0.35), lineWidth: 1)
         )
+    }
+}
+
+// MARK: - Teach Panel (shown before the question — learn then test)
+
+struct TeachPanel: View {
+    let loreText: String
+    let color: Color
+
+    @Environment(\.appTheme) private var theme
+
+    /// Parse loreText into clean, exam-relevant bullet points.
+    private var bullets: [String] {
+        loreText.components(separatedBy: "\n")
+            .compactMap { line -> String? in
+                var l = line.trimmingCharacters(in: .whitespaces)
+                if l.hasPrefix("> ") { l = String(l.dropFirst(2)) }
+                else if l.hasPrefix(">") { l = String(l.dropFirst(1)).trimmingCharacters(in: .whitespaces) }
+                // Strip terminal artifacts not meant for the learner
+                guard !l.isEmpty,
+                      !l.contains("QUERY"),
+                      !l.contains("SELECT THE CORRECT"),
+                      !l.uppercased().hasPrefix("FORMULA:"),
+                      !l.uppercased().hasPrefix("EXAMPLE:") else { return nil }
+                return l
+            }
+    }
+
+    /// Lines that look like exam tips or warnings — bolded visually.
+    private func isHighlight(_ text: String) -> Bool {
+        let u = text.uppercased()
+        return u.hasPrefix("NOTE:") || u.hasPrefix("CAUTION:") || u.hasPrefix("EXAM TIP:")
+            || u.hasPrefix("WARNING:") || u.hasPrefix("REMEMBER:") || u.hasPrefix("KEY:")
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Header
+            HStack(spacing: 6) {
+                Image(systemName: "book.closed.fill").font(.system(size: 10))
+                Text("WHAT YOU NEED TO KNOW")
+                    .font(.system(size: 11, weight: .bold))
+                    .tracking(0.3)
+            }
+            .foregroundColor(color.opacity(0.72))
+
+            // Bullet list
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(Array(bullets.enumerated()), id: \.offset) { _, bullet in
+                    HStack(alignment: .top, spacing: 10) {
+                        Text("▸")
+                            .font(.system(size: 13, design: .rounded))
+                            .foregroundColor(isHighlight(bullet) ? color : color.opacity(0.5))
+                            .padding(.top, 1)
+                        Text(bullet)
+                            .font(.system(size: 15,
+                                          weight: isHighlight(bullet) ? .semibold : .regular,
+                                          design: .rounded))
+                            .foregroundColor(isHighlight(bullet)
+                                             ? color.opacity(0.95)
+                                             : theme.primaryText.opacity(0.90))
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineSpacing(5)
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .background(color.opacity(0.04))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(color.opacity(0.18), lineWidth: 1))
+        .cornerRadius(10)
+    }
+}
+
+// MARK: - Explanation Panel
+
+struct ExplanationPanel: View {
+    let loreText: String
+    let color: Color
+
+    @Environment(\.appTheme) private var theme
+
+    private var cleanLines: [String] {
+        loreText.components(separatedBy: "\n")
+            .map { line in
+                var l = line.trimmingCharacters(in: .whitespaces)
+                if l.hasPrefix("> ") { l = String(l.dropFirst(2)) }
+                else if l.hasPrefix(">") { l = String(l.dropFirst(1)).trimmingCharacters(in: .whitespaces) }
+                return l
+            }
+            .filter { !$0.isEmpty }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                Image(systemName: "doc.text.fill").font(.system(size: 10))
+                Text("EXPLANATION")
+                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+            }
+            .foregroundColor(color.opacity(0.75))
+
+            VStack(alignment: .leading, spacing: 4) {
+                ForEach(Array(cleanLines.enumerated()), id: \.offset) { _, line in
+                    Text(line)
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundColor(theme.primaryText.opacity(0.82))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .lineSpacing(2)
+                }
+            }
+        }
+        .padding(14)
+        .background(color.opacity(0.05))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(color.opacity(0.2), lineWidth: 1))
+        .cornerRadius(8)
     }
 }
 
@@ -1982,11 +2131,19 @@ struct BossEncounterView: View {
     }
 
     private func questionPrompt(for node: DataNode) -> String {
-        let lines = node.loreText.components(separatedBy: "\n")
-        if let q = lines.reversed().first(where: { $0.contains("QUERY") }) {
-            return q.trimmingCharacters(in: .whitespaces)
+        if !node.questionText.isEmpty { return node.questionText }
+        let rawTitle = node.nodeTitle.replacingOccurrences(of: "\n", with: " ")
+        let displayName = node.baseConceptTitle ?? rawTitle
+        if node.baseConceptTitle != nil {
+            switch node.angle {
+            case .classification: return "Which drug class does \(displayName) belong to?"
+            case .mechanism:      return "Which of the following best describes the mechanism of action of \(displayName)?"
+            case .indication:     return "\(displayName) is MOST commonly indicated for which of the following conditions?"
+            case .safety:         return "Which adverse effect is MOST commonly associated with \(displayName)?"
+            case .dosing:         return "Which of the following is correct regarding the dosing or administration of \(displayName)?"
+            }
         }
-        return "> SELECT THE CORRECT ANSWER:"
+        return "Which of the following is correct regarding \(displayName)?"
     }
 
     private func triggerBreach() {

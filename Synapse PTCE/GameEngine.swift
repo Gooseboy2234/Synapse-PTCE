@@ -104,6 +104,9 @@ struct DataNode: Identifiable, Sendable {
     let domain: KnowledgeDomain
     let nodeTitle: String
     let loreText: String
+    /// PTCB-style question stem shown before the answer choices.
+    /// Leave empty ("") to auto-generate from angle/options at display time.
+    var questionText: String = ""
     var challengeType: ChallengeType = .multipleChoice
     var options: [String] = []
     var correctAnswer: String = ""

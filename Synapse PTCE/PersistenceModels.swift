@@ -2,7 +2,7 @@
 //  PersistenceModels.swift
 //  Synapse PTCE
 //
-//  v9.0 — Adds GameMode, AppAppearance, AppTheme, NodeAngle, StoryProgress.
+//  v11.0 — Adds TextSizeOption, ultra-dark AppAppearance modes.
 //
 
 import Foundation
@@ -136,13 +136,17 @@ enum GameMode: String, CaseIterable, Codable {
 // MARK: - App Appearance
 
 enum AppAppearance: String, CaseIterable, Codable {
-    case dark      = "DARK"
-    case warmLight = "WARM_LIGHT"
+    case dark       = "DARK"
+    case warmLight  = "WARM_LIGHT"
+    case ultraDark  = "ULTRA_DARK"
+    case midnight   = "MIDNIGHT"
 
     var displayName: String {
         switch self {
         case .dark:      return "Terminal Dark"
         case .warmLight: return "Warm Light"
+        case .ultraDark: return "Void Dark"
+        case .midnight:  return "Midnight Red"
         }
     }
 
@@ -150,6 +154,8 @@ enum AppAppearance: String, CaseIterable, Codable {
         switch self {
         case .dark:      return "High-contrast terminal aesthetic."
         case .warmLight: return "Mini Motorways warm cream palette."
+        case .ultraDark: return "Near-black with grey text. Easy on tired eyes."
+        case .midnight:  return "Dark red tint. Pair with Crimson theme."
         }
     }
 
@@ -157,6 +163,48 @@ enum AppAppearance: String, CaseIterable, Codable {
         switch self {
         case .dark:      return "moon.fill"
         case .warmLight: return "sun.max.fill"
+        case .ultraDark: return "moon.zzz.fill"
+        case .midnight:  return "moon.stars.fill"
+        }
+    }
+}
+
+// MARK: - Text Size Option
+
+enum TextSizeOption: String, CaseIterable, Codable {
+    case normal     = "NORMAL"
+    case large      = "LARGE"
+    case extraLarge = "XL"
+
+    var displayName: String {
+        switch self {
+        case .normal:     return "Normal"
+        case .large:      return "Large"
+        case .extraLarge: return "Extra Large"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .normal:     return "Default study note size."
+        case .large:      return "Easier to read in low light."
+        case .extraLarge: return "Maximum readability when tired."
+        }
+    }
+
+    var fontSize: CGFloat {
+        switch self {
+        case .normal:     return 15
+        case .large:      return 17
+        case .extraLarge: return 20
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .normal:     return "textformat.size.smaller"
+        case .large:      return "textformat.size"
+        case .extraLarge: return "textformat.size.larger"
         }
     }
 }
@@ -189,14 +237,38 @@ struct AppTheme {
 
     // MARK: Warm Light — Mini Motorways-inspired cream palette
     static let warmLight = AppTheme(
-        background:       Color(red: 0.937, green: 0.922, blue: 0.878),  // #EFEBE0 cream
-        surface:          Color(red: 0.961, green: 0.949, blue: 0.925),  // warm white
-        surfaceSecondary: Color(red: 0.914, green: 0.898, blue: 0.871),  // slightly deeper cream
-        primaryText:      Color(red: 0.173, green: 0.173, blue: 0.173),  // #2C2C2C charcoal
+        background:       Color(red: 0.937, green: 0.922, blue: 0.878),
+        surface:          Color(red: 0.961, green: 0.949, blue: 0.925),
+        surfaceSecondary: Color(red: 0.914, green: 0.898, blue: 0.871),
+        primaryText:      Color(red: 0.173, green: 0.173, blue: 0.173),
         secondaryText:    Color(red: 0.173, green: 0.173, blue: 0.173).opacity(0.48),
         divider:          Color(red: 0.173, green: 0.173, blue: 0.173).opacity(0.10),
         gridLine:         Color(red: 0.173, green: 0.173, blue: 0.173).opacity(0.035),
         isDark:           false
+    )
+
+    // MARK: Void Dark — near-black, low-contrast grey-on-grey for late-night study
+    static let ultraDark = AppTheme(
+        background:       Color(red: 0.033, green: 0.033, blue: 0.033),  // #090909
+        surface:          Color(red: 0.063, green: 0.063, blue: 0.063),  // #101010
+        surfaceSecondary: Color(red: 0.090, green: 0.090, blue: 0.090),  // #171717
+        primaryText:      Color.white.opacity(0.40),                     // muted grey
+        secondaryText:    Color.white.opacity(0.22),
+        divider:          Color.white.opacity(0.06),
+        gridLine:         Color.white.opacity(0.018),
+        isDark:           true
+    )
+
+    // MARK: Midnight Red — very dark red-tinted, for use with Crimson theme
+    static let midnight = AppTheme(
+        background:       Color(red: 0.055, green: 0.018, blue: 0.018),  // #0E0505
+        surface:          Color(red: 0.085, green: 0.030, blue: 0.030),  // #160808
+        surfaceSecondary: Color(red: 0.110, green: 0.042, blue: 0.042),  // #1C0B0B
+        primaryText:      Color(red: 0.68, green: 0.30, blue: 0.30),     // muted dark red
+        secondaryText:    Color(red: 0.68, green: 0.30, blue: 0.30).opacity(0.52),
+        divider:          Color(red: 0.68, green: 0.30, blue: 0.30).opacity(0.12),
+        gridLine:         Color(red: 0.68, green: 0.30, blue: 0.30).opacity(0.035),
+        isDark:           true
     )
 }
 
@@ -216,8 +288,6 @@ extension EnvironmentValues {
 // MARK: - Node Angle
 
 /// The pedagogical angle from which a DataNode's question approaches its topic.
-/// Multiple angles on the same drug (Classification, Indication, Safety…) rotate
-/// to build multi-dimensional recall.
 enum NodeAngle: String, CaseIterable, Codable {
     case classification = "CLASS"
     case indication     = "INDICATION"
@@ -295,7 +365,7 @@ struct LogicProbe {
 @Model
 final class NodeProgress {
 
-    var persistenceKey: String   // uniqueness enforced by progressMap in GameEngine (CloudKit-compatible)
+    var persistenceKey: String
     var isUnlocked: Bool
     var isCompleted: Bool
     var masteryLevel: Int
@@ -338,8 +408,10 @@ final class UserStats {
     var gameModeRaw: String
     var appearanceRaw: String
 
+    // MARK: Text Size
+    var textSizeRaw: String
+
     // MARK: Story Progress
-    /// Number of 5%-milestone story beats already shown to the user.
     var storyBeatsShown: Int
 
     // MARK: Boss State
@@ -360,6 +432,7 @@ final class UserStats {
         unlockedThemesRaw = Theme.amber.rawValue
         gameModeRaw       = GameMode.prodigy.rawValue
         appearanceRaw     = AppAppearance.dark.rawValue
+        textSizeRaw       = TextSizeOption.normal.rawValue
         storyBeatsShown   = 0
         bossStreakD1 = 0;  bossDefeatedD1 = false
         bossStreakD2 = 0;  bossDefeatedD2 = false
@@ -409,9 +482,10 @@ final class UserStats {
         unlockedThemesRaw += ",\(theme.rawValue)"
     }
 
-    // MARK: Derived — Game Mode & Appearance
+    // MARK: Derived — Game Mode, Appearance & Text Size
     var gameMode: GameMode          { GameMode(rawValue: gameModeRaw) ?? .prodigy }
     var appAppearance: AppAppearance { AppAppearance(rawValue: appearanceRaw) ?? .dark }
+    var textSizeOption: TextSizeOption { TextSizeOption(rawValue: textSizeRaw) ?? .normal }
 
     // MARK: Derived — Boss
 
