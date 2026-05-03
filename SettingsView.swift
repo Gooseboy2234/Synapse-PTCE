@@ -116,20 +116,138 @@ struct SettingsView: View {
 
     private var aboutSection: some View {
         SettingsSection(title: "ABOUT", theme: theme, accent: accent) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("SYNAPSE // PTCE NETWORK v13.0 // MAIN BRANCH")
-                    .font(.system(size: 12, weight: .bold, design: .monospaced))
-                    .foregroundColor(accent)
-                    .shadow(color: accent.opacity(0.4), radius: 3)
-
-                Divider().background(theme.divider)
-
-                Group {
-                    infoRow(label: "DEVELOPER", value: "Ethan Bradley (Gooseboy2234)")
-                    infoRow(label: "LOCATION",  value: "Hendersonville, TN")
-                    infoRow(label: "EXAM",      value: "2026 PTCB Blueprint")
-                    infoRow(label: "NODES",     value: "151 across 4 scored domains")
+            VStack(alignment: .leading, spacing: 16) {
+                
+                // App icon + title
+                HStack(spacing: 16) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color(red: 1.0, green: 0.65, blue: 0.0),
+                                        Color(red: 0.95, green: 0.22, blue: 0.30)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 70, height: 70)
+                        
+                        Image(systemName: "brain.head.profile")
+                            .font(.system(size: 36, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("SYNAPSE PTCE")
+                            .font(.system(size: 20, weight: .black, design: .monospaced))
+                            .foregroundColor(theme.primaryText)
+                        
+                        Text("v13.0 — Guided Learning Edition")
+                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                            .foregroundColor(theme.secondaryText)
+                    }
                 }
+                
+                Divider().background(theme.divider)
+                
+                // Who this is for
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "person.fill.checkmark")
+                            .foregroundColor(accent)
+                        Text("WHO THIS IS FOR:")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(accent)
+                    }
+                    
+                    Text("This app is designed for **pharmacy technician students** preparing for the PTCE (Pharmacy Technician Certification Exam). Whether you're a visual learner, need structured guidance, or want to master medications through proven learning science, Synapse PTCE is built specifically for you.")
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundColor(theme.primaryText.opacity(0.85))
+                        .lineSpacing(4)
+                }
+                
+                Divider().background(theme.divider)
+                
+                // About the author
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "person.circle.fill")
+                            .foregroundColor(accent)
+                        Text("ABOUT THE CREATOR:")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(accent)
+                    }
+                    
+                    Text("Created by **Ethan Bradley**, a pharmacy technician educator from Hendersonville, TN who saw students struggling with rote memorization. This app teaches the way the PTCE actually tests: **pattern recognition, clinical thinking, and patient safety**. Not just facts — understanding.")
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundColor(theme.primaryText.opacity(0.85))
+                        .lineSpacing(4)
+                }
+                
+                Divider().background(theme.divider)
+                
+                // Technical details
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Image(systemName: "info.circle.fill")
+                            .foregroundColor(accent)
+                        Text("TECHNICAL DETAILS:")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(accent)
+                    }
+                    
+                    Group {
+                        infoRow(label: "EXAM", value: "2026 PTCB Blueprint")
+                        infoRow(label: "NODES", value: "151 across 4 scored domains")
+                        infoRow(label: "STEMS", value: "25+ drug naming patterns")
+                        infoRow(label: "PLATFORM", value: "Swift 6 + SwiftUI + SwiftData")
+                    }
+                }
+                
+                Divider().background(theme.divider)
+                
+                // Quick access to Guided Learning with neon styling
+                NavigationLink(destination: GuidedLearningHub(accentColor: accent)) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "brain.head.profile")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [
+                                        Color(red: 0.0, green: 1.0, blue: 0.8),
+                                        Color(red: 0.0, green: 0.8, blue: 1.0)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Open Guided Learning System")
+                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                                .foregroundColor(theme.primaryText)
+                            
+                            Text("25+ stems • Flashcards • Quizzes • Interactions")
+                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                .foregroundColor(theme.secondaryText)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(theme.secondaryText)
+                    }
+                    .padding(14)
+                    .background(Color(red: 0.0, green: 1.0, blue: 0.8).opacity(0.08))
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(red: 0.0, green: 1.0, blue: 0.8).opacity(0.3), lineWidth: 1.5)
+                    )
+                }
+                .buttonStyle(.plain)
             }
             .padding(14)
             .background(theme.surface)
@@ -310,9 +428,7 @@ struct SettingsView: View {
                 .overlay(RoundedRectangle(cornerRadius: 6)
                     .stroke(resetText == "RESET" ? Color.red : theme.divider, lineWidth: 1))
                 .cornerRadius(6)
-                #if os(iOS)
-                .textInputAutocapitalization(.characters)
-                #endif
+                .autocapitalization(.characters)
                 .autocorrectionDisabled()
 
             HStack(spacing: 10) {

@@ -219,6 +219,18 @@ class GameEngine {
     // Story narrative
     var pendingStoryBeat: StoryBeat? = nil
 
+    // MARK: - Shared Budget Timer
+    // In timed modes the clock is a session-wide budget (secondsPerQuestion × nodes answered
+    // so far, topped up each time a new node is opened). It survives sheet dismissals so
+    // fast answers on one node carry over to harder ones.
+
+    /// Remaining seconds in the current timed session. Observable so views update live.
+    var timedBudgetRemaining: Int = 0
+    /// True while a timed session is active and the clock should be ticking.
+    var timedSessionActive: Bool  = false
+
+    private var budgetTimerTask: Task<Void, Never>? = nil
+
     var currentLogicProbe: LogicProbe { LogicProbe.from(xp: currentProbeXP) }
 
     /// Semantic colour tokens for the active appearance + theme.
@@ -568,12 +580,73 @@ class GameEngine {
         _userStats.gameModeRaw = mode.rawValue
         syncDisplayStats()
         try? modelContext.save()
+        // End any active timed session when the mode changes
+        endTimedSession()
     }
 
     func setAppearance(_ appearance: AppAppearance) {
         _userStats.appearanceRaw = appearance.rawValue
         syncDisplayStats()
         try? modelContext.save()
+    }
+
+    // MARK: - Shared Budget Timer
+
+    /// Call when a timed-mode node is about to be presented.
+    /// Tops up the budget by one question's worth of seconds and starts the clock
+    /// if it isn't already running.
+    func beginTimedQuestion() {
+        guard currentGameMode.isTimed else { return }
+        timedBudgetRemaining += currentGameMode.secondsPerQuestion
+        if !timedSessionActive {
+            timedSessionActive = true
+            startBudgetClock()
+        }
+    }
+
+    /// Pauses the budget clock (e.g. while the encounter sheet is being dismissed).
+    func pauseTimedSession() {
+        timedSessionActive = false
+        budgetTimerTask?.cancel()
+        budgetTimerTask = nil
+    }
+
+    /// Resumes the budget clock after a pause (e.g. when a new node sheet opens).
+    func resumeTimedSession() {
+        guard currentGameMode.isTimed, timedBudgetRemaining > 0 else { return }
+        timedSessionActive = true
+        startBudgetClock()
+    }
+
+    /// Ends the session entirely and resets the budget to zero.
+    func endTimedSession() {
+        timedSessionActive = false
+        timedBudgetRemaining = 0
+        budgetTimerTask?.cancel()
+        budgetTimerTask = nil
+    }
+
+    private func startBudgetClock() {
+        budgetTimerTask?.cancel()
+        budgetTimerTask = Task { [weak self] in
+            while true {
+                try? await Task.sleep(for: .seconds(1))
+                guard let self, !Task.isCancelled else { return }
+                guard self.timedSessionActive else { return }
+                if self.timedBudgetRemaining > 0 {
+                    self.timedBudgetRemaining -= 1
+                }
+                if self.timedBudgetRemaining == 0 {
+                    // Budget exhausted — force-submit the open node as a timeout
+                    if let openNode = self.selectedNode {
+                        self.gradeAnswer(nodeId: openNode.id, submitted: "<<<TIMEOUT>>>")
+                        self.selectedNode = nil
+                    }
+                    self.timedSessionActive = false
+                    return
+                }
+            }
+        }
     }
 
     // MARK: - Full Reset

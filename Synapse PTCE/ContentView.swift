@@ -147,10 +147,11 @@ struct MapView: View {
     @State private var showIntel    = false
     @State private var showReview   = false
     @State private var showExam     = false
+    @State private var showGuidedLearning = false
 
     var body: some View {
         ZStack {
-            GridBackground()
+            GridBackgroundView(accentColor: engine.currentTheme.accentColor, theme: engine.appTheme)
             if let domain = selectedDomain, let quest = selectedQuest {
                 SectorMapView(engine: engine, domain: domain, quest: quest) {
                     withAnimation(.easeInOut(duration: 0.35)) { selectedQuest = nil }
@@ -183,7 +184,8 @@ struct MapView: View {
                            onShowSettings: { showSettings = true },
                            onShowIntel:    { showIntel    = true },
                            onShowReview:   { showReview   = true },
-                           onShowExam:     { showExam     = true })
+                           onShowExam:     { showExam     = true },
+                           onShowGuidedLearning: { showGuidedLearning = true })
                 .transition(.asymmetric(
                     insertion: .move(edge: .leading).combined(with: .opacity),
                     removal:   .move(edge: .leading).combined(with: .opacity)
@@ -196,6 +198,7 @@ struct MapView: View {
         .sheet(item: $engine.selectedNode) { node in
             EncounterView(
                 node: node,
+                engine: engine,
                 gameMode: engine.currentGameMode,
                 probeAbility: engine.currentLogicProbe.activeAbility,
                 contentFontSize: engine.currentTextSize.fontSize
@@ -205,6 +208,8 @@ struct MapView: View {
                 engine.selectedNode = nil
             }
             .environment(\.appTheme, engine.appTheme)
+            .onAppear  { engine.beginTimedQuestion() }
+            .onDisappear { engine.pauseTimedSession() }
         }
         // Store sheet
         .sheet(isPresented: $showStore) {
@@ -232,17 +237,17 @@ struct MapView: View {
             .environment(\.appTheme, engine.appTheme)
         }
         // Practice Exam (full screen — exam deserves the full canvas)
-        #if os(iOS)
-        .fullScreenCover(isPresented: $showExam) {
+        .fullScreenCoverCompat(isPresented: $showExam) {
             PracticeExamView(engine: engine)
                 .environment(\.appTheme, engine.appTheme)
         }
-        #else
-        .sheet(isPresented: $showExam) {
-            PracticeExamView(engine: engine)
-                .environment(\.appTheme, engine.appTheme)
+        // Guided Learning Hub
+        .sheet(isPresented: $showGuidedLearning) {
+            NavigationStack {
+                GuidedLearningHub(accentColor: Color(red: 0.0, green: 1.0, blue: 0.8))
+                    .environment(\.appTheme, engine.appTheme)
+            }
         }
-        #endif
         // Story beat narrative overlay
         .sheet(item: $engine.pendingStoryBeat) { beat in
             StoryBeatView(beat: beat, accent: engine.currentTheme.accentColor) {
@@ -264,6 +269,7 @@ struct HubMapView: View {
     let onShowIntel: () -> Void
     let onShowReview: () -> Void
     let onShowExam: () -> Void
+    let onShowGuidedLearning: () -> Void
 
     // Positions shifted slightly lower to center in the space above the bottom bar
     private let hubPositions: [KnowledgeDomain: CGPoint] = [
@@ -272,6 +278,8 @@ struct HubMapView: View {
         .patientSafety:       CGPoint(x: 0.27, y: 0.64),
         .orderEntry:          CGPoint(x: 0.73, y: 0.64)
     ]
+    
+    @State private var pulseAnimation = false
 
     var body: some View {
         GeometryReader { geo in
@@ -299,6 +307,13 @@ struct HubMapView: View {
                         .position(x: pos.x * geo.size.width, y: pos.y * geo.size.height)
                     }
                 }
+                
+                // NEON GUIDED LEARNING BUTTON
+                GuidedLearningNeonButton(pulseAnimation: $pulseAnimation, onTap: onShowGuidedLearning)
+                    .position(x: 0.5 * geo.size.width, y: 0.15 * geo.size.height)
+            }
+            .onAppear {
+                pulseAnimation = true
             }
         }
         .ignoresSafeArea()
@@ -311,6 +326,116 @@ struct HubMapView: View {
                 onShowReview: onShowReview,
                 onShowExam: onShowExam
             )
+        }
+    }
+}
+
+// MARK: - Guided Learning Neon Button
+
+struct GuidedLearningNeonButton: View {
+    @Binding var pulseAnimation: Bool
+    let onTap: () -> Void
+    @Environment(\.appTheme) private var theme
+    
+    private let neonCyan = Color(red: 0.0, green: 1.0, blue: 0.8)
+    private let neonBlue = Color(red: 0.0, green: 0.8, blue: 1.0)
+    
+    var body: some View {
+        ZStack {
+            // Animated neon glow trail
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            neonCyan.opacity(0.6),
+                            neonBlue.opacity(0.3),
+                            Color.clear
+                        ],
+                        center: .center,
+                        startRadius: 20,
+                        endRadius: 80
+                    )
+                )
+                .frame(width: 160, height: 160)
+                .blur(radius: 20)
+                .scaleEffect(pulseAnimation ? 1.2 : 1.0)
+                .opacity(pulseAnimation ? 0.7 : 0.4)
+                .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: pulseAnimation)
+            
+            // Main button
+            Button(action: onTap) {
+                VStack(spacing: 10) {
+                    ZStack {
+                        // Outer glow ring
+                        Circle()
+                            .stroke(
+                                LinearGradient(
+                                    colors: [neonCyan, neonBlue, neonCyan],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 3
+                            )
+                            .frame(width: 70, height: 70)
+                            .shadow(color: neonCyan, radius: 10)
+                        
+                        // Icon
+                        Image(systemName: "brain.head.profile")
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [neonCyan, neonBlue],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .shadow(color: neonCyan, radius: 8)
+                    }
+                    
+                    VStack(spacing: 3) {
+                        Text("GUIDED LEARNING")
+                            .font(.system(size: 12, weight: .black, design: .monospaced))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [neonCyan, neonBlue],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                        
+                        Text("START HERE")
+                            .font(.system(size: 9, weight: .bold, design: .monospaced))
+                            .foregroundColor(neonCyan.opacity(0.7))
+                        
+                        // Beta badge
+                        Text("D1 STEMS")
+                            .font(.system(size: 7, weight: .black, design: .monospaced))
+                            .foregroundColor(.black)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(
+                                Capsule()
+                                    .fill(neonCyan)
+                            )
+                    }
+                }
+                .padding(16)
+                .background(theme.surface)
+                .cornerRadius(14)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(
+                            LinearGradient(
+                                colors: [neonCyan, neonBlue],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 2
+                        )
+                )
+                .shadow(color: neonCyan.opacity(0.3), radius: 20, y: 10)
+            }
+            .buttonStyle(.plain)
         }
     }
 }
@@ -1136,6 +1261,7 @@ struct DataNodeView: View {
 
 struct EncounterView: View {
     let node: DataNode
+    let engine: GameEngine
     let gameMode: GameMode
     /// Active Logic Probe ability, if any (passed from MapView).
     let probeAbility: ProbeAbility?
@@ -1161,10 +1287,6 @@ struct EncounterView: View {
     @State private var probeAbilityUsed = false
     @State private var eliminatedOption: String? = nil
 
-    // Timed Mode
-    @State private var timeRemaining: Int = 0
-    @State private var timerRunning = false
-
     @Environment(\.appTheme) private var theme
     private var color: Color { node.domain.accentColor }
     private let gold = Color(red: 1.0, green: 0.85, blue: 0.2)
@@ -1183,7 +1305,7 @@ struct EncounterView: View {
     var body: some View {
         ZStack {
             theme.background.ignoresSafeArea()
-            GridBackground().opacity(0.4).ignoresSafeArea()
+            GridBackgroundView(accentColor: color, theme: theme).opacity(0.4).ignoresSafeArea()
 
             // Glitch flash overlay
             Color.red
@@ -1223,18 +1345,20 @@ struct EncounterView: View {
                                 }
                             }
                             Spacer()
-                            if gameMode == .timed {
+                            if gameMode.isTimed {
+                                let budget = engine.timedBudgetRemaining
+                                let isLow = budget <= 30
                                 HStack(spacing: 4) {
                                     Image(systemName: "timer").font(.system(size: 10))
-                                    Text(String(format: "%02d", timeRemaining))
+                                    Text(timerLabel(budget))
                                         .font(.system(size: 12, weight: .bold, design: .monospaced))
                                 }
-                                .foregroundColor(timeRemaining <= 10 ? .red : color)
-                                .shadow(color: timeRemaining <= 10 ? Color.red.opacity(0.7) : .clear, radius: 4)
+                                .foregroundColor(isLow ? .red : color)
+                                .shadow(color: isLow ? Color.red.opacity(0.7) : .clear, radius: 4)
                                 .padding(.horizontal, 8).padding(.vertical, 3)
-                                .background((timeRemaining <= 10 ? Color.red : color).opacity(0.1))
+                                .background((isLow ? Color.red : color).opacity(0.1))
                                 .overlay(RoundedRectangle(cornerRadius: 5)
-                                    .stroke((timeRemaining <= 10 ? Color.red : color).opacity(0.4), lineWidth: 1))
+                                    .stroke((isLow ? Color.red : color).opacity(0.4), lineWidth: 1))
                                 .cornerRadius(5)
                             }
                         }
@@ -1383,10 +1507,6 @@ struct EncounterView: View {
                 try? await Task.sleep(for: .milliseconds(550))
                 withAnimation(.easeIn(duration: 0.35)) { bootComplete = true }
             }
-            if gameMode == .timed {
-                timeRemaining = GameMode.timed.timerSeconds
-                startCountdown()
-            }
         }
         .onDisappear { dismissTask?.cancel() }
     }
@@ -1443,24 +1563,12 @@ struct EncounterView: View {
         return "Which of the following is correct regarding \(displayName)?"
     }
 
-    private func startCountdown() {
-        dismissTask = Task {
-            while timeRemaining > 0 {
-                try? await Task.sleep(for: .seconds(1))
-                guard !Task.isCancelled else { return }
-                if showFeedback { return }  // already answered
-                timeRemaining -= 1
-            }
-            // Time expired
-            guard !Task.isCancelled, !showFeedback else { return }
-            let r = onSubmit(node.id, "<<<TIMEOUT>>>")
-            result = r
-            showFeedback = true
-            triggerGlitch()
-            try? await Task.sleep(for: .seconds(1.8))
-            guard !Task.isCancelled else { return }
-            onDismiss()
+    /// Formats the shared budget as m:ss when ≥ 60s, or a bare seconds count when low.
+    private func timerLabel(_ seconds: Int) -> String {
+        if seconds >= 60 {
+            return String(format: "%d:%02d", seconds / 60, seconds % 60)
         }
+        return String(format: "%02d", seconds)
     }
 
     private func triggerGlitch() {
@@ -1716,37 +1824,6 @@ struct ExplanationPanel: View {
     }
 }
 
-// MARK: - Grid Background
-
-struct GridBackground: View {
-    @Environment(\.appTheme) private var theme
-
-    var body: some View {
-        Canvas { ctx, size in
-            let spacing: CGFloat = 28
-            let lineColor = theme.gridLine
-            var x: CGFloat = 0
-            while x <= size.width {
-                var p = Path()
-                p.move(to: CGPoint(x: x, y: 0))
-                p.addLine(to: CGPoint(x: x, y: size.height))
-                ctx.stroke(p, with: .color(lineColor), lineWidth: 0.5)
-                x += spacing
-            }
-            var y: CGFloat = 0
-            while y <= size.height {
-                var p = Path()
-                p.move(to: CGPoint(x: 0, y: y))
-                p.addLine(to: CGPoint(x: size.width, y: y))
-                ctx.stroke(p, with: .color(lineColor), lineWidth: 0.5)
-                y += spacing
-            }
-        }
-        .background(theme.background)
-        .ignoresSafeArea()
-    }
-}
-
 // MARK: - Story Beat View
 
 struct StoryBeatView: View {
@@ -1770,7 +1847,7 @@ struct StoryBeatView: View {
             Color.black.ignoresSafeArea()
 
             // Subtle grid
-            GridBackground().opacity(0.18).ignoresSafeArea()
+            GridBackgroundView(accentColor: accent, theme: theme).opacity(0.18).ignoresSafeArea()
 
             // Scan-line sweep
             GeometryReader { geo in
@@ -1989,14 +2066,16 @@ struct BossEncounterView: View {
     @State private var burstScale: CGFloat = 0.2
     @State private var burstOpacity: Double = 0.0
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.appTheme) private var theme
 
     private var color: Color { domain.accentColor }
+    private var accent: Color { domain.accentColor }
     private var questionPool: [DataNode] { nodes.filter { $0.isCompleted || $0.isUnlocked } }
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            GridBackground().opacity(0.35).ignoresSafeArea()
+            GridBackgroundView(accentColor: accent, theme: theme).opacity(0.35).ignoresSafeArea()
 
             // Breach flash
             Color.red.opacity(breachFlash).ignoresSafeArea().allowsHitTesting(false)
@@ -2175,13 +2254,14 @@ struct BossEncounterView: View {
 struct StoreView: View {
     let engine: GameEngine
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.appTheme) private var theme
 
     private let cyan = Color(red: 0.6, green: 0.9, blue: 1.0)
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            GridBackground().opacity(0.35).ignoresSafeArea()
+            GridBackgroundView(accentColor: engine.currentTheme.accentColor, theme: theme).opacity(0.35).ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 0) {
                 // Header
@@ -2358,7 +2438,7 @@ struct CampaignView: View {
     var body: some View {
         ZStack {
             theme.background.ignoresSafeArea()
-            GridBackground().opacity(0.35).ignoresSafeArea()
+            GridBackgroundView(accentColor: accent, theme: theme).opacity(0.35).ignoresSafeArea()
 
             switch phase {
             case .briefing: briefingView
@@ -2434,11 +2514,11 @@ struct CampaignView: View {
 
                     VStack(alignment: .leading, spacing: 8) {
                         CampaignRule(icon: "checkmark.seal.fill",
-                                     text: "Answers save to your Stability Score", accent: accent, theme: theme)
+                                     text: "Answers save to your Stability Score", accentColor: accent, theme: theme)
                         CampaignRule(icon: "timer.circle.fill",
-                                     text: "No time limit — study at your own pace", accent: accent, theme: theme)
+                                     text: "No time limit — study at your own pace", accentColor: accent, theme: theme)
                         CampaignRule(icon: "arrow.2.squarepath",
-                                     text: "5 rounds × 4 domains = 20 questions", accent: accent, theme: theme)
+                                     text: "5 rounds × 4 domains = 20 questions", accentColor: accent, theme: theme)
                     }
 
                     let pool = buildQuestions()
@@ -2811,14 +2891,14 @@ struct CampaignView: View {
 private struct CampaignRule: View {
     let icon: String
     let text: String
-    let accent: Color
+    let accentColor: Color
     let theme: AppTheme
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: icon)
                 .font(.system(size: 12))
-                .foregroundColor(accent.opacity(0.8))
+                .foregroundColor(accentColor.opacity(0.8))
                 .frame(width: 18)
             Text(text)
                 .font(.system(size: 12, design: .monospaced))

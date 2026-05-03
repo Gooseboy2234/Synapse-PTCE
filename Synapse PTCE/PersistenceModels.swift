@@ -105,32 +105,51 @@ enum Theme: String, CaseIterable, Codable {
 // MARK: - Game Mode
 
 enum GameMode: String, CaseIterable, Codable {
-    case prodigy = "PRODIGY"
-    case timed   = "TIMED"
+    case prodigy        = "PRODIGY"
+    case economy        = "ECONOMY"
+    case timed          = "TIMED"
+    case criticalBreach = "CRITICAL_BREACH"
 
     var displayName: String {
         switch self {
-        case .prodigy: return "Prodigy Mode"
-        case .timed:   return "Emergency Override"
+        case .prodigy:        return "Prodigy Mode"
+        case .economy:        return "Economy Protocol"
+        case .timed:          return "Emergency Override"
+        case .criticalBreach: return "Critical Breach"
         }
     }
 
     var description: String {
         switch self {
-        case .prodigy: return "Narrative journey. Untimed. Logic Probe active."
-        case .timed:   return "High-pressure encounters with a 45-second countdown."
+        case .prodigy:        return "Narrative journey. Untimed. Logic Probe active."
+        case .economy:        return "Realistic exam pacing — 65s average per question."
+        case .timed:          return "High-pressure challenge — 45s average per question."
+        case .criticalBreach: return "Expert pressure test — 55s average per question."
         }
     }
 
     var icon: String {
         switch self {
-        case .prodigy: return "brain.head.profile"
-        case .timed:   return "exclamationmark.triangle.fill"
+        case .prodigy:        return "brain.head.profile"
+        case .economy:        return "timer"
+        case .timed:          return "exclamationmark.triangle.fill"
+        case .criticalBreach: return "bolt.trianglebadge.exclamationmark.fill"
         }
     }
 
-    /// Seconds given per question in timed mode.
-    var timerSeconds: Int { 45 }
+    /// Returns true for any mode that uses a shared budget countdown.
+    var isTimed: Bool { self != .prodigy }
+
+    /// Seconds budgeted per question. The total session budget is this × node count.
+    /// Zero for untimed modes.
+    var secondsPerQuestion: Int {
+        switch self {
+        case .prodigy:        return 0
+        case .economy:        return 65
+        case .timed:          return 45
+        case .criticalBreach: return 55
+        }
+    }
 }
 
 // MARK: - App Appearance

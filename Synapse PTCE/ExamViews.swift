@@ -50,30 +50,30 @@ struct IntelReportView: View {
                     VStack(alignment: .leading, spacing: 24) {
 
                         // ── Overall Stats ────────────────────────────
-                        SectionHeader(title: "OVERALL", accent: accent)
+                        IntelSectionHeader(title: "OVERALL", accent: accent)
 
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                            StatCard(label: "STABILITY", value: "\(engine.currentStabilityScore)/1000",
+                            IntelStatCard(label: "STABILITY", value: "\(engine.currentStabilityScore)/1000",
                                      color: accent, theme: theme)
-                            StatCard(label: "ACCURACY",
+                            IntelStatCard(label: "ACCURACY",
                                      value: engine.currentAccuracyPercent,
                                      color: green, theme: theme)
-                            StatCard(label: "NODES DONE",
+                            IntelStatCard(label: "NODES DONE",
                                      value: "\(engine.currentNodesCompleted)",
                                      color: cyan, theme: theme)
-                            StatCard(label: "PERFECT",
+                            IntelStatCard(label: "PERFECT",
                                      value: "\(engine.currentPerfectNodes)",
                                      color: Color(red: 1.0, green: 0.85, blue: 0.2), theme: theme)
-                            StatCard(label: "BREACH NODES",
+                            IntelStatCard(label: "BREACH NODES",
                                      value: "\(engine.breachNodes.count)",
                                      color: engine.breachNodes.isEmpty ? green : red, theme: theme)
-                            StatCard(label: "SYSTEM RANK",
+                            IntelStatCard(label: "SYSTEM RANK",
                                      value: engine.currentSystemRank.badge,
                                      color: accent, theme: theme)
                         }
 
                         // ── Domain Breakdown ──────────────────────────
-                        SectionHeader(title: "SECTOR BREAKDOWN", accent: accent)
+                        IntelSectionHeader(title: "SECTOR BREAKDOWN", accent: accent)
 
                         ForEach(KnowledgeDomain.allCases) { domain in
                             DomainStatRow(domain: domain, engine: engine, theme: theme)
@@ -82,7 +82,7 @@ struct IntelReportView: View {
                         // ── Breach Node List ──────────────────────────
                         let breaches = engine.breachNodes
                         if !breaches.isEmpty {
-                            SectionHeader(title: "BREACH NODES (\(breaches.count))", accent: red)
+                            IntelSectionHeader(title: "BREACH NODES (\(breaches.count))", accent: red)
 
                             ForEach(breaches.prefix(30)) { node in
                                 HStack(spacing: 10) {
@@ -146,7 +146,7 @@ struct IntelReportView: View {
     }
 }
 
-private struct SectionHeader: View {
+private struct IntelSectionHeader: View {
     let title: String
     let accent: Color
     var body: some View {
@@ -159,7 +159,7 @@ private struct SectionHeader: View {
     }
 }
 
-private struct StatCard: View {
+private struct IntelStatCard: View {
     let label: String
     let value: String
     let color: Color
@@ -465,11 +465,11 @@ struct PracticeExamView: View {
                     .shadow(color: accent.opacity(0.6), radius: 6)
 
                 VStack(alignment: .leading, spacing: 10) {
-                    ExamRule(icon: "questionmark.circle.fill", text: "Up to 90 questions sampled across all 4 domains", accent: accent)
-                    ExamRule(icon: "timer", text: "120-minute time limit — real PTCB exam pacing", accent: accent)
-                    ExamRule(icon: "chart.bar.fill", text: "Domain weights: D1 31 · D2 17 · D3 21 · D4 21", accent: accent)
-                    ExamRule(icon: "lock.fill", text: "Results are not saved to your stability score", accent: accent)
-                    ExamRule(icon: "checkmark.seal.fill", text: "Passing threshold: 78% correct (PTCB estimate)", accent: accent)
+                    PracticeExamRule(icon: "questionmark.circle.fill", text: "Up to 90 questions sampled across all 4 domains", accent: accent)
+                    PracticeExamRule(icon: "timer", text: "120-minute time limit — real PTCB exam pacing", accent: accent)
+                    PracticeExamRule(icon: "chart.bar.fill", text: "Domain weights: D1 31 · D2 17 · D3 21 · D4 21", accent: accent)
+                    PracticeExamRule(icon: "lock.fill", text: "Results are not saved to your stability score", accent: accent)
+                    PracticeExamRule(icon: "checkmark.seal.fill", text: "Passing threshold: 78% correct (PTCB estimate)", accent: accent)
                 }
 
                 let pool = engine.practiceExamSample()
@@ -799,7 +799,7 @@ struct PracticeExamView: View {
 
 // MARK: - Exam Sub-views
 
-private struct ExamRule: View {
+private struct PracticeExamRule: View {
     let icon: String
     let text: String
     let accent: Color

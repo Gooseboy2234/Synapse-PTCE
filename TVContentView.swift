@@ -186,6 +186,7 @@ struct TVRootView: View {
         .sheet(item: $engine.selectedNode) { node in
             TVEncounterView(
                 node: node,
+                engine: engine,
                 gameMode: engine.currentGameMode,
                 probeAbility: engine.currentLogicProbe.activeAbility,
                 contentFontSize: engine.currentTextSize.fontSize
@@ -195,6 +196,8 @@ struct TVRootView: View {
                 engine.selectedNode = nil
             }
             .environment(\.appTheme, engine.appTheme)
+            .onAppear  { engine.beginTimedQuestion() }
+            .onDisappear { engine.pauseTimedSession() }
         }
         .sheet(isPresented: $showSettings) {
             TVSettingsView(engine: engine)

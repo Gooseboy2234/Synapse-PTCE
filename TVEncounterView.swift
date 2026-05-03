@@ -14,6 +14,7 @@ import SwiftUI
 
 struct TVEncounterView: View {
     let node: DataNode
+    let engine: GameEngine
     let gameMode: GameMode
     let probeAbility: ProbeAbility?
     var contentFontSize: CGFloat = 18
@@ -29,8 +30,6 @@ struct TVEncounterView: View {
     @State private var glitchOpacity: Double  = 0.0
     @State private var probeAbilityUsed       = false
     @State private var eliminatedOption: String? = nil
-    @State private var timeRemaining: Int     = 0
-    @State private var timerRunning           = false
     @State private var dismissTask: Task<Void, Never>? = nil
 
     @Environment(\.appTheme) private var theme
@@ -119,18 +118,20 @@ struct TVEncounterView: View {
                         VStack(alignment: .leading, spacing: 28) {
 
                             // Timer (timed mode)
-                            if gameMode == .timed {
+                            if gameMode.isTimed {
+                                let budget = engine.timedBudgetRemaining
+                                let isLow = budget <= 30
                                 HStack(spacing: 8) {
                                     Image(systemName: "timer").font(.system(size: 18))
-                                    Text(String(format: "%02d", timeRemaining))
+                                    Text(timerLabel(budget))
                                         .font(.system(size: 26, weight: .black, design: .monospaced))
                                 }
-                                .foregroundColor(timeRemaining <= 10 ? .red : color)
-                                .shadow(color: timeRemaining <= 10 ? Color.red.opacity(0.7) : .clear, radius: 5)
+                                .foregroundColor(isLow ? .red : color)
+                                .shadow(color: isLow ? Color.red.opacity(0.7) : .clear, radius: 5)
                                 .padding(.horizontal, 14).padding(.vertical, 7)
-                                .background((timeRemaining <= 10 ? Color.red : color).opacity(0.10))
+                                .background((isLow ? Color.red : color).opacity(0.10))
                                 .overlay(RoundedRectangle(cornerRadius: 8)
-                                    .stroke((timeRemaining <= 10 ? Color.red : color).opacity(0.4), lineWidth: 1))
+                                    .stroke((isLow ? Color.red : color).opacity(0.4), lineWidth: 1))
                                 .cornerRadius(8)
                             }
 
@@ -241,30 +242,22 @@ struct TVEncounterView: View {
         }
         .onAppear {
             withAnimation(.easeOut(duration: 0.5).delay(0.15)) { bootComplete = true }
-            if gameMode == .timed {
-                timeRemaining = gameMode.timerSeconds
-                timerRunning = true
-            }
         }
         .onDisappear { dismissTask?.cancel() }
-        .task(id: timerRunning) {
-            guard timerRunning else { return }
-            while timerRunning && timeRemaining > 0 {
-                try? await Task.sleep(for: .seconds(1))
-                if timerRunning { timeRemaining -= 1 }
-            }
-            if timeRemaining == 0 && !showFeedback {
-                let r = onSubmit(node.id, selected.isEmpty ? "__TIMEOUT__" : selected)
-                result = r
-                showFeedback = true
-                triggerGlitch()
-            }
-        }
         .onExitCommand {
             dismissTask?.cancel()
             onDismiss()
             dismiss()
         }
+    }
+
+    // MARK: - Helpers
+
+    private func timerLabel(_ seconds: Int) -> String {
+        if seconds >= 60 {
+            return String(format: "%d:%02d", seconds / 60, seconds % 60)
+        }
+        return String(format: "%02d", seconds)
     }
 
     // MARK: - Effects
