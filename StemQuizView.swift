@@ -428,7 +428,7 @@ struct QuizCompleteView: View {
 
 // MARK: - Stat Card
 
-struct StatCard: View {
+fileprivate struct StatCard: View {
     let label: String
     let value: String
     let icon: String

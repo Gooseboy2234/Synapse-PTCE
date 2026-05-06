@@ -22,7 +22,7 @@ import SwiftData
 // MARK: - Knowledge Domain
 
 /// The four scored domains of the 2026 PTCB Exam Blueprint.
-enum KnowledgeDomain: String, CaseIterable, Identifiable {
+enum KnowledgeDomain: String, CaseIterable, Identifiable, Codable {
     case medications         = "MEDICATIONS"
     case federalRequirements = "FEDERAL_REQ"
     case patientSafety       = "PATIENT_SAFETY"
@@ -218,6 +218,35 @@ class GameEngine {
 
     // Story narrative
     var pendingStoryBeat: StoryBeat? = nil
+    
+    // Prodigy Features — Phase 1
+    var dailyQuests: [DailyQuest] = []
+    var pendingQuestRewards: [(xp: Int, shards: Int)] = []
+    var pendingAchievement: Achievement? = nil
+    var pendingStreakMilestone: (days: Int, xp: Int, shards: Int)? = nil
+    
+    // Prodigy Features — Phase 2
+    var unopenedChests: [UnopenedChest] = []
+    var pendingChestOpen: UnopenedChest? = nil
+    var powerUpEffects: PowerUpEffectsManager = PowerUpEffectsManager()
+    var pendingWeeklyReport: WeeklyReport? = nil
+    var floatingTexts: [FloatingText] = []
+    
+    // MARK: - Shelf Break Narrative System
+    
+    /// Story database — chapters, logs, characters, timeline
+    let storyDatabase: StoryDatabase
+    
+    // MARK: - Tutorial System
+
+    /// Tutorial manager for onboarding and help system
+    var tutorialManager: TutorialManager!
+
+    // MARK: - Mastery Tracker (Spaced Repetition)
+
+    /// Concept-level mastery tracker spanning the DataNode bank AND Rimrock questions.
+    /// A concept is "truly learned" only after correct answers on ≥2 distinct days.
+    var masteryTracker: MasteryTracker!
 
     // MARK: - Shared Budget Timer
     // In timed modes the clock is a session-wide budget (secondsPerQuestion × nodes answered
@@ -247,6 +276,8 @@ class GameEngine {
 
     private let modelContext: ModelContext
     private var _userStats: UserStats
+    /// Read-only access to the persistent UserStats record from outside the engine.
+    var userStats: UserStats { _userStats }
     /// Maps stable persistence key → NodeProgress for O(1) lookup.
     private var progressMap: [String: NodeProgress] = [:]
 
@@ -254,7 +285,7 @@ class GameEngine {
 
     init(nodes: [DataNode] = DataNode.phaseOneDatabase) {
         // ── 1. Build SwiftData stack ────────────────────────────────────────
-        let schema = Schema([NodeProgress.self, UserStats.self])
+        let schema = Schema([NodeProgress.self, UserStats.self, TutorialProgress.self, ConceptRecord.self, ExamAttempt.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         // Fatal failure here means SwiftData is unavailable — app cannot function.
         let container = try! ModelContainer(for: schema, configurations: [config])
@@ -276,6 +307,7 @@ class GameEngine {
         self.nodes                 = nodes
         self.modelContext          = ctx
         self._userStats            = stats
+        self.storyDatabase         = StoryDatabase() // NEW: Load narrative system
         self.currentStabilityScore = stats.stabilityScore
         self.currentXP             = stats.totalXP
         self.currentDataShards     = stats.dataShards
@@ -291,6 +323,21 @@ class GameEngine {
 
         // ── 4. Load saved node state (safe to call now — all props set) ──────
         self.loadNodeProgress()
+        
+        // ── 5. Initialize Prodigy Features ───────────────────────────────────
+        self.loadDailyQuests()
+        self.checkStreakUpdate()
+        
+        // ── 6. Initialize Phase 2 Features ───────────────────────────────────
+        self.unopenedChests = stats.unopenedChests
+        self.checkWeeklyReport()
+        
+        // ── 7. Initialize Tutorial System ────────────────────────────────────
+        self.tutorialManager = TutorialManager(modelContext: ctx)
+
+        // ── 8. Initialize Mastery Tracker (spaced repetition) ────────────────
+        self.masteryTracker = MasteryTracker(modelContext: ctx)
+        self.registerAllConcepts()
     }
 
     /// Designated initialiser used by `makeAsync` — accepts fully pre-loaded state
@@ -302,6 +349,7 @@ class GameEngine {
         self.nodes                 = nodes
         self.modelContext          = ctx
         self._userStats            = stats
+        self.storyDatabase         = StoryDatabase() // NEW: Load narrative system
         self.progressMap           = progressMap
         self.currentStabilityScore = stats.stabilityScore
         self.currentXP             = stats.totalXP
@@ -314,6 +362,72 @@ class GameEngine {
         self.currentTextSize       = stats.textSizeOption
         self.currentTestDate       = stats.testDate
         self.currentPlanStartDate  = stats.planStartDate
+        
+        // Initialize Tutorial System
+        self.tutorialManager = TutorialManager(modelContext: ctx)
+
+        // Initialize Mastery Tracker
+        self.masteryTracker = MasteryTracker(modelContext: ctx)
+        self.registerAllConcepts()
+    }
+
+    // MARK: - Mastery (Concept-level spaced repetition)
+
+    /// Walk the DataNode bank and the Rimrock question pool, registering every
+    /// concept the tracker should know about. Forms the denominator for the
+    /// global "truly learned" progress meter.
+    func registerAllConcepts() {
+        var descriptors: [ConceptDescriptor] = []
+
+        // DataNode concepts — group by baseConceptTitle when available
+        var dnSeen: Set<String> = []
+        for node in nodes {
+            let desc = ConceptDescriptor.from(dataNode: node)
+            if dnSeen.insert(desc.key).inserted {
+                descriptors.append(desc)
+            }
+        }
+
+        // Rimrock concepts — walk every question in every shift
+        var rmSeen: Set<String> = []
+        for shift in RimrockContent.allShifts {
+            for beat in shift.beats {
+                if case .question(let q) = beat {
+                    let desc = ConceptDescriptor.from(rimrockQuestion: q)
+                    if rmSeen.insert(desc.key).inserted {
+                        descriptors.append(desc)
+                    }
+                }
+            }
+        }
+
+        masteryTracker.registerConcepts(descriptors)
+    }
+
+    /// Hook called from `gradeAnswer` after a DataNode answer is graded.
+    /// Updates the concept-level mastery state.
+    private func recordDataNodeMastery(node: DataNode, wasCorrect: Bool) {
+        let descriptor = ConceptDescriptor.from(dataNode: node)
+        masteryTracker.record(
+            conceptKey: descriptor.key,
+            displayName: descriptor.displayName,
+            domain: descriptor.domain,
+            source: descriptor.source,
+            wasCorrect: wasCorrect
+        )
+    }
+
+    /// Public hook for the Rimrock flow to record mastery when a Rimrock question
+    /// is answered. Called from `RimrockShiftView.submitQuestion`.
+    func recordRimrockMastery(question: RimrockQuestion, wasCorrect: Bool) {
+        let descriptor = ConceptDescriptor.from(rimrockQuestion: question)
+        masteryTracker.record(
+            conceptKey: descriptor.key,
+            displayName: descriptor.displayName,
+            domain: descriptor.domain,
+            source: descriptor.source,
+            wasCorrect: wasCorrect
+        )
     }
 
     // MARK: - Computed
@@ -340,6 +454,41 @@ class GameEngine {
             pointsAvailable: total * ppn
         )
     }
+    
+    // MARK: - Story System Integration
+    
+    /// Current chapter based on overall stability score
+    var currentChapter: Int {
+        _userStats.currentChapter
+    }
+    
+    /// Get chapter definition for a specific domain
+    func chapter(for domain: KnowledgeDomain) -> Chapter? {
+        storyDatabase.chapter(for: domain)
+    }
+    
+    /// Check if a specific chapter is unlocked
+    func isChapterUnlocked(_ chapterID: Int) -> Bool {
+        _userStats.unlockedChapters().contains(chapterID)
+    }
+    
+    /// Get all logs unlocked for current progress
+    func unlockedLogs() -> [StoryLog] {
+        storyDatabase.logs.filter { log in
+            isChapterUnlocked(log.unlockChapter) &&
+            progress(for: log.domain ?? .medications).percentComplete >= log.unlockProgress
+        }
+    }
+    
+    /// Station day (narrative timestamp) — tied to current chapter
+    var stationDay: Int {
+        currentChapter
+    }
+    
+    /// Surface contact status (story element — lost after Chapter 6)
+    var hasSurfaceContact: Bool {
+        currentStabilityScore < 700
+    }
 
     // MARK: - Mastery Query
 
@@ -352,7 +501,7 @@ class GameEngine {
 
     /// Evaluate a submitted answer, award XP + stability points, persist everything.
     @discardableResult
-    func gradeAnswer(nodeId: UUID, submitted: String) -> GradeResult {
+    func gradeAnswer(nodeId: UUID, submitted: String, timeSpent: TimeInterval = 0) -> GradeResult {
         guard let idx = nodes.firstIndex(where: { $0.id == nodeId }) else {
             return GradeResult(
                 wasCorrect: false, pointsAwarded: 0,
@@ -394,6 +543,12 @@ class GameEngine {
             if wasPerfect {
                 _userStats.dataShards  += 1
                 _userStats.perfectNodes += 1
+                _userStats.lifetimeDataShards += 1
+                _userStats.currentPerfectStreak += 1
+                _userStats.longestPerfectStreak = max(_userStats.longestPerfectStreak,
+                                                      _userStats.currentPerfectStreak)
+            } else {
+                _userStats.currentPerfectStreak = 0
             }
 
             // Update NodeProgress record
@@ -403,24 +558,110 @@ class GameEngine {
                 : MasteryLevel.stabilized.rawValue
 
             unlocked = unlockNextSector(after: nodes[idx])
+            
+            // ── Prodigy Feature Tracking ──────────────────────────────────
+            
+            // Quest tracking
+            trackQuestEvent(.answeredCorrectly)
+            trackQuestEvent(.completedNode(domain: nodes[idx].domain))
+            trackQuestEvent(.earnedXP(amount: xpAwarded))
+            if wasPerfect {
+                trackQuestEvent(.achievedPerfect)
+            }
+            
+            // Achievement tracking
+            trackAchievement(.nodeCompleted(count: _userStats.nodesCompleted, perfect: wasPerfect))
+            trackAchievement(.perfectStreak(count: _userStats.currentPerfectStreak))
+            trackAchievement(.shardsCollected(total: _userStats.lifetimeDataShards))
+            if timeSpent > 0 {
+                trackAchievement(.speedQuestion(seconds: timeSpent))
+            }
+            
+            // Check domain completion
+            let domainProgress = self.progress(for: nodes[idx].domain)
+            if domainProgress.completed == domainProgress.total {
+                trackAchievement(.domainCompleted(domain: nodes[idx].domain))
+            }
+            
+            // No mistakes achievement tracking
+            let nodesWithMistakes = nodes.filter { node in
+                let k = persistenceKey(for: node)
+                return (progressMap[k]?.wrongAttemptCount ?? 0) > 0
+            }.count
+            if nodesWithMistakes == 0 && _userStats.nodesCompleted >= 20 {
+                trackAchievement(.noMistakesRun(count: _userStats.nodesCompleted))
+            }
+            
+            // Play sound effects
+            SoundEffectManager.shared.play(.correctAnswer)
+            if shardAwarded {
+                SoundEffectManager.shared.play(.shardEarned)
+            }
+            SoundEffectManager.shared.play(.xpGained)
+            
+            // ── Phase 2: Chest Drop System ────────────────────────────
+            checkChestDrop(wasPerfect: wasPerfect)
+            
+            // ── Phase 2: Weekly Stats Tracking ────────────────────────
+            _userStats.trackWeeklyQuestion(
+                xp: xpAwarded,
+                shards: shardAwarded ? 1 : 0,
+                domain: nodes[idx].domain,
+                wasPerfect: wasPerfect
+            )
+            
+            // ── Phase 2: Apply Active Power-Up Effects ────────────────
+            var finalXP = xpAwarded
+            var finalShards = shardAwarded ? 1 : 0
+            
+            // Double XP power-up
+            if powerUpEffects.isDoubleXPActive {
+                finalXP *= 2
+                powerUpEffects.consumeUse(of: .doubleXP)
+                addFloatingText("2× XP!", color: .yellow, at: CGPoint(x: 200, y: 200))
+            }
+            
+            // Shard Boost power-up
+            if powerUpEffects.isShardBoostActive && !shardAwarded {
+                finalShards = 1
+                _userStats.dataShards += 1
+                _userStats.lifetimeDataShards += 1
+                powerUpEffects.consumeUse(of: .shardBoost)
+                addFloatingText("Shard Boost!", color: .cyan, at: CGPoint(x: 200, y: 250))
+                shardAwarded = true
+            }
 
         } else if !correct {
             _userStats.totalAttempts  += 1
+            _userStats.currentPerfectStreak = 0  // Break perfect streak
             progress?.wrongAttemptCount += 1
             // Advance from "available" to "attempted" on first wrong answer
             if let p = progress, p.masteryLevel == MasteryLevel.available.rawValue {
                 p.masteryLevel = MasteryLevel.attempted.rawValue
             }
+            
+            // Play wrong answer sound
+            SoundEffectManager.shared.play(.wrongAnswer)
+            
         } else {
             // Correct but node was already completed — still a valid attempt
             _userStats.totalAttempts += 1
+            trackQuestEvent(.answeredCorrectly)
+            SoundEffectManager.shared.play(.correctAnswer)
         }
+
+        // Record concept-level mastery (spaced repetition tracker).
+        // Fires on every attempt, correct or not.
+        recordDataNodeMastery(node: nodes[idx], wasCorrect: correct)
 
         syncDisplayStats()
         checkStoryBeat()
         try? modelContext.save()
 
         let didRankUp = currentSystemRank.rawValue > previousRank.rawValue
+        if didRankUp {
+            SoundEffectManager.shared.play(.rankUp)
+        }
 
         return GradeResult(
             wasCorrect: correct,
@@ -507,16 +748,30 @@ class GameEngine {
                 // Bonus: 500 XP + 2 shards for defeating a boss
                 _userStats.totalXP    += 500
                 _userStats.dataShards += 2
+                _userStats.lifetimeDataShards += 2
+                
+                // Track quest and achievement
+                trackQuestEvent(.defeatedBoss)
+                let totalBosses = KnowledgeDomain.allCases.filter { isBossDefeated(for: $0) }.count
+                trackAchievement(.bossDefeated(count: totalBosses))
+                
+                SoundEffectManager.shared.play(.bossDefeated)
+                
+                // ── Phase 2: Boss always drops Epic Chest ──────────────────
+                checkChestDrop(wasPerfect: true, isBoss: true)
+                
                 syncDisplayStats()
                 try? modelContext.save()
                 return (0, true)
             } else {
                 _userStats.setBossStreak(newStreak, for: domain)
+                SoundEffectManager.shared.play(.correctAnswer)
                 try? modelContext.save()
                 return (newStreak, false)
             }
         } else {
             _userStats.setBossStreak(0, for: domain)
+            SoundEffectManager.shared.play(.wrongAnswer)
             try? modelContext.save()
             return (0, false)
         }
@@ -572,6 +827,101 @@ class GameEngine {
             result += Array(pool.shuffled().prefix(target))
         }
         return result.shuffled()
+    }
+    
+    /// Track completion of a practice exam (for achievement)
+    func completePracticeExam() {
+        trackAchievement(.practiceExamCompleted)
+    }
+
+    // MARK: - Blueprint Exam (PTCB-format full-length)
+
+    /// Returns up to 90 nodes sampled by the OFFICIAL PTCB 2020 content blueprint:
+    /// Medications 40% (36), Federal 12.5% (11), Patient Safety 26.25% (24),
+    /// Order Entry 21.25% (19). Pulls from the full available pool — no preference
+    /// for completed nodes — so the exam reflects breadth, not what the player
+    /// already mastered. Falls back to whatever the pool can provide if a domain
+    /// has fewer than its target count of available questions.
+    func blueprintExamSample() -> [DataNode] {
+        let targets: [(KnowledgeDomain, Int)] = [
+            (.medications, 36),
+            (.federalRequirements, 11),
+            (.patientSafety, 24),
+            (.orderEntry, 19)
+        ]
+        var result: [DataNode] = []
+        for (domain, target) in targets {
+            let pool = nodes.filter {
+                $0.domain == domain && !$0.options.isEmpty && !$0.correctAnswer.isEmpty
+            }
+            result += Array(pool.shuffled().prefix(target))
+        }
+        return result.shuffled()
+    }
+
+    /// Persist a completed Blueprint Exam attempt and trigger any related
+    /// achievements/quests. Called by BlueprintExamView at the moment the
+    /// player finishes (or the timer expires with answers in hand).
+    @discardableResult
+    func recordExamAttempt(
+        questions: [DataNode],
+        answers: [UUID: Bool],
+        timeUsedSeconds: Int
+    ) -> ExamAttempt {
+        let total = questions.count
+        let correct = answers.values.filter { $0 }.count
+        let rawPct = total > 0 ? Double(correct) / Double(total) : 0
+        let scaled = BlueprintExamScoring.scaledScore(for: rawPct)
+        let didPass = scaled >= BlueprintExamScoring.passingScaledScore
+
+        // Build per-domain breakdown.
+        var byDomain: [String: DomainResult] = [:]
+        for q in questions {
+            let key = q.domain.rawValue
+            var current = byDomain[key] ?? DomainResult(correct: 0, total: 0)
+            current.total += 1
+            if answers[q.id] == true { current.correct += 1 }
+            byDomain[key] = current
+        }
+        let json = (try? JSONEncoder().encode(byDomain))
+            .flatMap { String(data: $0, encoding: .utf8) } ?? "{}"
+
+        let attempt = ExamAttempt(
+            totalQuestions: total,
+            rawCorrect: correct,
+            timeUsedSeconds: timeUsedSeconds,
+            scaledScore: scaled,
+            didPass: didPass,
+            domainResultsJSON: json
+        )
+        modelContext.insert(attempt)
+        try? modelContext.save()
+        trackAchievement(.practiceExamCompleted)
+        return attempt
+    }
+
+    /// All persisted exam attempts, newest first.
+    func allExamAttempts() -> [ExamAttempt] {
+        let descriptor = FetchDescriptor<ExamAttempt>(
+            sortBy: [SortDescriptor(\.attemptDate, order: .reverse)]
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    /// The most recent exam attempt, if any.
+    var latestExamAttempt: ExamAttempt? {
+        allExamAttempts().first
+    }
+    
+    /// Track opening a breach node for review (for daily quest)
+    func openBreachNode() {
+        trackQuestEvent(.reviewedBreachNode)
+    }
+    
+    /// Track study session start (for time-based achievements)
+    func trackStudySessionStart() {
+        let hour = Calendar.current.component(.hour, from: Date())
+        trackAchievement(.studySessionStarted(hour: hour))
     }
 
     // MARK: - Game Mode & Appearance
@@ -789,6 +1139,535 @@ class GameEngine {
             try? modelContext.save()
         }
     }
+    
+    // MARK: - Prodigy Features — Phase 1
+    
+    // MARK: Daily Quest System
+    
+    /// Load daily quests from UserStats, generating new ones if needed
+    private func loadDailyQuests() {
+        if _userStats.shouldResetQuests() {
+            generateNewDailyQuests()
+        } else {
+            dailyQuests = _userStats.dailyQuests
+        }
+    }
+    
+    /// Generate 3 new random daily quests
+    private func generateNewDailyQuests() {
+        let questPool: [QuestType] = [
+            .answerCorrectly(count: Int.random(in: 10...20)),
+            .perfectNodes(count: Int.random(in: 3...6)),
+            .studyDomain(domain: KnowledgeDomain.allCases.randomElement()!, count: Int.random(in: 4...8)),
+            .earnXP(amount: Int.random(in: 200...500)),
+            .defeatBoss,
+            .reviewMistakes(count: Int.random(in: 5...10)),
+            .studyStreak(days: _userStats.streakData.currentStreak + 1)
+        ]
+        
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+        let midnightTomorrow = Calendar.current.startOfDay(for: tomorrow)
+        
+        let selectedTypes = questPool.shuffled().prefix(3)
+        dailyQuests = selectedTypes.map { DailyQuest(type: $0, expiresAt: midnightTomorrow) }
+        
+        _userStats.dailyQuests = dailyQuests
+        _userStats.setLastQuestReset(Date())
+        try? modelContext.save()
+    }
+    
+    /// Update quest progress based on an event
+    func trackQuestEvent(_ event: QuestEvent) {
+        var updated = false
+        
+        for i in dailyQuests.indices {
+            guard !dailyQuests[i].isComplete else { continue }
+            
+            switch (dailyQuests[i].type, event) {
+            case (.answerCorrectly, .answeredCorrectly):
+                dailyQuests[i].currentProgress += 1
+                updated = true
+                
+            case (.perfectNodes, .achievedPerfect):
+                dailyQuests[i].currentProgress += 1
+                updated = true
+                
+            case (.studyDomain(let domain, _), .completedNode(let nodeDomain)) where domain == nodeDomain:
+                dailyQuests[i].currentProgress += 1
+                updated = true
+                
+            case (.earnXP(let target), .earnedXP(let amount)):
+                dailyQuests[i].currentProgress = min(target, dailyQuests[i].currentProgress + amount)
+                updated = true
+                
+            case (.defeatBoss, .defeatedBoss):
+                dailyQuests[i].currentProgress = 1
+                updated = true
+                
+            case (.reviewMistakes, .reviewedBreachNode):
+                dailyQuests[i].currentProgress += 1
+                updated = true
+                
+            case (.studyStreak(let days), _):
+                // Updated separately via checkStreakUpdate
+                if _userStats.streakData.currentStreak >= days {
+                    dailyQuests[i].currentProgress = days
+                    updated = true
+                }
+                
+            default:
+                break
+            }
+            
+            // Check if quest just completed
+            if dailyQuests[i].isComplete && dailyQuests[i].currentProgress == dailyQuests[i].type.target {
+                let rewards = dailyQuests[i].type.rewards
+                pendingQuestRewards.append(rewards)
+                SoundEffectManager.shared.play(.questComplete)
+            }
+        }
+        
+        if updated {
+            _userStats.dailyQuests = dailyQuests
+            try? modelContext.save()
+        }
+    }
+    
+    /// Claim all pending quest rewards
+    func claimQuestRewards() {
+        for reward in pendingQuestRewards {
+            _userStats.totalXP += reward.xp
+            _userStats.dataShards += reward.shards
+            _userStats.lifetimeDataShards += reward.shards
+        }
+        pendingQuestRewards.removeAll()
+        syncDisplayStats()
+        try? modelContext.save()
+    }
+    
+    // MARK: Achievement System
+    
+    /// Track achievement events and unlock when criteria met
+    func trackAchievement(_ event: AchievementEvent) {
+        var newlyUnlocked: [AchievementType] = []
+        
+        switch event {
+        case .nodeCompleted(let count, let perfect):
+            if count == 1 && !_userStats.isAchievementUnlocked(.firstSteps) {
+                newlyUnlocked.append(.firstSteps)
+            }
+            if count == 10 && !_userStats.isAchievementUnlocked(.tenNodes) {
+                newlyUnlocked.append(.tenNodes)
+            }
+            if perfect && !_userStats.isAchievementUnlocked(.firstPerfect) {
+                newlyUnlocked.append(.firstPerfect)
+            }
+            
+        case .bossDefeated(let count):
+            if count == 1 && !_userStats.isAchievementUnlocked(.firstBoss) {
+                newlyUnlocked.append(.firstBoss)
+            }
+            if isBossDefeated(for: .medications) &&
+               isBossDefeated(for: .federalRequirements) &&
+               isBossDefeated(for: .patientSafety) &&
+               isBossDefeated(for: .orderEntry) &&
+               !_userStats.isAchievementUnlocked(.allBossesDefeated) {
+                newlyUnlocked.append(.allBossesDefeated)
+            }
+            
+        case .perfectStreak(let count):
+            if count >= 5 && !_userStats.isAchievementUnlocked(.perfectStreak5) {
+                newlyUnlocked.append(.perfectStreak5)
+            }
+            if count >= 10 && !_userStats.isAchievementUnlocked(.perfectStreak10) {
+                newlyUnlocked.append(.perfectStreak10)
+            }
+            
+        case .shardsCollected(let total):
+            if total >= 100 && !_userStats.isAchievementUnlocked(.shardCollector100) {
+                newlyUnlocked.append(.shardCollector100)
+            }
+            if total >= 500 && !_userStats.isAchievementUnlocked(.shardCollector500) {
+                newlyUnlocked.append(.shardCollector500)
+            }
+            if total >= 1000 && !_userStats.isAchievementUnlocked(.shardCollector1000) {
+                newlyUnlocked.append(.shardCollector1000)
+            }
+            
+        case .streakAchieved(let days):
+            if days >= 3 && !_userStats.isAchievementUnlocked(.streak3Days) {
+                newlyUnlocked.append(.streak3Days)
+            }
+            if days >= 7 && !_userStats.isAchievementUnlocked(.streak7Days) {
+                newlyUnlocked.append(.streak7Days)
+            }
+            if days >= 14 && !_userStats.isAchievementUnlocked(.streak14Days) {
+                newlyUnlocked.append(.streak14Days)
+            }
+            if days >= 30 && !_userStats.isAchievementUnlocked(.streak30Days) {
+                newlyUnlocked.append(.streak30Days)
+            }
+            
+        case .domainCompleted(let domain):
+            let type: AchievementType
+            switch domain {
+            case .medications: type = .domainMasterD1
+            case .federalRequirements: type = .domainMasterD2
+            case .patientSafety: type = .domainMasterD3
+            case .orderEntry: type = .domainMasterD4
+            }
+            if !_userStats.isAchievementUnlocked(type) {
+                newlyUnlocked.append(type)
+            }
+            
+        case .practiceExamCompleted:
+            if !_userStats.isAchievementUnlocked(.examReady) {
+                newlyUnlocked.append(.examReady)
+            }
+            
+        case .studySessionStarted(let hour):
+            if hour >= 22 || hour <= 2 {
+                if !_userStats.isAchievementUnlocked(.nightOwl) {
+                    newlyUnlocked.append(.nightOwl)
+                }
+            }
+            if hour < 7 && !_userStats.isAchievementUnlocked(.earlyBird) {
+                newlyUnlocked.append(.earlyBird)
+            }
+            
+        case .speedQuestion(let seconds):
+            if seconds < 30 {
+                _userStats.fastQuestionCount += 1
+                if _userStats.fastQuestionCount >= 10 &&
+                   !_userStats.isAchievementUnlocked(.speedDemon) {
+                    newlyUnlocked.append(.speedDemon)
+                }
+            }
+            
+        case .noMistakesRun(let count):
+            if count >= 20 && !_userStats.isAchievementUnlocked(.noMistakes) {
+                newlyUnlocked.append(.noMistakes)
+            }
+        }
+        
+        // Unlock achievements and award rewards
+        for type in newlyUnlocked {
+            _userStats.unlockAchievement(type)
+            let rewards = type.rewards
+            _userStats.totalXP += rewards.xp
+            _userStats.dataShards += rewards.shards
+            _userStats.lifetimeDataShards += rewards.shards
+            
+            // Set pending achievement for UI display
+            if let achievement = _userStats.achievements.first(where: { $0.type == type }) {
+                pendingAchievement = achievement
+            }
+            
+            SoundEffectManager.shared.play(.achievementUnlocked)
+        }
+        
+        if !newlyUnlocked.isEmpty {
+            syncDisplayStats()
+            try? modelContext.save()
+        }
+    }
+    
+    // MARK: Streak System
+    
+    /// Check if streak should update (call once per session start)
+    private func checkStreakUpdate() {
+        let oldStreak = _userStats.streakData.currentStreak
+        _userStats.updateStreak()
+        let newStreak = _userStats.streakData.currentStreak
+        
+        // Track achievement for streak
+        trackAchievement(.streakAchieved(days: newStreak))
+        
+        // Check for milestone rewards
+        if let milestone = _userStats.streakData.nextMilestone(),
+           newStreak >= milestone,
+           !_userStats.streakData.streakRewardsClaimed.contains(milestone) {
+            var data = _userStats.streakData
+            data.streakRewardsClaimed.insert(milestone)
+            _userStats.streakData = data
+            
+            let rewards = data.milestoneReward(for: milestone)
+            pendingStreakMilestone = (milestone, rewards.xp, rewards.shards)
+            SoundEffectManager.shared.play(.streakMilestone)
+        }
+        
+        try? modelContext.save()
+    }
+    
+    /// Claim pending streak milestone reward
+    func claimStreakReward() {
+        guard let milestone = pendingStreakMilestone else { return }
+        _userStats.totalXP += milestone.xp
+        _userStats.dataShards += milestone.shards
+        _userStats.lifetimeDataShards += milestone.shards
+        pendingStreakMilestone = nil
+        syncDisplayStats()
+        try? modelContext.save()
+    }
+    
+    // MARK: - Prodigy Features — Phase 2
+    
+    // MARK: Power-Up System
+    
+    /// Purchase a power-up with Data Shards
+    @discardableResult
+    func purchasePowerUp(_ type: PowerUpType) -> Bool {
+        guard _userStats.dataShards >= type.cost else { return false }
+        
+        _userStats.dataShards -= type.cost
+        var inventory = _userStats.powerUpInventory
+        inventory.add(type)
+        _userStats.powerUpInventory = inventory
+        
+        SoundEffectManager.shared.play(.shardEarned)
+        syncDisplayStats()
+        try? modelContext.save()
+        return true
+    }
+    
+    /// Use a power-up during a question
+    @discardableResult
+    func usePowerUp(_ type: PowerUpType) -> Bool {
+        var inventory = _userStats.powerUpInventory
+        guard inventory.use(type) else { return false }
+        
+        _userStats.powerUpInventory = inventory
+        powerUpEffects.activate(type)
+        
+        SoundEffectManager.shared.play(.correctAnswer)
+        try? modelContext.save()
+        return true
+    }
+    
+    /// Check if a power-up can be used in current context
+    func canUsePowerUp(_ type: PowerUpType) -> Bool {
+        switch type.usageLimit {
+        case .unlimited:
+            return true
+        case .timedModesOnly:
+            return currentGameMode.isTimed
+        case .multipleChoiceOnly:
+            return selectedNode?.challengeType == .multipleChoice
+        }
+    }
+    
+    // MARK: Chest System
+    
+    /// Check if a chest should drop after completing a node
+    func checkChestDrop(wasPerfect: Bool, isBoss: Bool = false) {
+        if isBoss || ChestDropCalculator.shouldDropChest(wasPerfect: wasPerfect) {
+            let chestType = ChestDropCalculator.determineChestType(wasPerfect: wasPerfect, isBoss: isBoss)
+            let chest = UnopenedChest(type: chestType, sourceNode: selectedNode?.nodeTitle)
+            
+            _userStats.addChest(chest)
+            unopenedChests = _userStats.unopenedChests
+            
+            // Trigger chest opening UI
+            pendingChestOpen = chest
+            
+            SoundEffectManager.shared.play(.nodeUnlock)
+            try? modelContext.save()
+        }
+    }
+    
+    /// Open a chest and award rewards
+    func openChest(_ chest: UnopenedChest) -> ChestReward {
+        let reward = ChestDropCalculator.generateReward(for: chest.type)
+        
+        // Award rewards
+        _userStats.totalXP += reward.xp
+        _userStats.dataShards += reward.shards
+        _userStats.lifetimeDataShards += reward.shards
+        
+        // Award power-ups
+        var inventory = _userStats.powerUpInventory
+        for powerUp in reward.powerUps {
+            inventory.add(powerUp)
+        }
+        _userStats.powerUpInventory = inventory
+        
+        // Track stats
+        _userStats.totalChestsOpened += 1
+        _userStats.trackWeeklyChestOpened()
+        
+        // Remove from unopened
+        _userStats.removeChest(chest.id)
+        unopenedChests = _userStats.unopenedChests
+        
+        // Add floating text
+        addFloatingText("+\(reward.xp) XP", color: .yellow, at: CGPoint(x: 200, y: 300))
+        addFloatingText("+\(reward.shards) 💎", color: .cyan, at: CGPoint(x: 200, y: 350))
+        
+        SoundEffectManager.shared.play(.achievementUnlocked)
+        syncDisplayStats()
+        try? modelContext.save()
+        
+        return reward
+    }
+    
+    // MARK: Weekly Report System
+    
+    /// Check if a weekly report should be generated
+    func checkWeeklyReport() {
+        if _userStats.shouldGenerateWeeklyReport() {
+            if let report = _userStats.generateWeeklyReport() {
+                pendingWeeklyReport = report
+                _userStats.resetWeeklyStats()
+                try? modelContext.save()
+            }
+        }
+    }
+    
+    /// Dismiss weekly report
+    func dismissWeeklyReport() {
+        pendingWeeklyReport = nil
+    }
+    
+    // MARK: Visual Effects
+    
+    /// Add floating text animation
+    func addFloatingText(_ text: String, color: Color, at position: CGPoint) {
+        let floatingText = FloatingText(text: text, color: color, startPosition: position, createdAt: Date())
+        floatingTexts.append(floatingText)
+        
+        // Auto-remove after expiration
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            self?.floatingTexts.removeAll { $0.id == floatingText.id }
+        }
+    }
+    
+    /// Trigger particle effect (for future animation implementation)
+    func triggerParticleEffect(_ effect: ParticleEffect) {
+        // Placeholder for particle system integration
+        // Can be implemented with custom SwiftUI views or SpriteKit
+    }
+    
+    // MARK: - Prodigy Features — Phase 3
+    
+    // MARK: Game Center Integration
+    
+    /// Submit current XP to weekly leaderboard
+    func submitWeeklyXP() {
+        GameCenterManager.shared.submitScore(_userStats.weeklyXPEarned, to: GameCenterManager.LeaderboardID.weeklyXP)
+    }
+    
+    /// Submit total XP to all-time leaderboard
+    func submitTotalXP() {
+        GameCenterManager.shared.submitScore(_userStats.totalXP, to: GameCenterManager.LeaderboardID.totalXP)
+    }
+    
+    /// Submit perfect nodes count
+    func submitPerfectNodes() {
+        GameCenterManager.shared.submitScore(_userStats.perfectNodes, to: GameCenterManager.LeaderboardID.perfectNodes)
+    }
+    
+    /// Submit study streak
+    func submitStreak() {
+        GameCenterManager.shared.submitScore(_userStats.streakData.currentStreak, to: GameCenterManager.LeaderboardID.studyStreak)
+    }
+    
+    /// Report achievement to Game Center
+    func reportGameCenterAchievement(for type: AchievementType) {
+        // Map internal achievements to Game Center IDs
+        let achievementID = mapToGameCenterAchievement(type)
+        GameCenterManager.shared.reportAchievement(achievementID)
+    }
+    
+    private func mapToGameCenterAchievement(_ type: AchievementType) -> String {
+        switch type {
+        case .firstSteps: return GameCenterManager.AchievementID.firstSteps
+        case .tenNodes: return GameCenterManager.AchievementID.tenNodes
+        case .firstPerfect: return GameCenterManager.AchievementID.firstPerfect
+        case .firstBoss: return GameCenterManager.AchievementID.firstBoss
+        case .streak7Days: return GameCenterManager.AchievementID.streak7Days
+        case .streak30Days: return GameCenterManager.AchievementID.streak30Days
+        case .domainMasterD1: return GameCenterManager.AchievementID.domainMasterD1
+        case .allBossesDefeated: return GameCenterManager.AchievementID.allBosses
+        default: return "" // Add mappings for other achievements
+        }
+    }
+    
+    // MARK: Badge System
+    
+    func isBadgeUnlocked(_ badge: ProfileBadge) -> Bool {
+        switch badge {
+        case .pharmacyTech:
+            return _userStats.nodesCompleted >= 100
+        case .certifiedRx:
+            return completionPercent >= 1.0
+        case .shardMaster:
+            return _userStats.lifetimeDataShards >= 1000
+        case .speedRunner:
+            return _userStats.fastQuestionCount >= 50
+        case .perfectionist:
+            return _userStats.perfectNodes >= 50
+        case .nightOwl:
+            // Would need to track night study sessions
+            return false
+        case .earlyBird:
+            // Would need to track early morning sessions
+            return false
+        case .streakLegend:
+            return _userStats.streakData.longestStreak >= 30
+        case .domainMaster:
+            return KnowledgeDomain.allCases.allSatisfy { domain in
+                progress(for: domain).completed == progress(for: domain).total
+            }
+        case .bossSlayer:
+            return KnowledgeDomain.allCases.allSatisfy { isBossDefeated(for: $0) }
+        }
+    }
+    
+    // MARK: Frame System
+    
+    func isFrameUnlocked(_ frame: AvatarFrame) -> Bool {
+        switch frame {
+        case .classic:
+            return true
+        case .neon:
+            return _userStats.systemRank.rawValue >= 3
+        case .holographic:
+            return _userStats.nodesCompleted >= 50
+        case .corrupted:
+            return KnowledgeDomain.allCases.allSatisfy { isBossDefeated(for: $0) }
+        case .gold:
+            return _userStats.totalXP >= 5000
+        case .platinum:
+            return completionPercent >= 1.0
+        }
+    }
+    
+    // MARK: Background Effect System
+    
+    func isEffectUnlocked(_ effect: BackgroundEffect) -> Bool {
+        guard effect != .none else { return true }
+        // Check if effect is in unlocked list (stored in UserStats)
+        return _userStats.unlockedEffects.contains(effect.rawValue)
+    }
+    
+    @discardableResult
+    func purchaseBackgroundEffect(_ effect: BackgroundEffect) -> Bool {
+        guard !isEffectUnlocked(effect), _userStats.dataShards >= effect.cost else { return false }
+        
+        _userStats.dataShards -= effect.cost
+        _userStats.unlockEffect(effect)
+        
+        SoundEffectManager.shared.play(.shardEarned)
+        syncDisplayStats()
+        try? modelContext.save()
+        return true
+    }
+    
+    // MARK: Sharing System
+    
+    func generateShareContent(for type: ShareableContent.ContentType) -> ShareableContent {
+        ShareableContent(type: type)
+    }
 }
 
 // MARK: - Active Database Registry
@@ -843,6 +1722,8 @@ extension DataNode {
         all += multiAngleNodes_D4e      // Phase 13 ✓ — Order Entry final gap fill: sig interpretation, volume conversions, reconstitution, partial dose, concentration, IV admixture, expiration, compounding yield, apothecary, days supply (+10 nodes)
         all += multiAngleNodes_D1n      // Phase 13 ✓ — D1m interactions+counseling: Glipizide, Methotrexate, Isotretinoin, Sildenafil, Cephalexin, Aripiprazole, Naltrexone, Venlafaxine (+16 nodes)
         all += multiAngleNodes_D1o      // Phase 14 ✓ — Full 6-angle coverage complete: Cyclobenzaprine + Naloxone (+12 nodes)
+        all += DataNode.blueprintFillNodes  // Phase 15 — PTCB blueprint gap-fill (~106 nodes): top-50 drug fills, USP <800>, alligation, infusion duration, vaccine workflow, mifepristone/ketamine REMS, Beers, CYP, herbals, drug-nutrient, theophylline/carbamazepine NTI, USP <795> details, tech scope, DAW codes
+        all += DataNode.blueprintFillNodes2 // Phase 16 — depth fills: math drill volume (BSA/weight/IBW/%/ratio/dilution/mEq/SG/temp/Roman/AWP/apothecary/days supply/drip), federal record-keeping timelines (Form 222/41/106/224, biennial, CII validity, refills, POA, HIPAA/DSCSA retention, OBRA-90), CDC vaccine schedule depth (birth/2-mo/MMR/varicella/HPV/Tdap/pneumo/Shingrix/flu/RSV/spacing/contraindications/sites/VFC)
         return all
     }
 }
@@ -883,7 +1764,7 @@ extension GameEngine {
         let loadedNodes = DataNode.phaseOneDatabase
 
         let result: LoadResult = await Task.detached(priority: .userInitiated) {
-            let schema      = Schema([NodeProgress.self, UserStats.self])
+            let schema      = Schema([NodeProgress.self, UserStats.self, TutorialProgress.self, ConceptRecord.self, ExamAttempt.self])
             // CloudKit config — enables automatic sync across all signed-in Apple devices.
             // Requires iCloud + CloudKit capability to be enabled in Xcode project settings.
             let cloudConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false,

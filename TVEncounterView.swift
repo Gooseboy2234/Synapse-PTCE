@@ -267,11 +267,9 @@ struct TVEncounterView: View {
         withAnimation(.easeOut(duration: 1.4)) {
             burstScale = 2.2; burstOpacity = 0.0
         }
-        timerRunning = false
     }
 
     private func triggerGlitch() {
-        timerRunning = false
         withAnimation(.easeIn(duration: 0.06)) { glitchOpacity = 0.18 }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
             withAnimation(.easeOut(duration: 0.18)) { glitchOpacity = 0 }

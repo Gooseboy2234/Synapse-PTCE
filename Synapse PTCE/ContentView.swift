@@ -148,6 +148,12 @@ struct MapView: View {
     @State private var showReview   = false
     @State private var showExam     = false
     @State private var showGuidedLearning = false
+    @State private var showRimrockShift = false
+    @State private var showMasteryDetail = false
+    @State private var showBlueprintExam = false
+    @State private var showExamHistory  = false
+    @State private var showReadiness    = false
+    @AppStorage("narrative_mode_enabled") private var narrativeEnabled = true
 
     var body: some View {
         ZStack {
@@ -176,22 +182,48 @@ struct MapView: View {
                     removal:   .move(edge: .trailing).combined(with: .opacity)
                 ))
             } else {
-                HubMapView(engine: engine,
-                           onSelectDomain: { domain in
-                               withAnimation(.easeInOut(duration: 0.35)) { selectedDomain = domain }
-                           },
-                           onShowStore:    { showStore    = true },
-                           onShowSettings: { showSettings = true },
-                           onShowIntel:    { showIntel    = true },
-                           onShowReview:   { showReview   = true },
-                           onShowExam:     { showExam     = true },
-                           onShowGuidedLearning: { showGuidedLearning = true })
-                .transition(.asymmetric(
-                    insertion: .move(edge: .leading).combined(with: .opacity),
-                    removal:   .move(edge: .leading).combined(with: .opacity)
-                ))
+                // Hub view: Rimrock home (narrative) or classic HubMap
+                if narrativeEnabled {
+                    RimrockHomeView(
+                        engine: engine,
+                        onSelectDomain: { domain in
+                            withAnimation(.easeInOut(duration: 0.35)) { selectedDomain = domain }
+                        },
+                        onShowStore: { showStore = true },
+                        onShowSettings: { showSettings = true },
+                        onShowIntel: { showIntel = true },
+                        onShowReview: { showReview = true },
+                        onShowExam: { showExam = true },
+                        onShowBlueprintExam: { showBlueprintExam = true },
+                        onShowExamHistory: { showExamHistory = true },
+                        onShowReadiness: { showReadiness = true },
+                        onShowRimrockShifts: { showRimrockShift = true },
+                        onShowMasteryDetail: { showMasteryDetail = true }
+                    )
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .leading).combined(with: .opacity),
+                        removal:   .move(edge: .leading).combined(with: .opacity)
+                    ))
+                } else {
+                    HubMapView(engine: engine,
+                               onSelectDomain: { domain in
+                                   withAnimation(.easeInOut(duration: 0.35)) { selectedDomain = domain }
+                               },
+                               onShowStore:    { showStore    = true },
+                               onShowSettings: { showSettings = true },
+                               onShowIntel:    { showIntel    = true },
+                               onShowReview:   { showReview   = true },
+                               onShowExam:     { showExam     = true },
+                               onShowGuidedLearning: { showGuidedLearning = true })
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .leading).combined(with: .opacity),
+                        removal:   .move(edge: .leading).combined(with: .opacity)
+                    ))
+                }
             }
         }
+        // (Top-corner overlays removed — RimrockHomeView surfaces mastery and
+        // the shifts hub inline. HubMapView still has its own command bar.)
         // Propagate theme to entire view tree
         .environment(\.appTheme, engine.appTheme)
         // Node encounter sheet
@@ -241,11 +273,40 @@ struct MapView: View {
             PracticeExamView(engine: engine)
                 .environment(\.appTheme, engine.appTheme)
         }
+        // Blueprint Exam (full screen) — PTCB-format diagnostic
+        .fullScreenCoverCompat(isPresented: $showBlueprintExam) {
+            BlueprintExamView(engine: engine)
+                .environment(\.appTheme, engine.appTheme)
+        }
+        // Exam history
+        .sheet(isPresented: $showExamHistory) {
+            ExamHistoryView(engine: engine)
+                .environment(\.appTheme, engine.appTheme)
+        }
+        // Readiness score
+        .sheet(isPresented: $showReadiness) {
+            ReadinessScoreView(engine: engine)
+                .environment(\.appTheme, engine.appTheme)
+        }
         // Guided Learning Hub
         .sheet(isPresented: $showGuidedLearning) {
             NavigationStack {
                 GuidedLearningHub(accentColor: Color(red: 0.0, green: 1.0, blue: 0.8))
                     .environment(\.appTheme, engine.appTheme)
+            }
+        }
+        // Rimrock — full-screen narrative hub (picker → shift)
+        .fullScreenCoverCompat(isPresented: $showRimrockShift) {
+            RimrockHubView(gameEngine: engine) {
+                showRimrockShift = false
+            }
+        }
+        // Mastery detail — full-screen breakdown of spaced-repetition progress
+        .fullScreenCoverCompat(isPresented: $showMasteryDetail) {
+            if let snap = engine.masteryTracker?.globalMastery() {
+                MasteryDetailView(snapshot: snap) {
+                    showMasteryDetail = false
+                }
             }
         }
         // Story beat narrative overlay
@@ -255,7 +316,18 @@ struct MapView: View {
             }
             .environment(\.appTheme, engine.appTheme)
         }
+        // Tutorial overlay system
+        .tutorialOverlay(manager: engine.tutorialManager, theme: ThemeManager())
+        .onAppear {
+            // Show onboarding tutorial on first launch
+            if engine.tutorialManager.shouldShowOnboarding() {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    engine.tutorialManager.startOnboarding()
+                }
+            }
+        }
     }
+
 }
 
 // MARK: - Hub Map
@@ -280,13 +352,15 @@ struct HubMapView: View {
     ]
     
     @State private var pulseAnimation = false
+    @AppStorage("narrative_mode_enabled") private var narrativeEnabled = true
 
     var body: some View {
         GeometryReader { geo in
             ZStack {
                 HubConnectionLines(positions: hubPositions, size: geo.size)
 
-                // Watermark
+                // Classic-mode watermark. Narrative mode routes to RimrockHomeView,
+                // so this view is only reached when narrative is off.
                 VStack {
                     Spacer()
                     Text("SYNAPSE // PTCE NETWORK v13.0 // MAIN BRANCH")
@@ -300,7 +374,8 @@ struct HubMapView: View {
                         Button { onSelectDomain(domain) } label: {
                             DomainHubNode(
                                 domain: domain,
-                                progress: engine.progress(for: domain)
+                                progress: engine.progress(for: domain),
+                                narrativeMode: narrativeEnabled
                             )
                         }
                         .buttonStyle(.plain)
@@ -641,6 +716,7 @@ struct CommandButton: View {
 struct DomainHubNode: View {
     let domain: KnowledgeDomain
     let progress: DomainProgress
+    var narrativeMode: Bool = false // Shelf Break narrative labels
 
     @State private var pulse = false
 
@@ -686,8 +762,8 @@ struct DomainHubNode: View {
                     .font(.system(size: 13, weight: .black, design: .monospaced))
                     .foregroundColor(domain.accentColor)
 
-                // Short name
-                Text(shortName(for: domain))
+                // Short name (use narrative labels in Shelf Break mode)
+                Text(shortName(for: domain, narrative: narrativeMode))
                     .font(.system(size: 8, weight: .semibold, design: .monospaced))
                     .foregroundColor(domain.accentColor.opacity(0.85))
                     .multilineTextAlignment(.center)
@@ -708,12 +784,23 @@ struct DomainHubNode: View {
         .contentShape(Circle())
     }
 
-    private func shortName(for domain: KnowledgeDomain) -> String {
-        switch domain {
-        case .medications:         return "MEDICATIONS"
-        case .federalRequirements: return "FED.REQ"
-        case .patientSafety:       return "PT.SAFETY"
-        case .orderEntry:          return "ORDER\nENTRY"
+    private func shortName(for domain: KnowledgeDomain, narrative: Bool) -> String {
+        if narrative {
+            // Shelf Break dispensary labels
+            switch domain {
+            case .medications:         return "PHARMACY\nOPS"
+            case .federalRequirements: return "VAULT\nPROTOCOL"
+            case .patientSafety:       return "MEDICAL\nBAY"
+            case .orderEntry:          return "SUPPLY\nSYSTEM"
+            }
+        } else {
+            // Classic PTCE labels
+            switch domain {
+            case .medications:         return "MEDICATIONS"
+            case .federalRequirements: return "FED.REQ"
+            case .patientSafety:       return "PT.SAFETY"
+            case .orderEntry:          return "ORDER\nENTRY"
+            }
         }
     }
 }
@@ -1475,9 +1562,6 @@ struct EncounterView: View {
                                     }
                                 }
 
-                                if !glossaryTerms.isEmpty {
-                                    GlossaryPanel(terms: glossaryTerms, color: color)
-                                }
                             }
                         }
                     }

@@ -50,6 +50,7 @@ struct SettingsView: View {
                 // ── Content ──────────────────────────────────────────────────
                 ScrollView {
                     VStack(alignment: .leading, spacing: 28) {
+                        tutorialSection
                         gameModeSection
                         textSizeSection
                         appearanceSection
@@ -62,6 +63,84 @@ struct SettingsView: View {
             }
         }
         .environment(\.appTheme, engine.appTheme)
+    }
+    
+    // MARK: - Tutorial Section
+    
+    @State private var showTutorialLibrary = false
+    
+    private var tutorialSection: some View {
+        SettingsSection(title: "TUTORIAL & HELP", theme: theme, accent: accent) {
+            VStack(spacing: 12) {
+                Button(action: { showTutorialLibrary = true }) {
+                    HStack {
+                        Image(systemName: "book.fill")
+                            .font(.system(size: 18))
+                            .foregroundColor(accent)
+                            .frame(width: 32)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Tutorial Library")
+                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .foregroundColor(theme.primaryText)
+                            Text("Review any tutorial topic")
+                                .font(.system(size: 13, weight: .regular, design: .rounded))
+                                .foregroundColor(theme.secondaryText)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(theme.secondaryText.opacity(0.6))
+                    }
+                    .padding(14)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(theme.surface.opacity(0.5))
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                Button(action: { 
+                    engine.tutorialManager.resetTutorial()
+                    engine.tutorialManager.startOnboarding()
+                }) {
+                    HStack {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 18))
+                            .foregroundColor(accent)
+                            .frame(width: 32)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Restart Onboarding")
+                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .foregroundColor(theme.primaryText)
+                            Text("Watch the tutorial again")
+                                .font(.system(size: 13, weight: .regular, design: .rounded))
+                                .foregroundColor(theme.secondaryText)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "play.circle.fill")
+                            .font(.system(size: 20))
+                            .foregroundColor(accent)
+                    }
+                    .padding(14)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(theme.surface.opacity(0.5))
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+        }
+        .sheet(isPresented: $showTutorialLibrary) {
+            TutorialLibraryView(tutorialManager: engine.tutorialManager,
+                                themeManager: ThemeManager())
+                .environment(\.appTheme, engine.appTheme)
+        }
     }
 
     // MARK: - Game Mode

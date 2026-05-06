@@ -817,9 +817,9 @@ private struct PracticeExamRule: View {
     }
 }
 
-private enum FeedbackState { case neutral, correct, wrong }
+enum FeedbackState { case neutral, correct, wrong }
 
-private struct ExamOptionButton: View {
+struct ExamOptionButton: View {
     let option: String
     let isSelected: Bool
     let feedbackState: FeedbackState
@@ -865,7 +865,7 @@ private struct ExamOptionButton: View {
     }
 }
 
-private struct ExamDomainResult: View {
+struct ExamDomainResult: View {
     let domain: KnowledgeDomain
     let correct: Int
     let total: Int

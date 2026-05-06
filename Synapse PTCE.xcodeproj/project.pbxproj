@@ -39,6 +39,7 @@
 		AA1BA0412F8F10290015709F /* MultiAngle_D4e.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0402F8F10290015709F /* MultiAngle_D4e.swift */; };
 		AA1BA0432F8F10AA0015709F /* MultiAngle_D1n.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0422F8F10AA0015709F /* MultiAngle_D1n.swift */; };
 		AA1BA0472F8F15850015709F /* MultiAngle_D1o.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0462F8F15850015709F /* MultiAngle_D1o.swift */; };
+		AA962EC02FA915D90036FAA2 /* StorySystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA962EBF2FA915D90036FAA2 /* StorySystem.swift */; };
 		AAA745D22FA7BB90001CD048 /* DrugStems.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745D12FA7BB8F001CD048 /* DrugStems.swift */; };
 		AAA745D42FA7BBDC001CD048 /* HighRiskMedications.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745D32FA7BBDC001CD048 /* HighRiskMedications.swift */; };
 		AAA745D62FA7BC31001CD048 /* DrugInteractions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745D52FA7BC31001CD048 /* DrugInteractions.swift */; };
@@ -47,8 +48,6 @@
 		AAA745DC2FA7BC86001CD048 /* BodySystemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745DB2FA7BC86001CD048 /* BodySystemsView.swift */; };
 		AAA745DE2FA7BCA5001CD048 /* HighRiskMedicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745DD2FA7BCA5001CD048 /* HighRiskMedicationsView.swift */; };
 		AAA745E02FA7BCC7001CD048 /* DrugInteractionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745DF2FA7BCC7001CD048 /* DrugInteractionsView.swift */; };
-		AAA745E22FA7BCF3001CD048 /* INTEGRATION_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = AAA745E12FA7BCF3001CD048 /* INTEGRATION_GUIDE.md */; };
-		AAA745E42FA7BD38001CD048 /* D1_MEDICATIONS_OVERHAUL_SUMMARY.md in Resources */ = {isa = PBXBuildFile; fileRef = AAA745E32FA7BD38001CD048 /* D1_MEDICATIONS_OVERHAUL_SUMMARY.md */; };
 		AAA745E62FA7BD5E001CD048 /* QuickStartIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745E52FA7BD5E001CD048 /* QuickStartIntegration.swift */; };
 		AAA745E82FA7BEA9001CD048 /* GuidedLearningHub.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745E72FA7BEA9001CD048 /* GuidedLearningHub.swift */; };
 		AAA745EA2FA7BEC3001CD048 /* LearningProgressModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745E92FA7BEC3001CD048 /* LearningProgressModels.swift */; };
@@ -58,12 +57,8 @@
 		AAA745F22FA7BFCF001CD048 /* StemQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745F12FA7BFCF001CD048 /* StemQuizView.swift */; };
 		AAA745F42FA7C009001CD048 /* DrugSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745F32FA7C009001CD048 /* DrugSearchView.swift */; };
 		AAA745F62FA7C044001CD048 /* SimplifiedLearningViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745F52FA7C044001CD048 /* SimplifiedLearningViews.swift */; };
-		AAA745F82FA7C088001CD048 /* COMPLETE_INTEGRATION_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = AAA745F72FA7C088001CD048 /* COMPLETE_INTEGRATION_GUIDE.md */; };
 		AAA745FA2FA7D5A2001CD048 /* PTCEMedicationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745F92FA7D5A2001CD048 /* PTCEMedicationModels.swift */; };
 		AAA745FC2FA7D5F9001CD048 /* PTCEMedicationDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745FB2FA7D5F9001CD048 /* PTCEMedicationDatabase.swift */; };
-		AAA745FE2FA7D655001CD048 /* FINAL_INTEGRATION_INSTRUCTIONS.md in Resources */ = {isa = PBXBuildFile; fileRef = AAA745FD2FA7D655001CD048 /* FINAL_INTEGRATION_INSTRUCTIONS.md */; };
-		AAA746002FA7FC71001CD048 /* GUIDED_LEARNING_COMPLETE_IMPLEMENTATION.md in Resources */ = {isa = PBXBuildFile; fileRef = AAA745FF2FA7FC71001CD048 /* GUIDED_LEARNING_COMPLETE_IMPLEMENTATION.md */; };
-		AAA746022FA7FDD2001CD048 /* DATABASE_EXPANSION_COMPLETE.md in Resources */ = {isa = PBXBuildFile; fileRef = AAA746012FA7FDD2001CD048 /* DATABASE_EXPANSION_COMPLETE.md */; };
 		AAEF108D2F907AB4006102AF /* TVContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF108C2F907AB4006102AF /* TVContentView.swift */; };
 		AAEF108F2F907AE9006102AF /* TVHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF108E2F907AE9006102AF /* TVHubView.swift */; };
 		AAEF10912F907B1B006102AF /* TVMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF10902F907B1B006102AF /* TVMapView.swift */; };
@@ -105,6 +100,7 @@
 		AA1BA0402F8F10290015709F /* MultiAngle_D4e.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D4e.swift; sourceTree = "<group>"; };
 		AA1BA0422F8F10AA0015709F /* MultiAngle_D1n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1n.swift; sourceTree = "<group>"; };
 		AA1BA0462F8F15850015709F /* MultiAngle_D1o.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1o.swift; sourceTree = "<group>"; };
+		AA962EBF2FA915D90036FAA2 /* StorySystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorySystem.swift; sourceTree = "<group>"; };
 		AAA745D12FA7BB8F001CD048 /* DrugStems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugStems.swift; sourceTree = "<group>"; };
 		AAA745D32FA7BBDC001CD048 /* HighRiskMedications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighRiskMedications.swift; sourceTree = "<group>"; };
 		AAA745D52FA7BC31001CD048 /* DrugInteractions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugInteractions.swift; sourceTree = "<group>"; };
@@ -113,8 +109,6 @@
 		AAA745DB2FA7BC86001CD048 /* BodySystemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodySystemsView.swift; sourceTree = "<group>"; };
 		AAA745DD2FA7BCA5001CD048 /* HighRiskMedicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighRiskMedicationsView.swift; sourceTree = "<group>"; };
 		AAA745DF2FA7BCC7001CD048 /* DrugInteractionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugInteractionsView.swift; sourceTree = "<group>"; };
-		AAA745E12FA7BCF3001CD048 /* INTEGRATION_GUIDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = INTEGRATION_GUIDE.md; sourceTree = "<group>"; };
-		AAA745E32FA7BD38001CD048 /* D1_MEDICATIONS_OVERHAUL_SUMMARY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = D1_MEDICATIONS_OVERHAUL_SUMMARY.md; sourceTree = "<group>"; };
 		AAA745E52FA7BD5E001CD048 /* QuickStartIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickStartIntegration.swift; sourceTree = "<group>"; };
 		AAA745E72FA7BEA9001CD048 /* GuidedLearningHub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedLearningHub.swift; sourceTree = "<group>"; };
 		AAA745E92FA7BEC3001CD048 /* LearningProgressModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningProgressModels.swift; sourceTree = "<group>"; };
@@ -124,12 +118,8 @@
 		AAA745F12FA7BFCF001CD048 /* StemQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StemQuizView.swift; sourceTree = "<group>"; };
 		AAA745F32FA7C009001CD048 /* DrugSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugSearchView.swift; sourceTree = "<group>"; };
 		AAA745F52FA7C044001CD048 /* SimplifiedLearningViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplifiedLearningViews.swift; sourceTree = "<group>"; };
-		AAA745F72FA7C088001CD048 /* COMPLETE_INTEGRATION_GUIDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = COMPLETE_INTEGRATION_GUIDE.md; sourceTree = "<group>"; };
 		AAA745F92FA7D5A2001CD048 /* PTCEMedicationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PTCEMedicationModels.swift; sourceTree = "<group>"; };
 		AAA745FB2FA7D5F9001CD048 /* PTCEMedicationDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PTCEMedicationDatabase.swift; sourceTree = "<group>"; };
-		AAA745FD2FA7D655001CD048 /* FINAL_INTEGRATION_INSTRUCTIONS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FINAL_INTEGRATION_INSTRUCTIONS.md; sourceTree = "<group>"; };
-		AAA745FF2FA7FC71001CD048 /* GUIDED_LEARNING_COMPLETE_IMPLEMENTATION.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = GUIDED_LEARNING_COMPLETE_IMPLEMENTATION.md; sourceTree = "<group>"; };
-		AAA746012FA7FDD2001CD048 /* DATABASE_EXPANSION_COMPLETE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DATABASE_EXPANSION_COMPLETE.md; sourceTree = "<group>"; };
 		AAEF108C2F907AB4006102AF /* TVContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVContentView.swift; sourceTree = "<group>"; };
 		AAEF108E2F907AE9006102AF /* TVHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVHubView.swift; sourceTree = "<group>"; };
 		AAEF10902F907B1B006102AF /* TVMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVMapView.swift; sourceTree = "<group>"; };
@@ -206,8 +196,6 @@
 				AAA745DB2FA7BC86001CD048 /* BodySystemsView.swift */,
 				AAA745DD2FA7BCA5001CD048 /* HighRiskMedicationsView.swift */,
 				AAA745DF2FA7BCC7001CD048 /* DrugInteractionsView.swift */,
-				AAA745E12FA7BCF3001CD048 /* INTEGRATION_GUIDE.md */,
-				AAA745E32FA7BD38001CD048 /* D1_MEDICATIONS_OVERHAUL_SUMMARY.md */,
 				AAA745E52FA7BD5E001CD048 /* QuickStartIntegration.swift */,
 				AAA745E72FA7BEA9001CD048 /* GuidedLearningHub.swift */,
 				AAA745E92FA7BEC3001CD048 /* LearningProgressModels.swift */,
@@ -217,12 +205,9 @@
 				AAA745F12FA7BFCF001CD048 /* StemQuizView.swift */,
 				AAA745F32FA7C009001CD048 /* DrugSearchView.swift */,
 				AAA745F52FA7C044001CD048 /* SimplifiedLearningViews.swift */,
-				AAA745F72FA7C088001CD048 /* COMPLETE_INTEGRATION_GUIDE.md */,
 				AAA745F92FA7D5A2001CD048 /* PTCEMedicationModels.swift */,
 				AAA745FB2FA7D5F9001CD048 /* PTCEMedicationDatabase.swift */,
-				AAA745FD2FA7D655001CD048 /* FINAL_INTEGRATION_INSTRUCTIONS.md */,
-				AAA745FF2FA7FC71001CD048 /* GUIDED_LEARNING_COMPLETE_IMPLEMENTATION.md */,
-				AAA746012FA7FDD2001CD048 /* DATABASE_EXPANSION_COMPLETE.md */,
+				AA962EBF2FA915D90036FAA2 /* StorySystem.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -298,12 +283,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AAA745E42FA7BD38001CD048 /* D1_MEDICATIONS_OVERHAUL_SUMMARY.md in Resources */,
-				AAA746022FA7FDD2001CD048 /* DATABASE_EXPANSION_COMPLETE.md in Resources */,
-				AAA746002FA7FC71001CD048 /* GUIDED_LEARNING_COMPLETE_IMPLEMENTATION.md in Resources */,
-				AAA745F82FA7C088001CD048 /* COMPLETE_INTEGRATION_GUIDE.md in Resources */,
-				AAA745E22FA7BCF3001CD048 /* INTEGRATION_GUIDE.md in Resources */,
-				AAA745FE2FA7D655001CD048 /* FINAL_INTEGRATION_INSTRUCTIONS.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -329,6 +308,7 @@
 				AA1BA0212F8EFE5C0015709F /* MultiAngle_D2c.swift in Sources */,
 				AA1BA00F2F8ECC3C0015709F /* MultiAngle_D3.swift in Sources */,
 				AA1BA0192F8ED1BC0015709F /* MultiAngle_D3b.swift in Sources */,
+				AA962EC02FA915D90036FAA2 /* StorySystem.swift in Sources */,
 				AA1BA00D2F8ECBAA0015709F /* MultiAngle_D2.swift in Sources */,
 				AA1BA00B2F8ECB150015709F /* MultiAngle_D1.swift in Sources */,
 				AAA745D82FA7BC54001CD048 /* ConceptualLearningView.swift in Sources */,
@@ -519,22 +499,20 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 26.4;
 				MARKETING_VERSION = 12;
 				PRODUCT_BUNDLE_IDENTIFIER = "Yellow-Labs.Synapse-PTCE";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 26.4;
 			};
 			name = Debug;
@@ -566,22 +544,20 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 26.4;
 				MARKETING_VERSION = 12;
 				PRODUCT_BUNDLE_IDENTIFIER = "Yellow-Labs.Synapse-PTCE";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 26.4;
 			};
 			name = Release;
