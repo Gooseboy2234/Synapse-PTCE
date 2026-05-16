@@ -3,7 +3,9 @@
 //  Synapse PTCE  v13.0
 //
 //  Apple TV root entry point. Replaces ContentView on tvOS.
-//  Handles async boot sequence and hands off to TVRootView.
+//  Handles async boot sequence and hands off to TVRimrockHomeView (the
+//  Rimrock-first landing). The legacy `TVRootView` further down in this
+//  file is retained as a fallback shell but is no longer the default entry.
 //
 
 #if os(tvOS)
@@ -18,7 +20,7 @@ struct TVContentView: View {
     var body: some View {
         ZStack {
             if let engine {
-                TVRootView(engine: engine)
+                TVRimrockHomeView(engine: engine)
                     .transition(.opacity)
             } else {
                 TVBootView(progress: loadProgress)
@@ -38,74 +40,81 @@ struct TVContentView: View {
 }
 
 // MARK: - TV Boot View
+//
+// Rimrock-themed sunrise: amber sky gradient over the Bighorn silhouette with
+// a soft animated radio-signal pulse on the SYNAPSE wordmark while the
+// content layer loads.
 
 struct TVBootView: View {
     let progress: Double
 
-    private let accent = Color(red: 1.0, green: 0.65, blue: 0.0)
-    private let bg     = Color(red: 0.059, green: 0.059, blue: 0.059)
+    @State private var pulse = false
+
+    private var palette: RimrockAtmosphere.Palette { RimrockAtmosphere.palette(for: 1) }
 
     var body: some View {
         ZStack {
-            bg.ignoresSafeArea()
-
-            // Grid background
-            Canvas { ctx, size in
-                let spacing: CGFloat = 60
-                let lineColor = accent.opacity(0.04)
-                var x: CGFloat = 0
-                while x <= size.width {
-                    var p = Path()
-                    p.move(to: .init(x: x, y: 0))
-                    p.addLine(to: .init(x: x, y: size.height))
-                    ctx.stroke(p, with: .color(lineColor), lineWidth: 0.8)
-                    x += spacing
-                }
-                var y: CGFloat = 0
-                while y <= size.height {
-                    var p = Path()
-                    p.move(to: .init(x: 0, y: y))
-                    p.addLine(to: .init(x: size.width, y: y))
-                    ctx.stroke(p, with: .color(lineColor), lineWidth: 0.8)
-                    y += spacing
-                }
-            }
-            .ignoresSafeArea()
+            // Rimrock dawn atmosphere — same sky/sun/ridge stack the home uses
+            RimrockAtmosphere.skyBackground(for: 1).ignoresSafeArea()
 
             VStack(spacing: 0) {
                 Spacer()
 
-                VStack(spacing: 16) {
-                    Text("SYNAPSE")
-                        .font(.system(size: 108, weight: .black, design: .monospaced))
-                        .foregroundColor(accent)
-                        .shadow(color: accent.opacity(0.70), radius: 30)
-                    Text("PTCE NETWORK  v13.0")
-                        .font(.system(size: 26, weight: .bold, design: .monospaced))
-                        .foregroundColor(accent.opacity(0.48))
-                        .tracking(4)
+                // Wordmark — soft amber pulse while loading
+                VStack(spacing: 18) {
+                    HStack(spacing: 16) {
+                        Image(systemName: "antenna.radiowaves.left.and.right")
+                            .font(.system(size: 36, weight: .heavy))
+                            .foregroundColor(palette.accent)
+                            .opacity(pulse ? 0.55 : 1.0)
+                        Text("SYNAPSE")
+                            .font(.system(size: 96, weight: .black, design: .monospaced))
+                            .foregroundColor(palette.accent)
+                            .shadow(color: palette.accent.opacity(0.65), radius: 28)
+                            .tracking(4)
+                    }
+
+                    Text("RIMROCK PHARMACY · JOHNSON COUNTY")
+                        .font(.system(size: 18, weight: .bold, design: .monospaced))
+                        .foregroundColor(palette.sceneText.opacity(0.65))
+                        .tracking(3.2)
                 }
 
                 Spacer()
 
-                VStack(spacing: 16) {
-                    Text("INITIALIZING NETWORK...")
-                        .font(.system(size: 20, weight: .bold, design: .monospaced))
-                        .foregroundColor(accent.opacity(0.45))
-                        .tracking(3)
+                // Progress strip — Mara's frequency tuning in
+                VStack(spacing: 14) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "dot.radiowaves.left.and.right")
+                            .font(.system(size: 14))
+                        Text("TUNING TO MARA'S FREQUENCY…")
+                            .font(.system(size: 16, weight: .bold, design: .monospaced))
+                            .tracking(2.4)
+                    }
+                    .foregroundColor(palette.accent.opacity(0.55))
 
                     ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(accent.opacity(0.10))
-                            .frame(width: 560, height: 6)
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(accent)
-                            .frame(width: 560 * progress, height: 6)
-                            .shadow(color: accent.opacity(0.8), radius: 8)
+                        Capsule()
+                            .fill(palette.accent.opacity(0.10))
+                            .frame(width: 600, height: 6)
+                        Capsule()
+                            .fill(palette.accent)
+                            .frame(width: 600 * progress, height: 6)
+                            .shadow(color: palette.accent.opacity(0.85), radius: 8)
                     }
-                    .frame(width: 560, height: 6)
+                    .frame(width: 600, height: 6)
+
+                    Text("\(Int((progress * 100).rounded()))%")
+                        .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                        .foregroundColor(palette.sceneText.opacity(0.45))
+                        .tracking(1.6)
                 }
-                .padding(.bottom, 100)
+                .padding(.bottom, 140)
+            }
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.3).repeatForever(autoreverses: true)) {
+                pulse = true
             }
         }
     }
@@ -125,6 +134,7 @@ struct TVRootView: View {
     @State private var showExam      = false
     @State private var showCampaign  = false
     @State private var showReview    = false
+    @State private var showRimrock   = false
 
     var body: some View {
         ZStack {
@@ -172,7 +182,8 @@ struct TVRootView: View {
                     onShowIntel:     { showIntel     = true },
                     onShowExam:      { showExam      = true },
                     onShowCampaign:  { showCampaign  = true },
-                    onShowReview:    { showReview    = true }
+                    onShowReview:    { showReview    = true },
+                    onShowRimrock:   { showRimrock   = true }
                 )
                 .transition(.asymmetric(
                     insertion: .move(edge: .leading).combined(with: .opacity),
@@ -229,6 +240,11 @@ struct TVRootView: View {
                 engine.pendingStoryBeat = nil
             }
             .environment(\.appTheme, engine.appTheme)
+        }
+        .sheet(isPresented: $showRimrock) {
+            RimrockHubView(gameEngine: engine) {
+                showRimrock = false
+            }
         }
     }
 }

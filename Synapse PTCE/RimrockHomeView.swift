@@ -36,13 +36,29 @@ struct RimrockHomeView: View {
         engine.masteryTracker?.globalMastery() ?? Self.emptySnapshot
     }
 
-    /// The next Rimrock shift to recommend in Today's Path.
-    /// Defaults to Day 1 if the player hasn't played anything; otherwise
-    /// `lastShiftPlayed + 1`, capped at the last shift.
-    private var nextShift: RimrockShift {
+    /// Bank-coverage snapshot — the *actual* pass-prep gauge. Surfaces alongside
+    /// mastery so the player sees both signals.
+    private var coverage: PracticeCoverage { engine.practiceCoverage() }
+
+    /// Whether the player has finished the curated 35-day arc.
+    private var arcComplete: Bool {
+        lastShiftPlayed >= RimrockContent.allShifts.count
+    }
+
+    /// The next curated Rimrock shift in the arc, or `nil` once the player has
+    /// played past Day 35 (procedural shifts take over via the hub).
+    private var nextCuratedShift: RimrockShift? {
+        if arcComplete { return nil }
         let all = RimrockContent.allShifts
         let nextDay = max(1, lastShiftPlayed + 1)
-        return all.first(where: { $0.dayNumber >= nextDay }) ?? all.first!
+        return all.first(where: { $0.dayNumber >= nextDay })
+    }
+
+    /// Legacy alias retained for call sites that just want "what's next" without
+    /// caring whether it's curated or procedural; returns Day 1 as a safe fallback
+    /// for the very-first-launch case.
+    private var nextShift: RimrockShift {
+        nextCuratedShift ?? RimrockContent.allShifts.first!
     }
 
     var body: some View {
@@ -199,30 +215,78 @@ struct RimrockHomeView: View {
                     }
                 }
 
-                HStack(spacing: 16) {
-                    Text("\(mastery.trulyLearned) of \(mastery.totalConcepts) truly learned")
-                        .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                        .foregroundColor(palette.sceneText.opacity(0.85))
-
-                    Rectangle()
-                        .fill(palette.sceneText.opacity(0.25))
-                        .frame(width: 0.5, height: 12)
-
-                    HStack(spacing: 5) {
-                        Image(systemName: mastery.dueForReview > 0 ? "bell.badge.fill" : "checkmark.circle")
-                            .font(.system(size: 10))
-                        Text(mastery.dueForReview > 0
-                             ? "\(mastery.dueForReview) due today"
-                             : "no reviews due")
+                VStack(spacing: 6) {
+                    HStack(spacing: 12) {
+                        Text("\(mastery.trulyLearned) / \(mastery.totalConcepts) truly learned")
                             .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                            .foregroundColor(palette.sceneText.opacity(0.85))
+
+                        Rectangle()
+                            .fill(palette.sceneText.opacity(0.25))
+                            .frame(width: 0.5, height: 12)
+
+                        HStack(spacing: 5) {
+                            Image(systemName: mastery.dueForReview > 0 ? "bell.badge.fill" : "checkmark.circle")
+                                .font(.system(size: 10))
+                            Text(mastery.dueForReview > 0
+                                 ? "\(mastery.dueForReview) due today"
+                                 : "no reviews due")
+                                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                        }
+                        .foregroundColor(mastery.dueForReview > 0
+                                         ? Color(red: 0.95, green: 0.78, blue: 0.45)
+                                         : palette.sceneText.opacity(0.6))
                     }
-                    .foregroundColor(mastery.dueForReview > 0
-                                     ? Color(red: 0.95, green: 0.78, blue: 0.45)
-                                     : palette.sceneText.opacity(0.6))
+
+                    // PASS PATH — bank verification gauge. The real "are you
+                    // ready for the PTCB" signal.
+                    passPathStrip
                 }
             }
         }
         .buttonStyle(.plain)
+    }
+
+    // MARK: - Pass Path strip (bank coverage gauge)
+
+    /// Inline coverage gauge — "X% PASS PATH · Y / Z verified · READY pill at ≥80%".
+    /// Sits under the mastery sub-row in the hero so the player sees both
+    /// signals at a glance.
+    private var passPathStrip: some View {
+        let cov = coverage
+        let pct = Int((cov.verifiedPercent * 100).rounded())
+        let color: Color = {
+            if cov.verifiedPercent >= 0.8 { return Color(red: 0.25, green: 0.85, blue: 0.55) }
+            if cov.verifiedPercent >= 0.5 { return Color(red: 0.95, green: 0.78, blue: 0.45) }
+            return palette.accent
+        }()
+        return HStack(spacing: 8) {
+            Image(systemName: "checkmark.shield.fill")
+                .font(.system(size: 10))
+                .foregroundColor(color)
+            Text("\(pct)% PASS PATH")
+                .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                .tracking(1.2)
+                .foregroundColor(color)
+            Text("·")
+                .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                .foregroundColor(palette.sceneText.opacity(0.35))
+            Text("\(cov.verified) / \(cov.bankSize) verified")
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundColor(palette.sceneText.opacity(0.65))
+
+            if cov.verifiedPercent >= 0.8 {
+                Text("READY")
+                    .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                    .tracking(1.3)
+                    .foregroundColor(Color(red: 0.25, green: 0.85, blue: 0.55))
+                    .padding(.horizontal, 6).padding(.vertical, 2)
+                    .background(Color(red: 0.25, green: 0.85, blue: 0.55).opacity(0.15))
+                    .overlay(Capsule()
+                        .stroke(Color(red: 0.25, green: 0.85, blue: 0.55).opacity(0.55), lineWidth: 0.8))
+                    .clipShape(Capsule())
+            }
+        }
     }
 
     // MARK: - Today's Path
@@ -271,7 +335,8 @@ struct RimrockHomeView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(isReview ? "REVIEW" : "NEXT SHIFT")
+                        Text(isReview ? "REVIEW"
+                             : (arcComplete ? "OPEN SHIFT" : "NEXT SHIFT"))
                             .font(.system(size: 9, weight: .heavy, design: .monospaced))
                             .tracking(1.5)
                             .foregroundColor(palette.accent.opacity(0.75))
@@ -281,18 +346,37 @@ struct RimrockHomeView: View {
                                 .font(.system(size: 22, weight: .heavy, design: .monospaced))
                                 .foregroundColor(.white.opacity(0.95))
                                 .tracking(0.8)
-                        } else {
+                        } else if let curated = nextCuratedShift {
                             HStack(spacing: 10) {
-                                Text("DAY \(nextShift.dayNumber)")
+                                Text("DAY \(curated.dayNumber)")
                                     .font(.system(size: 22, weight: .heavy, design: .monospaced))
                                     .foregroundColor(palette.accent)
                                     .tracking(0.5)
-                                Text(nextShift.title.uppercased())
+                                Text(curated.title.uppercased())
                                     .font(.system(size: 18, weight: .heavy, design: .monospaced))
                                     .foregroundColor(.white.opacity(0.95))
                                     .tracking(1.0)
                             }
-                            Text("\(nextShift.dateLine) · \(nextShift.timeLine)")
+                            Text("\(curated.dateLine) · \(curated.timeLine)")
+                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                .foregroundColor(palette.sceneText.opacity(0.7))
+                                .padding(.top, 1)
+                        } else {
+                            // Post-arc: procedural shifts. The hub view handles
+                            // generation; this card just teases the day number.
+                            HStack(spacing: 10) {
+                                Text("DAY \(coverage.nextShiftNumber)")
+                                    .font(.system(size: 22, weight: .heavy, design: .monospaced))
+                                    .foregroundColor(palette.accent)
+                                    .tracking(0.5)
+                                Text("OPEN SHIFT")
+                                    .font(.system(size: 18, weight: .heavy, design: .monospaced))
+                                    .foregroundColor(.white.opacity(0.95))
+                                    .tracking(1.0)
+                            }
+                            Text(coverage.isFullyVerified
+                                 ? "Full bank verified — reinforcement only"
+                                 : "Procedural · \(max(0, coverage.bankSize - coverage.verified)) Qs left to verify")
                                 .font(.system(size: 11, weight: .medium, design: .monospaced))
                                 .foregroundColor(palette.sceneText.opacity(0.7))
                                 .padding(.top, 1)
@@ -304,15 +388,28 @@ struct RimrockHomeView: View {
                         .foregroundColor(palette.accent.opacity(0.8))
                 }
 
-                if !isReview, let teaser = teaserFor(shift: nextShift) {
-                    Text(teaser)
-                        .font(.system(size: 14, design: .serif))
-                        .italic()
-                        .foregroundColor(palette.sceneText.opacity(0.85))
-                        .lineSpacing(4)
-                        .lineLimit(3)
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                if !isReview {
+                    if let curated = nextCuratedShift, let teaser = teaserFor(shift: curated) {
+                        Text(teaser)
+                            .font(.system(size: 14, design: .serif))
+                            .italic()
+                            .foregroundColor(palette.sceneText.opacity(0.85))
+                            .lineSpacing(4)
+                            .lineLimit(3)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    } else if arcComplete {
+                        Text(coverage.isFullyVerified
+                             ? "Every question in the bank is verified. Keep showing up for reinforcement, or schedule the PTCB."
+                             : "Shifts drill the full PTCB bank now — Mara keeps the radio on, you keep working through.")
+                            .font(.system(size: 14, design: .serif))
+                            .italic()
+                            .foregroundColor(palette.sceneText.opacity(0.85))
+                            .lineSpacing(4)
+                            .lineLimit(3)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
             }
             .padding(18)
@@ -387,7 +484,8 @@ struct RimrockHomeView: View {
 
     private var domainsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("PTCB DOMAINS", subtitle: "drill the question bank by domain")
+            sectionHeader("PTCB DOMAINS",
+                          subtitle: "drill the bank by domain — no story, no waiting")
 
             LazyVGrid(
                 columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
@@ -397,6 +495,19 @@ struct RimrockHomeView: View {
                     domainTile(domain)
                 }
             }
+
+            // Quick reminder that this is the "skip the reading" path
+            HStack(spacing: 8) {
+                Image(systemName: "books.vertical")
+                    .font(.system(size: 11))
+                    .foregroundColor(palette.sceneText.opacity(0.55))
+                Text("Prefer to skip the story? Tap a domain — same bank, no narrative.")
+                    .font(.system(size: 11, design: .serif))
+                    .italic()
+                    .foregroundColor(palette.sceneText.opacity(0.60))
+                Spacer(minLength: 0)
+            }
+            .padding(.top, 4)
         }
     }
 

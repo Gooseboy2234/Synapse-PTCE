@@ -422,13 +422,15 @@ struct BlueprintExamView: View {
             }
             .background(Color.black)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button("Close") { showingReview = false }
                         .foregroundColor(accent)
                 }
             }
             .navigationTitle("Review")
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
         }
     }
 
@@ -579,9 +581,11 @@ struct ExamHistoryView: View {
                 }
             }
             .navigationTitle("Exam History")
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button("Close") { dismiss() }
                         .foregroundColor(accent)
                 }
@@ -870,9 +874,11 @@ struct ReadinessScoreView: View {
                 }
             }
             .navigationTitle("Readiness")
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button("Close") { dismiss() }
                         .foregroundColor(accent)
                 }

@@ -447,7 +447,7 @@ extension ConceptDescriptor {
         ConceptDescriptor(
             key: "RM:\(q.topic)",
             displayName: Self.humanize(q.topic),
-            domain: q.domain,
+            domain: q.domain.knowledgeDomain,
             source: .rimrock
         )
     }

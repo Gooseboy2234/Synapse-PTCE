@@ -34,7 +34,15 @@ struct RimrockHubView: View {
                 RimrockDayPickerView(
                     shifts: RimrockContent.allShifts,
                     masterySnapshot: gameEngine?.masteryTracker.globalMastery(),
+                    practiceCoverage: gameEngine?.practiceCoverage(),
                     onSelect: { shift in
+                        withAnimation(.easeInOut(duration: 0.35)) {
+                            activeShift = shift
+                        }
+                    },
+                    onSelectPracticeNext: {
+                        guard let engine = gameEngine else { return }
+                        let shift = engine.generateNextPracticeShift()
                         withAnimation(.easeInOut(duration: 0.35)) {
                             activeShift = shift
                         }
@@ -53,7 +61,9 @@ struct RimrockDayPickerView: View {
 
     let shifts: [RimrockShift]
     let masterySnapshot: GlobalMasterySnapshot?
+    let practiceCoverage: PracticeCoverage?
     let onSelect: (RimrockShift) -> Void
+    let onSelectPracticeNext: () -> Void
     let onDismiss: () -> Void
 
     // Picker uses the morning palette as a baseline
@@ -76,6 +86,14 @@ struct RimrockDayPickerView: View {
                         ForEach(0..<shifts.count, id: \.self) { idx in
                             shiftCard(shifts[idx])
                                 .onTapGesture { onSelect(shifts[idx]) }
+                        }
+
+                        // After the curated arc, surface ongoing practice shifts —
+                        // procedurally drawn from the full DataNode bank, every
+                        // question hit at least twice with ≥4-shift spacing.
+                        if let coverage = practiceCoverage {
+                            practiceSection(coverage: coverage)
+                                .padding(.top, 18)
                         }
 
                         Color.clear.frame(height: 80)  // breathing room above ridges
@@ -193,6 +211,136 @@ struct RimrockDayPickerView: View {
                     .foregroundColor(basePalette.sceneText.opacity(0.65))
             }
         }
+    }
+
+    // MARK: - Practice section (post-Day-35 procedural shifts)
+
+    @ViewBuilder
+    private func practiceSection(coverage: PracticeCoverage) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Section header — clearly demarcated from the curated arc
+            HStack(spacing: 8) {
+                Image(systemName: "infinity")
+                    .font(.system(size: 11, weight: .heavy))
+                Text("ONGOING PRACTICE")
+                    .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                    .tracking(1.6)
+                Rectangle()
+                    .fill(basePalette.accent.opacity(0.35))
+                    .frame(height: 0.5)
+            }
+            .foregroundColor(basePalette.accent.opacity(0.85))
+            .padding(.top, 4)
+
+            // Subhead explaining the rule
+            Text("Every question in the bank — \(coverage.bankSize) of them — wrapped in shift narrative and drilled at least twice, spaced apart enough to verify retention.")
+                .font(.system(size: 11, weight: .regular, design: .monospaced))
+                .foregroundColor(basePalette.sceneText.opacity(0.62))
+                .lineSpacing(3)
+                .fixedSize(horizontal: false, vertical: true)
+
+            // Coverage strip — two stacked progress lines
+            VStack(spacing: 8) {
+                coverageRow(
+                    label: "SEEN",
+                    count: coverage.seenOnce,
+                    total: coverage.bankSize,
+                    color: basePalette.accent.opacity(0.65)
+                )
+                coverageRow(
+                    label: "VERIFIED",
+                    count: coverage.verified,
+                    total: coverage.bankSize,
+                    color: Color(red: 0.25, green: 0.85, blue: 0.55)
+                )
+            }
+            .padding(14)
+            .background(basePalette.panel.opacity(0.55))
+            .overlay(RoundedRectangle(cornerRadius: 8)
+                .stroke(basePalette.accent.opacity(0.20), lineWidth: 1))
+            .cornerRadius(8)
+
+            // Next shift card — the play button
+            Button(action: onSelectPracticeNext) {
+                HStack(alignment: .top, spacing: 14) {
+                    VStack(spacing: 0) {
+                        Text("DAY")
+                            .font(.system(size: 8, weight: .bold, design: .monospaced))
+                            .tracking(1.2)
+                            .foregroundColor(basePalette.label.opacity(0.85))
+                        Text("\(coverage.nextShiftNumber)")
+                            .font(.system(size: 28, weight: .heavy, design: .monospaced))
+                            .foregroundColor(basePalette.accent)
+                            .padding(.top, 1)
+                    }
+                    .frame(width: 56)
+
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(coverage.isFullyVerified ? "FULL COVERAGE — REINFORCEMENT" : "NEXT PRACTICE SHIFT")
+                            .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                            .tracking(1.4)
+                            .foregroundColor(coverage.isFullyVerified
+                                             ? Color(red: 0.25, green: 0.85, blue: 0.55)
+                                             : basePalette.accent)
+                        Text(practiceSubtitle(for: coverage))
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundColor(basePalette.sceneText.opacity(0.65))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(basePalette.accent.opacity(0.7))
+                }
+                .padding(14)
+                .background(
+                    LinearGradient(
+                        colors: [basePalette.panel, basePalette.panel.opacity(0.7)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(RoundedRectangle(cornerRadius: 11)
+                    .stroke(basePalette.accent.opacity(0.45), lineWidth: 1.2))
+                .cornerRadius(11)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func coverageRow(label: String, count: Int, total: Int, color: Color) -> some View {
+        let pct = total > 0 ? Double(count) / Double(total) : 0
+        return VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(label)
+                    .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                    .tracking(1.2)
+                    .foregroundColor(basePalette.sceneText.opacity(0.6))
+                Spacer()
+                Text("\(count) / \(total)  ·  \(Int((pct * 100).rounded()))%")
+                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.white.opacity(0.85))
+            }
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Rectangle().fill(color.opacity(0.18)).frame(height: 5).cornerRadius(2.5)
+                    Rectangle().fill(color)
+                        .frame(width: geo.size.width * pct, height: 5)
+                        .cornerRadius(2.5)
+                }
+            }
+            .frame(height: 5)
+        }
+    }
+
+    private func practiceSubtitle(for coverage: PracticeCoverage) -> String {
+        if coverage.isFullyVerified {
+            return "All \(coverage.bankSize) questions verified. Keep playing for SR reinforcement."
+        }
+        let remaining = coverage.bankSize - coverage.verified
+        return "10 questions · ≥4-shift spacing · \(remaining) still to verify"
     }
 
     // MARK: - Card

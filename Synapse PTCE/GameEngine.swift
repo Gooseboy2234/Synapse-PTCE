@@ -285,7 +285,7 @@ class GameEngine {
 
     init(nodes: [DataNode] = DataNode.phaseOneDatabase) {
         // ── 1. Build SwiftData stack ────────────────────────────────────────
-        let schema = Schema([NodeProgress.self, UserStats.self, TutorialProgress.self, ConceptRecord.self, ExamAttempt.self])
+        let schema = Schema([NodeProgress.self, UserStats.self, TutorialProgress.self, ConceptRecord.self, ExamAttempt.self, QuestionExposure.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         // Fatal failure here means SwiftData is unavailable — app cannot function.
         let container = try! ModelContainer(for: schema, configurations: [config])
@@ -612,18 +612,16 @@ class GameEngine {
             
             // ── Phase 2: Apply Active Power-Up Effects ────────────────
             var finalXP = xpAwarded
-            var finalShards = shardAwarded ? 1 : 0
-            
+
             // Double XP power-up
             if powerUpEffects.isDoubleXPActive {
                 finalXP *= 2
                 powerUpEffects.consumeUse(of: .doubleXP)
                 addFloatingText("2× XP!", color: .yellow, at: CGPoint(x: 200, y: 200))
             }
-            
-            // Shard Boost power-up
+
+            // Shard Boost power-up — top up a shard if the natural award didn't fire
             if powerUpEffects.isShardBoostActive && !shardAwarded {
-                finalShards = 1
                 _userStats.dataShards += 1
                 _userStats.lifetimeDataShards += 1
                 powerUpEffects.consumeUse(of: .shardBoost)
@@ -911,6 +909,100 @@ class GameEngine {
     /// The most recent exam attempt, if any.
     var latestExamAttempt: ExamAttempt? {
         allExamAttempts().first
+    }
+
+    // MARK: - Practice Shifts (post-Day-35 procedural mode)
+
+    /// Snapshot of practice coverage across the full DataNode bank.
+    func practiceCoverage() -> PracticeCoverage {
+        let exposures = allExposures()
+        let bank = nodes.filter { !$0.options.isEmpty && !$0.correctAnswer.isEmpty }
+        let bankSize = bank.count
+        let seenOnce = exposures.count
+        let verified = exposures.filter { $0.exposureCount >= 2 }.count
+        // `completedShifts` reflects only procedural shifts the player has
+        // actually finished — 0 when none. The `nextShiftNumber` computed
+        // property handles the floor at `firstPracticeDay` so we don't need
+        // to fake a "Day 35 prelude" here.
+        let completedShifts = exposures.map { $0.lastSeenShift }.max() ?? 0
+        return PracticeCoverage(
+            bankSize: bankSize,
+            seenOnce: seenOnce,
+            verified: verified,
+            completedShifts: completedShifts
+        )
+    }
+
+    /// Build the next practice shift, picking ~10 questions following the
+    /// re-exposure → unseen → least-recently-seen priority cascade.
+    func generateNextPracticeShift() -> RimrockShift {
+        let bank = nodes.filter { !$0.options.isEmpty && !$0.correctAnswer.isEmpty }
+        return generatePracticeShift(dayNumber: practiceCoverage().nextShiftNumber, bank: bank)
+    }
+
+    /// Build a practice shift for a specific day number — used to regenerate
+    /// the same shift on re-entry from the picker so the question set is
+    /// stable while the player is mid-shift.
+    func generatePracticeShift(dayNumber: Int, bank: [DataNode]) -> RimrockShift {
+        let exposures = allExposures()
+        let exposureByID = Dictionary(uniqueKeysWithValues: exposures.map { ($0.nodeIDString, $0) })
+        let spacing = RimrockPracticeGenerator.reExposureSpacingShifts
+        let target = RimrockPracticeGenerator.questionsPerShift
+
+        // Priority 1: re-exposures (seen exactly once, aged ≥ spacing shifts)
+        let dueRepeats = exposures
+            .filter { $0.exposureCount == 1 && (dayNumber - $0.lastSeenShift) >= spacing }
+            .compactMap { rec in bank.first(where: { $0.id.uuidString == rec.nodeIDString }) }
+            .shuffled()
+
+        // Priority 2: brand-new (no exposure record)
+        let unseen = bank.filter { exposureByID[$0.id.uuidString] == nil }.shuffled()
+
+        // Priority 3: least-recently-seen anything (binge filler)
+        let leastRecent = exposures
+            .sorted(by: { $0.lastSeenShift < $1.lastSeenShift })
+            .compactMap { rec in bank.first(where: { $0.id.uuidString == rec.nodeIDString }) }
+
+        var picks: [DataNode] = []
+        var picked = Set<UUID>()
+        for src in [dueRepeats, unseen, leastRecent] {
+            for node in src {
+                if picks.count >= target { break }
+                if picked.insert(node.id).inserted { picks.append(node) }
+            }
+            if picks.count >= target { break }
+        }
+        return RimrockPracticeGenerator.buildShift(dayNumber: dayNumber, questions: picks)
+    }
+
+    /// Record an exposure for a DataNode-derived practice question. Called by
+    /// RimrockShiftView when a `DN_<uuid>` question id resolves.
+    func recordQuestionExposure(nodeID: UUID, wasCorrect: Bool, sessionShift: Int) {
+        let key = nodeID.uuidString
+        let descriptor = FetchDescriptor<QuestionExposure>(
+            predicate: #Predicate<QuestionExposure> { $0.nodeIDString == key }
+        )
+        if let existing = try? modelContext.fetch(descriptor).first {
+            existing.exposureCount += 1
+            existing.lastSeenAt = .now
+            existing.lastSeenShift = sessionShift
+            existing.lastWasCorrect = wasCorrect
+        } else {
+            modelContext.insert(QuestionExposure(
+                nodeID: nodeID,
+                sessionShift: sessionShift,
+                wasCorrect: wasCorrect
+            ))
+        }
+        try? modelContext.save()
+    }
+
+    /// All persisted exposure records (newest first by lastSeenShift).
+    func allExposures() -> [QuestionExposure] {
+        let descriptor = FetchDescriptor<QuestionExposure>(
+            sortBy: [SortDescriptor(\.lastSeenShift, order: .reverse)]
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
     }
     
     /// Track opening a breach node for review (for daily quest)
@@ -1376,7 +1468,6 @@ class GameEngine {
     
     /// Check if streak should update (call once per session start)
     private func checkStreakUpdate() {
-        let oldStreak = _userStats.streakData.currentStreak
         _userStats.updateStreak()
         let newStreak = _userStats.streakData.currentStreak
         
@@ -1764,7 +1855,7 @@ extension GameEngine {
         let loadedNodes = DataNode.phaseOneDatabase
 
         let result: LoadResult = await Task.detached(priority: .userInitiated) {
-            let schema      = Schema([NodeProgress.self, UserStats.self, TutorialProgress.self, ConceptRecord.self, ExamAttempt.self])
+            let schema      = Schema([NodeProgress.self, UserStats.self, TutorialProgress.self, ConceptRecord.self, ExamAttempt.self, QuestionExposure.self])
             // CloudKit config — enables automatic sync across all signed-in Apple devices.
             // Requires iCloud + CloudKit capability to be enabled in Xcode project settings.
             let cloudConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false,

@@ -74,13 +74,83 @@ struct RimrockPhoneCall {
     let turns: [RimrockPhoneTurn]
 }
 
+// MARK: - Question Domain (Rimrock)
+
+/// Rimrock-specific knowledge domain for in-narrative questions.
+/// Simplified domain categorization for Rimrock story content.
+enum RimrockDomain: String, Codable {
+    case pharmacology
+    case law
+    case sterile
+    case math
+    case general
+    
+    var shortName: String {
+        switch self {
+        case .pharmacology:  return "PHARM"
+        case .law:           return "LAW"
+        case .sterile:       return "STERILE"
+        case .math:          return "MATH"
+        case .general:       return "GEN"
+        }
+    }
+    
+    var accentColor: Color {
+        switch self {
+        case .pharmacology:  return Color(red: 0.40, green: 0.76, blue: 0.64)  // mint
+        case .law:           return Color(red: 0.94, green: 0.73, blue: 0.42)  // amber
+        case .sterile:       return Color(red: 0.53, green: 0.73, blue: 0.92)  // sky blue
+        case .math:          return Color(red: 0.92, green: 0.58, blue: 0.48)  // coral
+        case .general:       return Color(red: 0.78, green: 0.72, blue: 0.88)  // lavender
+        }
+    }
+
+    /// Bridge to the main `KnowledgeDomain` used by the iOS engine + mastery tracker.
+    var knowledgeDomain: KnowledgeDomain {
+        switch self {
+        case .pharmacology:  return .medications
+        case .law:           return .federalRequirements
+        case .sterile:       return .patientSafety
+        case .math:          return .orderEntry
+        case .general:       return .patientSafety
+        }
+    }
+
+    // MARK: - Legacy aliases
+    //
+    // The Rimrock question bank was authored against the iOS `KnowledgeDomain`
+    // case names. These static aliases let those call sites keep compiling
+    // against the simplified Rimrock domain set without touching ~1000+
+    // question literals.
+
+    static var medications:         RimrockDomain { .pharmacology }
+    static var federalRequirements: RimrockDomain { .law }
+    static var patientSafety:       RimrockDomain { .sterile }
+    static var orderEntry:          RimrockDomain { .general }
+}
+
+// MARK: - KnowledgeDomain → RimrockDomain bridge
+
+extension KnowledgeDomain {
+    /// Maps the iOS engine's `KnowledgeDomain` to the simplified Rimrock domain
+    /// set. Inverse of `RimrockDomain.knowledgeDomain`.
+    var rimrockDomain: RimrockDomain {
+        switch self {
+        case .medications:         return .pharmacology
+        case .federalRequirements: return .law
+        case .patientSafety:       return .sterile
+        case .orderEntry:          return .general
+        }
+    }
+}
+
 // MARK: - Question
 
 /// A PTCE question embedded in the narrative. Decoupled from `DataNode` for now —
 /// future passes can migrate these into the existing question bank or vice versa.
 struct RimrockQuestion {
     let id: String                    // stable id, e.g. "D1_USP_FRIDGE_TEMP"
-    let domain: KnowledgeDomain       // reuses the existing PTCE domain enum
+    let domain: RimrockDomain         // simplified domain for Rimrock questions
     let topic: String                 // analytics tag: "USP_STORAGE", "BRAND_GENERIC"
     let prompt: String
     let options: [String]
@@ -185,11 +255,13 @@ indirect enum RimrockBeat {
 
 // MARK: - Shift
 
-struct RimrockShift {
+struct RimrockShift: Identifiable {
     let dayNumber: Int                // 1...25
     let title: String                 // "Rimrock"
     let dateLine: String              // "Tuesday, May 12"
     let timeLine: String              // "8:41 AM"
     let locationLine: String          // "Johnson County, Wyoming"
     let beats: [RimrockBeat]
+
+    var id: Int { dayNumber }
 }

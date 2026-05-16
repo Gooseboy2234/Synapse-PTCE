@@ -181,14 +181,14 @@ enum RimrockContent {
                 "That'll do. Lock the safe — combination's on the slip in your folder, don't memorize it out loud — flip the Closed sign, and shut the back door from the inside. The radio stays on overnight. Just so you know."
             ]),
 
-            .scene("You tidy. In the back, on the shelf above the deionized water dispenser, there's a coffee mug. White, generic, four-pack-from-the-grocery kind. Someone has scratched a name off the side with the point of a pen, scratched it down past the glaze."),
+            .scene("You tidy. In the back, on the shelf above the deionized water dispenser, there's a coffee mug. White, generic, four-pack-from-the-grocery kind. Someone has scratched a black X on the side with a permanent marker — clean, deliberate, the way techs at the chain pharmacies mark an open stock bottle so anyone walking past knows: this one's already been broken into, use it before you crack a sealed one."),
 
             .object(
                 name: "A mug",
-                description: "You can still read the first letter if you tilt it. W.",
+                description: "Big black X on the side. Pharmacy-tech shorthand for open stock — the previous tech kept the habit even on her own coffee mug.",
                 logEntry: RimrockLogEntry(
                     title: "A mug, in the back",
-                    body: "Scratched-off name on the side. The first letter is W."
+                    body: "Black X marked on the side, the open-stock-bottle convention. The previous tech kept the habit on her personal mug."
                 )
             ),
 
@@ -1549,12 +1549,12 @@ enum RimrockContent {
                         ]
                     ),
                     RimrockChoice(
-                        label: "The W on the mug.",
+                        label: "The W on the note. The X on her mug.",
                         tone: .press,
                         rapportDelta: 0,
                         response: [
                             .dialogue(speaker: .mara, lines: [
-                                "...Yeah. The W on the mug. The W on the note. Wren Bishop. She was the tech here before you, about a year. She's not here anymore."
+                                "...Yeah. The X on the mug — that's a chain-pharmacy habit, marking open stock so the next tech doesn't crack a sealed bottle. Wren came over from a CVS in Gillette and never lost it. The W on the note's the giveaway. Wren Bishop. She was the tech here before you, about a year. She's not here anymore."
                             ])
                         ]
                     ),

@@ -19,6 +19,7 @@ struct TVHubView: View {
     let onShowExam:      () -> Void
     let onShowCampaign:  () -> Void
     let onShowReview:    () -> Void
+    let onShowRimrock:   () -> Void
 
     @Environment(\.appTheme) private var theme
     private var accent: Color { engine.currentTheme.accentColor }
@@ -56,7 +57,8 @@ struct TVHubView: View {
                 onShowIntel:     onShowIntel,
                 onShowExam:      onShowExam,
                 onShowCampaign:  onShowCampaign,
-                onShowReview:    onShowReview
+                onShowReview:    onShowReview,
+                onShowRimrock:   onShowRimrock
             )
         }
     }
@@ -274,6 +276,7 @@ struct TVActionBar: View {
     let onShowExam:     () -> Void
     let onShowCampaign: () -> Void
     let onShowReview:   () -> Void
+    let onShowRimrock:  () -> Void
 
     @Environment(\.appTheme) private var theme
     private var accent: Color { engine.currentTheme.accentColor }
@@ -346,6 +349,7 @@ struct TVActionBar: View {
 
                 // Center: action buttons
                 HStack(spacing: 30) {
+                    TVActionButton(label: "RADIO",    icon: "antenna.radiowaves.left.and.right", color: Color(red: 0.95, green: 0.78, blue: 0.45), action: onShowRimrock)
                     TVActionButton(label: "CAMPAIGN", icon: "arrow.2.squarepath", color: violet, action: onShowCampaign)
                     TVActionButton(label: "EXAM",     icon: "doc.text.fill",              color: gold,   action: onShowExam)
                     TVActionButton(

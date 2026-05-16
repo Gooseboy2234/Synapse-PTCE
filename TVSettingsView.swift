@@ -25,43 +25,69 @@ struct TVSettingsView: View {
     private let cyan   = Color(red: 0.6,  green: 0.9,  blue: 1.0)
     private let gold   = Color(red: 1.0,  green: 0.85, blue: 0.2)
 
+    /// Rimrock dawn palette — used for the settings backdrop so the panel
+    /// reads as part of the same Apple TV experience.
+    private var rimrockPalette: RimrockAtmosphere.Palette {
+        RimrockAtmosphere.palette(for: 1)
+    }
+
     var body: some View {
         ZStack {
-            theme.background.ignoresSafeArea()
-            TVGridBackground()
+            // Rimrock atmosphere replaces the legacy terminal grid backdrop.
+            RimrockAtmosphere.skyBackground(for: 1).ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header
+                // Header — branded as Rimrock, not "SYSTEM"
                 HStack {
                     Button {
                         dismiss()
                     } label: {
                         HStack(spacing: 8) {
-                            Image(systemName: "chevron.left").font(.system(size: 18, weight: .bold))
-                            Text("BACK").font(.system(size: 18, weight: .bold, design: .monospaced))
+                            Image(systemName: "tv.and.hifispeaker.fill")
+                                .font(.system(size: 14, weight: .bold))
+                            Text("MENU · BACK")
+                                .font(.system(size: 16, weight: .heavy, design: .monospaced))
+                                .tracking(1.4)
                         }
-                        .foregroundColor(accent)
+                        .foregroundColor(rimrockPalette.sceneText.opacity(0.65))
+                        .padding(.horizontal, 12).padding(.vertical, 6)
+                        .background(Color.black.opacity(0.30))
+                        .overlay(RoundedRectangle(cornerRadius: 6)
+                            .stroke(rimrockPalette.sceneText.opacity(0.25), lineWidth: 0.8))
+                        .cornerRadius(6)
                     }
                     .buttonStyle(.plain)
                     .padding(.leading, 100)
 
                     Spacer()
 
-                    Text("SYSTEM SETTINGS")
-                        .font(.system(size: 28, weight: .black, design: .monospaced))
-                        .foregroundColor(accent)
-                        .shadow(color: accent.opacity(0.55), radius: 8)
+                    VStack(spacing: 4) {
+                        HStack(spacing: 10) {
+                            Image(systemName: "antenna.radiowaves.left.and.right")
+                                .font(.system(size: 16, weight: .heavy))
+                            Text("RIMROCK SETTINGS")
+                                .font(.system(size: 24, weight: .heavy, design: .monospaced))
+                                .tracking(2.0)
+                        }
+                        .foregroundColor(rimrockPalette.accent)
+                        .shadow(color: rimrockPalette.accent.opacity(0.55), radius: 8)
+
+                        Text("JOHNSON COUNTY · WYOMING")
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundColor(rimrockPalette.sceneText.opacity(0.55))
+                            .tracking(1.6)
+                    }
 
                     Spacer()
 
                     Text("v13.0")
-                        .font(.system(size: 18, design: .monospaced))
-                        .foregroundColor(theme.secondaryText)
+                        .font(.system(size: 14, design: .monospaced))
+                        .foregroundColor(rimrockPalette.sceneText.opacity(0.55))
                         .padding(.trailing, 100)
                 }
-                .padding(.vertical, 26)
-                .background(theme.surface.opacity(0.88))
-                .overlay(Rectangle().fill(accent.opacity(0.18)).frame(height: 1), alignment: .bottom)
+                .padding(.vertical, 22)
+                .background(Color.black.opacity(0.35))
+                .overlay(Rectangle().fill(rimrockPalette.accent.opacity(0.20)).frame(height: 1), alignment: .bottom)
 
                 // Content
                 ScrollView(.vertical, showsIndicators: false) {
