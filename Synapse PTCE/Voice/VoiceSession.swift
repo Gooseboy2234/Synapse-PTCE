@@ -104,29 +104,53 @@ final class VoiceSession {
     }
 
     private var interruptionObserver: NSObjectProtocol?
+    private var routeChangeObserver: NSObjectProtocol?
 
     private func observeInterruptions() {
         #if os(iOS) || os(tvOS)
-        if interruptionObserver != nil { return }
-        interruptionObserver = NotificationCenter.default.addObserver(
-            forName: AVAudioSession.interruptionNotification,
-            object: AVAudioSession.sharedInstance(),
-            queue: .main
-        ) { [weak self] note in
-            guard let self else { return }
-            guard let raw = note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
-                  let type = AVAudioSession.InterruptionType(rawValue: raw) else { return }
-            Task { @MainActor in
-                switch type {
-                case .began:
-                    self.pause()
-                case .ended:
-                    // Don't auto-resume — let the user decide. They tapped into
-                    // a phone call or Siri; coming back to the app and pressing
-                    // Resume is the correct mental model.
-                    break
-                @unknown default:
-                    break
+        if interruptionObserver == nil {
+            interruptionObserver = NotificationCenter.default.addObserver(
+                forName: AVAudioSession.interruptionNotification,
+                object: AVAudioSession.sharedInstance(),
+                queue: .main
+            ) { [weak self] note in
+                guard let self else { return }
+                guard let raw = note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+                      let type = AVAudioSession.InterruptionType(rawValue: raw) else { return }
+                Task { @MainActor in
+                    switch type {
+                    case .began:
+                        self.pause()
+                    case .ended:
+                        // Don't auto-resume — let the user decide. They tapped
+                        // into a phone call or Siri; coming back to the app
+                        // and pressing Resume is the correct mental model.
+                        break
+                    @unknown default:
+                        break
+                    }
+                }
+            }
+        }
+
+        if routeChangeObserver == nil {
+            routeChangeObserver = NotificationCenter.default.addObserver(
+                forName: AVAudioSession.routeChangeNotification,
+                object: AVAudioSession.sharedInstance(),
+                queue: .main
+            ) { [weak self] note in
+                guard let self,
+                      VoicePreferences.shared.pauseOnHeadphoneUnplug,
+                      let raw = note.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
+                      let reason = AVAudioSession.RouteChangeReason(rawValue: raw)
+                else { return }
+                Task { @MainActor in
+                    // .oldDeviceUnavailable fires when AirPods are removed or a
+                    // wired headphone is unplugged. Auto-pause so the shift
+                    // doesn't blast out of the phone speaker.
+                    if reason == .oldDeviceUnavailable {
+                        self.pause()
+                    }
                 }
             }
         }
@@ -137,6 +161,10 @@ final class VoiceSession {
         if let obs = interruptionObserver {
             NotificationCenter.default.removeObserver(obs)
             interruptionObserver = nil
+        }
+        if let obs = routeChangeObserver {
+            NotificationCenter.default.removeObserver(obs)
+            routeChangeObserver = nil
         }
     }
 

@@ -276,17 +276,54 @@ struct VoiceModeView: View {
                 Text("Listen — the next prompt will arrive shortly.")
                     .font(.system(.subheadline, design: .rounded).weight(.medium))
                     .foregroundColor(.white.opacity(0.65))
-            } else {
-                Text(session.currentNarration)
+            } else if VoicePreferences.shared.showCaptions {
+                highlightedNarration(full: session.currentNarration,
+                                     current: session.narrator.currentChunkText)
                     .font(.system(.body, design: .serif))
-                    .foregroundColor(.white.opacity(0.92))
                     .lineSpacing(4)
                     .fixedSize(horizontal: false, vertical: true)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
-                    .id(session.currentNarration)  // forces a fresh transition per beat
+                    .id(session.currentNarration)
+            } else {
+                // Captions disabled — show a calm waveform animation instead.
+                HStack(spacing: 4) {
+                    ForEach(0..<5, id: \.self) { i in
+                        Capsule()
+                            .fill(accent.opacity(0.7))
+                            .frame(width: 4, height: pulse ? CGFloat(8 + (i % 3) * 8) : 8)
+                            .animation(
+                                reduceMotion ? nil
+                                             : .easeInOut(duration: 0.6 + Double(i) * 0.05)
+                                                  .repeatForever(autoreverses: true),
+                                value: pulse
+                            )
+                    }
+                }
+                .frame(height: 28)
+                .accessibilityHidden(true)
             }
         }
         .animation(.easeInOut(duration: 0.28), value: session.currentNarration)
+        .animation(.easeInOut(duration: 0.18), value: session.narrator.currentChunkText)
+    }
+
+    /// Renders the full beat text with the currently-speaking sentence
+    /// highlighted in white and the rest dimmed — a "karaoke" effect at
+    /// sentence granularity. Falls back to even dimming when no chunk is
+    /// currently active (between sentences).
+    private func highlightedNarration(full: String, current: String) -> Text {
+        let dim = Color.white.opacity(0.45)
+        let active = Color.white.opacity(0.95)
+        let trimmedCurrent = current.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedCurrent.isEmpty,
+              let range = full.range(of: trimmedCurrent) else {
+            return Text(full).foregroundColor(dim)
+        }
+        let before = String(full[..<range.lowerBound])
+        let after  = String(full[range.upperBound...])
+        return Text(before).foregroundColor(dim)
+            + Text(trimmedCurrent).foregroundColor(active)
+            + Text(after).foregroundColor(dim)
     }
 
     private func confirmationPanel(picked: String, heard: String) -> some View {

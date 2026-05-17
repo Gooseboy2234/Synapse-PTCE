@@ -25,6 +25,8 @@ final class VoicePreferences {
         static let pitch    = "voice_pref_pitch"
         static let silence  = "voice_pref_silence"
         static let confirm  = "voice_pref_confirm_low_confidence"
+        static let captions = "voice_pref_show_captions"
+        static let pauseOnUnplug = "voice_pref_pause_on_unplug"
     }
 
     // Defaults --------------------------------------------------------------
@@ -69,6 +71,20 @@ final class VoicePreferences {
         }
     }
 
+    /// Render live sentence captions over the audio during narration.
+    var showCaptions: Bool {
+        didSet {
+            UserDefaults.standard.set(showCaptions, forKey: Key.captions)
+        }
+    }
+
+    /// Auto-pause when headphones / AirPods are disconnected.
+    var pauseOnHeadphoneUnplug: Bool {
+        didSet {
+            UserDefaults.standard.set(pauseOnHeadphoneUnplug, forKey: Key.pauseOnUnplug)
+        }
+    }
+
     private init() {
         let d = UserDefaults.standard
         self.voiceID = d.string(forKey: Key.voiceID)
@@ -76,6 +92,8 @@ final class VoicePreferences {
         self.pitch = (d.object(forKey: Key.pitch) as? Float) ?? Self.defaultPitch
         self.silenceThreshold = (d.object(forKey: Key.silence) as? Double) ?? Self.defaultSilence
         self.confirmLowConfidenceMatches = (d.object(forKey: Key.confirm) as? Bool) ?? Self.defaultConfirm
+        self.showCaptions = (d.object(forKey: Key.captions) as? Bool) ?? true
+        self.pauseOnHeadphoneUnplug = (d.object(forKey: Key.pauseOnUnplug) as? Bool) ?? true
     }
 
     // MARK: - Utilities

@@ -273,6 +273,38 @@ struct SettingsView: View {
                 }
                 .tint(accent)
 
+                // ── Captions toggle ───────────────────────────────────────
+                Toggle(isOn: Binding(
+                    get: { prefs.showCaptions },
+                    set: { prefs.showCaptions = $0 }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Show live captions")
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .foregroundColor(theme.primaryText)
+                        Text("Read along with the narration. The current sentence is highlighted.")
+                            .font(.system(size: 11, design: .rounded))
+                            .foregroundColor(theme.secondaryText)
+                    }
+                }
+                .tint(accent)
+
+                // ── Headphone-unplug pause toggle ─────────────────────────
+                Toggle(isOn: Binding(
+                    get: { prefs.pauseOnHeadphoneUnplug },
+                    set: { prefs.pauseOnHeadphoneUnplug = $0 }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Pause when headphones come out")
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .foregroundColor(theme.primaryText)
+                        Text("Voice Mode pauses automatically if AirPods or a wired headset disconnect.")
+                            .font(.system(size: 11, design: .rounded))
+                            .foregroundColor(theme.secondaryText)
+                    }
+                }
+                .tint(accent)
+
                 // ── Preview ──────────────────────────────────────────────
                 Button(action: previewVoice) {
                     HStack(spacing: 10) {

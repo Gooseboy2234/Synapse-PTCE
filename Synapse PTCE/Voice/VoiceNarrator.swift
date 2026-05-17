@@ -21,6 +21,9 @@ final class VoiceNarrator: NSObject {
     }
 
     private(set) var state: NarratorState = .idle
+    /// Whichever sentence is currently being spoken. Drives sentence-level
+    /// highlight in the view. Empty when nothing is speaking.
+    private(set) var currentChunkText: String = ""
 
     var volume: Float = 1.0
     /// Sentence-level chunking gives the narration natural breath pauses.
@@ -50,6 +53,7 @@ final class VoiceNarrator: NSObject {
 
     private func speakNextChunk() {
         guard !pendingChunks.isEmpty else {
+            currentChunkText = ""
             let cb = onFinished
             onFinished = nil
             state = .idle
@@ -57,6 +61,7 @@ final class VoiceNarrator: NSObject {
             return
         }
         let chunk = pendingChunks.removeFirst()
+        currentChunkText = chunk
         let prefs = VoicePreferences.shared
         let utterance = AVSpeechUtterance(string: chunk)
         utterance.rate = prefs.rate
@@ -98,6 +103,7 @@ final class VoiceNarrator: NSObject {
     func stop() {
         synth.stopSpeaking(at: .immediate)
         pendingChunks.removeAll()
+        currentChunkText = ""
         onFinished = nil
         state = .idle
     }
