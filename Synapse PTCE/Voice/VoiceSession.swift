@@ -45,11 +45,15 @@ final class VoiceSession {
     /// Called when the shift's beat list is exhausted.
     var onFinished: (() -> Void)?
 
+    private var activeShift: RimrockShift?
+
     // MARK: - Lifecycle
 
     func start(shift: RimrockShift) {
         beats = shift.beats
         cursor = 0
+        activeShift = shift
+        startLiveActivity(for: shift)
         narrator.speak("\(shift.title). Day \(shift.dayNumber).") { [weak self] in
             self?.advance()
         }
@@ -72,7 +76,55 @@ final class VoiceSession {
     func stop() {
         narrator.stop()
         listener.stop()
+        endLiveActivity()
         phase = .finished
+    }
+
+    // MARK: - Live Activity
+
+    private func startLiveActivity(for shift: RimrockShift) {
+        #if canImport(ActivityKit)
+        if #available(iOS 16.2, *) {
+            let state = RimrockActivityAttributes.ContentState(
+                dayNumber: shift.dayNumber,
+                sceneLabel: "Starting…",
+                progress: 0,
+                streak: 0,
+                awaitingResponse: false,
+                promptPreview: nil
+            )
+            LiveActivityController.shared.start(
+                shiftTitle: "\(shift.title) — Day \(shift.dayNumber)",
+                initialState: state
+            )
+        }
+        #endif
+    }
+
+    private func updateLiveActivity(label: String, awaiting: Bool, prompt: String? = nil) {
+        #if canImport(ActivityKit)
+        if #available(iOS 16.2, *) {
+            guard let shift = activeShift else { return }
+            let p = beats.isEmpty ? 0 : Double(cursor) / Double(max(beats.count, 1))
+            let state = RimrockActivityAttributes.ContentState(
+                dayNumber: shift.dayNumber,
+                sceneLabel: label,
+                progress: min(max(p, 0), 1),
+                streak: 0,
+                awaitingResponse: awaiting,
+                promptPreview: prompt
+            )
+            LiveActivityController.shared.update(state)
+        }
+        #endif
+    }
+
+    private func endLiveActivity() {
+        #if canImport(ActivityKit)
+        if #available(iOS 16.2, *) {
+            LiveActivityController.shared.end(finalState: nil)
+        }
+        #endif
     }
 
     /// Re-speak the last narrated beat.
@@ -115,11 +167,13 @@ final class VoiceSession {
         switch beat {
         case .scene(let text):
             phase = .narrating(beatIndex: cursor - 1)
+            updateLiveActivity(label: "Scene", awaiting: false)
             narrator.speak(text) { [weak self] in self?.advance() }
 
         case .dialogue(let speaker, let lines):
             phase = .narrating(beatIndex: cursor - 1)
             let label = speaker.displayLabel.isEmpty ? "" : "\(speaker.displayLabel) says, "
+            updateLiveActivity(label: speaker.displayLabel.isEmpty ? "Narration" : speaker.displayLabel, awaiting: false)
             narrator.speak(label + lines.joined(separator: " ")) { [weak self] in self?.advance() }
 
         case .nameEntry:
@@ -167,6 +221,7 @@ final class VoiceSession {
 
     private func presentQuestion(_ q: RimrockQuestion) {
         phase = .awaitingQuestion(prompt: q.prompt, options: q.options, correct: q.correctAnswer)
+        updateLiveActivity(label: "Question", awaiting: true, prompt: q.prompt)
         let optionText = q.options.enumerated()
             .map { "\(letter(for: $0.offset)). \($0.element)" }
             .joined(separator: ". ")
@@ -184,6 +239,7 @@ final class VoiceSession {
     private func presentChoice(prompt: String, choices: [RimrockChoice]) {
         let labels = choices.map(\.label)
         phase = .awaitingChoice(prompt: prompt, choices: labels)
+        updateLiveActivity(label: "Choice", awaiting: true, prompt: prompt)
         let optionText = labels.enumerated()
             .map { "\(letter(for: $0.offset)). \($0.element)" }
             .joined(separator: ". ")

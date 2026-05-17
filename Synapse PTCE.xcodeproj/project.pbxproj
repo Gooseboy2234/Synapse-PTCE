@@ -263,6 +263,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Ethan Bradley Synapse";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Synapse PTCE uses your microphone in Voice Mode so you can answer hands-free while the app narrates your shift.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Voice Mode recognizes your spoken answers on-device so you can study hands-free.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -314,6 +315,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Ethan Bradley Synapse";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Synapse PTCE uses your microphone in Voice Mode so you can answer hands-free while the app narrates your shift.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Voice Mode recognizes your spoken answers on-device so you can study hands-free.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
