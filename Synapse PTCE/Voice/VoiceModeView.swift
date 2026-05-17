@@ -49,9 +49,13 @@ struct VoiceModeView: View {
     var body: some View {
         ZStack {
             backdrop
+            // Constrain on iPad / large windows so the readable max-width feels
+            // intentional rather than stretched edge to edge.
             content
                 .padding(.horizontal, padding.h)
                 .padding(.vertical, padding.v)
+                .frame(maxWidth: 720)
+                .frame(maxWidth: .infinity)
 
             if !voiceOnboarded {
                 onboardingOverlay
@@ -140,19 +144,22 @@ struct VoiceModeView: View {
 
                 VStack(spacing: 2) {
                     Text("VOICE MODE")
-                        .font(.system(size: 11, weight: .black, design: .monospaced))
+                        .font(.system(.caption2, design: .monospaced).weight(.black))
                         .foregroundColor(accent)
                         .tracking(2)
                     Text("Day \(shift.dayNumber) — \(shift.title)")
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .font(.system(.subheadline, design: .rounded).weight(.semibold))
                         .foregroundColor(.white.opacity(0.9))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
 
                 Spacer()
 
                 Text(elapsedFormatted)
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .font(.system(.footnote, design: .monospaced).weight(.semibold))
                     .foregroundColor(.white.opacity(0.55))
+                    .monospacedDigit()
                     .frame(minWidth: 56, alignment: .trailing)
                     .accessibilityLabel("Elapsed time \(elapsedFormatted)")
             }
@@ -183,7 +190,7 @@ struct VoiceModeView: View {
             }
             if !session.lastHeard.isEmpty {
                 Text("\u{201C}\(session.lastHeard)\u{201D}")
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .font(.system(.footnote, design: .rounded).weight(.medium))
                     .italic()
                     .foregroundColor(.white.opacity(0.55))
                     .multilineTextAlignment(.center)
@@ -205,11 +212,11 @@ struct VoiceModeView: View {
         let (label, color, icon) = phaseChrome
         return HStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.system(size: 11, weight: .bold))
+                .font(.system(.caption, design: .default).weight(.bold))
                 .foregroundColor(color)
                 .contentTransition(.symbolEffect(.replace))
             Text(label)
-                .font(.system(size: 10, weight: .black, design: .monospaced))
+                .font(.system(.caption2, design: .monospaced).weight(.black))
                 .foregroundColor(color)
                 .tracking(2)
                 .contentTransition(.opacity)
@@ -229,13 +236,10 @@ struct VoiceModeView: View {
         switch session.phase {
         case .idle:
             Text("Preparing your shift…")
-                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                .font(.system(.headline, design: .rounded).weight(.semibold))
                 .foregroundColor(.white.opacity(0.85))
         case .narrating:
-            Text("Listen — the next prompt will arrive shortly.")
-                .font(.system(size: 15, weight: .medium, design: .rounded))
-                .foregroundColor(.white.opacity(0.75))
-                .multilineTextAlignment(.leading)
+            narrationCaption
         case .awaitingChoice(let prompt, let choices):
             choicePanel(prompt: prompt, options: choices)
         case .awaitingQuestion(let prompt, let options, _):
@@ -258,60 +262,95 @@ struct VoiceModeView: View {
         }
     }
 
+    @ViewBuilder
+    private var narrationCaption: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if !session.currentSpeaker.isEmpty {
+                Text(session.currentSpeaker.uppercased())
+                    .font(.system(.caption2, design: .monospaced).weight(.heavy))
+                    .foregroundColor(accent.opacity(0.85))
+                    .tracking(2)
+                    .accessibilityLabel(session.currentSpeaker)
+            }
+            if session.currentNarration.isEmpty {
+                Text("Listen — the next prompt will arrive shortly.")
+                    .font(.system(.subheadline, design: .rounded).weight(.medium))
+                    .foregroundColor(.white.opacity(0.65))
+            } else {
+                Text(session.currentNarration)
+                    .font(.system(.body, design: .serif))
+                    .foregroundColor(.white.opacity(0.92))
+                    .lineSpacing(4)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    .id(session.currentNarration)  // forces a fresh transition per beat
+            }
+        }
+        .animation(.easeInOut(duration: 0.28), value: session.currentNarration)
+    }
+
     private func confirmationPanel(picked: String, heard: String) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("I HEARD")
-                    .font(.system(size: 10, weight: .black, design: .monospaced))
+                    .font(.system(.caption2, design: .monospaced).weight(.black))
                     .foregroundColor(.white.opacity(0.45))
                     .tracking(1.5)
                 Text("\u{201C}\(heard)\u{201D}")
                     .italic()
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .font(.system(.footnote, design: .rounded).weight(.medium))
                     .foregroundColor(.white.opacity(0.7))
                     .lineLimit(2)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("DID YOU MEAN")
-                    .font(.system(size: 10, weight: .black, design: .monospaced))
+                    .font(.system(.caption2, design: .monospaced).weight(.black))
                     .foregroundColor(listen)
                     .tracking(1.5)
                 Text(picked)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .font(.system(.title3, design: .rounded).weight(.semibold))
                     .foregroundColor(.white)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
             HStack(spacing: 12) {
-                Button(action: { session.submitAnswer(picked) }) {
+                Button(action: {
+                    haptic(.medium)
+                    session.submitAnswer(picked)
+                }) {
                     HStack {
                         Image(systemName: "checkmark")
                         Text("Yes — submit")
                     }
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .font(.system(.footnote, design: .rounded).weight(.bold))
                     .foregroundColor(.black)
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, 12)
                     .background(listen)
                     .cornerRadius(10)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Yes, submit \(picked)")
 
-                Button(action: { session.repeatLast() }) {
+                Button(action: {
+                    haptic(.light)
+                    session.repeatLast()
+                }) {
                     HStack {
                         Image(systemName: "arrow.uturn.left")
                         Text("No — try again")
                     }
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .font(.system(.footnote, design: .rounded).weight(.bold))
                     .foregroundColor(.white)
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, 12)
                     .background(Color.white.opacity(0.08))
                     .overlay(RoundedRectangle(cornerRadius: 10).stroke(.white.opacity(0.18), lineWidth: 1))
                     .cornerRadius(10)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("No, try again")
             }
         }
     }
@@ -319,7 +358,7 @@ struct VoiceModeView: View {
     private func choicePanel(prompt: String, options: [String]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(prompt)
-                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                .font(.system(.headline, design: .rounded).weight(.semibold))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
@@ -343,25 +382,29 @@ struct VoiceModeView: View {
         }) {
             HStack(spacing: 12) {
                 Text(letter)
-                    .font(.system(size: 14, weight: .black, design: .monospaced))
+                    .font(.system(.callout, design: .monospaced).weight(.black))
                     .foregroundColor(accent)
                     .frame(width: 26, height: 26)
                     .background(accent.opacity(0.14))
                     .clipShape(Circle())
                 Text(text)
-                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .font(.system(.callout, design: .rounded).weight(.medium))
                     .foregroundColor(.white.opacity(0.9))
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
-                Spacer()
+                Spacer(minLength: 8)
             }
-            .padding(12)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .frame(minHeight: 48)            // 44pt minimum tap target + breathing room
             .background(Color.white.opacity(0.04))
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(.white.opacity(0.08), lineWidth: 1))
             .cornerRadius(12)
+            .contentShape(RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(letter). \(text)")
+        .accessibilityAddTraits(.isButton)
     }
 
     // MARK: - Listening indicator
@@ -385,10 +428,10 @@ struct VoiceModeView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(listenHeadline)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.system(.subheadline, design: .rounded).weight(.semibold))
                     .foregroundColor(.white.opacity(0.92))
                 Text(listenSubhead)
-                    .font(.system(size: 11, design: .rounded))
+                    .font(.system(.caption, design: .rounded))
                     .foregroundColor(.white.opacity(0.55))
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -401,10 +444,10 @@ struct VoiceModeView: View {
                         UIApplication.shared.open(url)
                     }
                 }
-                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .font(.system(.caption, design: .monospaced).weight(.bold))
                 .foregroundColor(.black)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
                 .background(Color.white.opacity(0.85))
                 .cornerRadius(8)
             }
@@ -461,19 +504,20 @@ struct VoiceModeView: View {
     private var dictationField: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("OR DICTATE")
-                .font(.system(size: 10, weight: .black, design: .monospaced))
+                .font(.system(.caption2, design: .monospaced).weight(.black))
                 .foregroundColor(listen.opacity(0.85))
                 .tracking(2)
             TextField("Press Siri to speak, or type", text: $dictationText)
                 .focused($dictationFocused)
                 .submitLabel(.send)
+                .font(.system(.callout, design: .rounded))
                 .onSubmit {
                     let text = dictationText.trimmingCharacters(in: .whitespacesAndNewlines)
                     guard !text.isEmpty else { return }
                     session.submitAnswer(text)
                     dictationText = ""
                 }
-                .padding(12)
+                .padding(14)
                 .background(Color.white.opacity(0.06))
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(listen.opacity(0.35), lineWidth: 1))
                 .cornerRadius(10)
@@ -509,20 +553,22 @@ struct VoiceModeView: View {
         Button(action: action) {
             VStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 18, weight: .bold))
+                    .font(.system(.title3).weight(.bold))
                     .foregroundColor(tint.opacity(0.95))
                     .frame(width: 56, height: 56)
                     .background(Color.white.opacity(0.06))
                     .overlay(Circle().stroke(.white.opacity(0.1), lineWidth: 1))
                     .clipShape(Circle())
+                    .contentTransition(.symbolEffect(.replace))
                 Text(label)
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .font(.system(.caption2, design: .monospaced).weight(.semibold))
                     .foregroundColor(.white.opacity(0.55))
                     .tracking(1.2)
             }
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)
+        .accessibilityAddTraits(.isButton)
     }
 
     // MARK: - Onboarding overlay
@@ -530,17 +576,19 @@ struct VoiceModeView: View {
     private var onboardingOverlay: some View {
         ZStack {
             Color.black.opacity(0.65).ignoresSafeArea()
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 22) {
                 Text("VOICE MODE")
-                    .font(.system(size: 11, weight: .black, design: .monospaced))
+                    .font(.system(.caption2, design: .monospaced).weight(.black))
                     .foregroundColor(accent)
                     .tracking(2.5)
 
                 Text("Study with your hands free.")
-                    .font(.system(size: 26, weight: .black, design: .rounded))
+                    .font(.system(.title, design: .rounded).weight(.black))
                     .foregroundColor(.white)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
 
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 14) {
                     onboardingRow(icon: "headphones",
                                   title: "Listen to the shift",
                                   body: "Mara narrates each scene. Pause, skip, or repeat any time.")
@@ -556,13 +604,17 @@ struct VoiceModeView: View {
                     onboardingRow(icon: "lock.shield",
                                   title: "Lock-screen safe",
                                   body: "Audio keeps playing while the screen is off. Great for commutes and chores.")
+                    onboardingRow(icon: "person.wave.2.fill",
+                                  title: "Voice commands",
+                                  body: "Say \u{201C}pause\u{201D}, \u{201C}repeat\u{201D}, \u{201C}skip\u{201D}, or \u{201C}exit\u{201D} any time.")
                 }
 
                 Button(action: {
+                    haptic(.medium)
                     withAnimation(.easeInOut(duration: 0.25)) { voiceOnboarded = true }
                 }) {
                     Text("Start the shift")
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .font(.system(.headline, design: .rounded).weight(.bold))
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
@@ -570,9 +622,11 @@ struct VoiceModeView: View {
                         .cornerRadius(12)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Start the shift")
+                .accessibilityAddTraits(.isButton)
             }
             .padding(28)
-            .frame(maxWidth: 460)
+            .frame(maxWidth: 480)
             .background(Color(white: 0.08))
             .overlay(RoundedRectangle(cornerRadius: 20).stroke(accent.opacity(0.4), lineWidth: 1))
             .cornerRadius(20)
@@ -584,19 +638,20 @@ struct VoiceModeView: View {
     private func onboardingRow(icon: String, title: String, body: String) -> some View {
         HStack(alignment: .top, spacing: 14) {
             Image(systemName: icon)
-                .font(.system(size: 18, weight: .semibold))
+                .font(.system(.title3).weight(.semibold))
                 .foregroundColor(accent)
                 .frame(width: 30)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .font(.system(.subheadline, design: .rounded).weight(.bold))
                     .foregroundColor(.white)
                 Text(body)
-                    .font(.system(size: 12, design: .rounded))
+                    .font(.system(.footnote, design: .rounded))
                     .foregroundColor(.white.opacity(0.7))
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Derived state

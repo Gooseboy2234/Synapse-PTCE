@@ -28,6 +28,10 @@ final class VoiceSession {
 
     private(set) var phase: Phase = .idle
     private(set) var lastHeard: String = ""
+    /// Text the narrator is currently speaking — surfaced as a live caption.
+    private(set) var currentNarration: String = ""
+    /// Optional label identifying the speaker, e.g. "Mara", "Narrator".
+    private(set) var currentSpeaker: String = ""
 
     let narrator = VoiceNarrator()
     let listener = VoiceListener()
@@ -150,6 +154,11 @@ final class VoiceSession {
             advance()
         }
         pushNowPlaying(label: nowPlayingLabelForCurrentPhase(), awaiting: false)
+    }
+
+    private func clearNarration() {
+        currentNarration = ""
+        currentSpeaker = ""
     }
 
     private func nowPlayingLabelForCurrentPhase() -> String {
@@ -275,17 +284,21 @@ final class VoiceSession {
         switch beat {
         case .scene(let text):
             phase = .narrating(beatIndex: cursor - 1)
+            currentSpeaker = "Narration"
+            currentNarration = text
             updateLiveActivity(label: "Scene", awaiting: false)
             pushNowPlaying(label: "Scene", awaiting: false)
-            narrator.speak(text) { [weak self] in self?.advance() }
+            narrator.speak(text) { [weak self] in self?.clearNarration(); self?.advance() }
 
         case .dialogue(let speaker, let lines):
             phase = .narrating(beatIndex: cursor - 1)
             let label = speaker.displayLabel.isEmpty ? "" : "\(speaker.displayLabel) says, "
             let nowLabel = speaker.displayLabel.isEmpty ? "Narration" : speaker.displayLabel
+            currentSpeaker = nowLabel
+            currentNarration = lines.joined(separator: " ")
             updateLiveActivity(label: nowLabel, awaiting: false)
             pushNowPlaying(label: nowLabel, awaiting: false)
-            narrator.speak(label + lines.joined(separator: " ")) { [weak self] in self?.advance() }
+            narrator.speak(label + lines.joined(separator: " ")) { [weak self] in self?.clearNarration(); self?.advance() }
 
         case .nameEntry:
             // Voice mode skips name entry for now — the engine collects it in the UI.
@@ -294,7 +307,9 @@ final class VoiceSession {
         case .prescription(let rx):
             phase = .narrating(beatIndex: cursor - 1)
             let text = "Prescription from \(rx.prescriberName). For \(rx.patientName). \(rx.drug) \(rx.strength). Sig: \(rx.sig). Quantity \(rx.quantity), refills \(rx.refills)."
-            narrator.speak(text) { [weak self] in self?.advance() }
+            currentSpeaker = "Prescription"
+            currentNarration = text
+            narrator.speak(text) { [weak self] in self?.clearNarration(); self?.advance() }
 
         case .question(let q):
             presentQuestion(q)
@@ -302,14 +317,18 @@ final class VoiceSession {
         case .phoneCall(let call):
             phase = .narrating(beatIndex: cursor - 1)
             let lines = call.turns.map { "\($0.speaker.displayLabel): \($0.line)" }.joined(separator: ". ")
-            narrator.speak("Phone call from \(call.callerID). \(lines)") { [weak self] in self?.advance() }
+            currentSpeaker = "Phone — \(call.callerID)"
+            currentNarration = lines
+            narrator.speak("Phone call from \(call.callerID). \(lines)") { [weak self] in self?.clearNarration(); self?.advance() }
 
         case .choice(let prompt, let choices):
             presentChoice(prompt: prompt, choices: choices)
 
         case .object(let name, let description, _):
             phase = .narrating(beatIndex: cursor - 1)
-            narrator.speak("You notice \(name). \(description)") { [weak self] in self?.advance() }
+            currentSpeaker = "You notice"
+            currentNarration = "\(name) — \(description)"
+            narrator.speak("You notice \(name). \(description)") { [weak self] in self?.clearNarration(); self?.advance() }
 
         case .ending(let ending):
             phase = .feedback(line: ending.body, isCorrect: false)
