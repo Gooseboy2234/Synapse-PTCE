@@ -26,7 +26,10 @@ struct RimrockHomeView: View {
 
     @State private var heroRingPhase: Double = 0
     @State private var resumeShift: RimrockShift? = nil
+    @State private var streakCelebration: Bool = false
     @AppStorage("rimrock_last_shift_played") private var lastShiftPlayed: Int = 0
+    @AppStorage("rimrock_streak_count") private var streakCount: Int = 0
+    @AppStorage("rimrock_streak_last_seen") private var lastSeenStreak: Int = 0
 
     /// Reactive read of the persisted voice-mode session, if any.
     private var savedVoice: SavedVoiceSession? {
@@ -86,10 +89,71 @@ struct RimrockHomeView: View {
                 .padding(.horizontal, 22)
                 .padding(.bottom, 40)
             }
+
+            if streakCelebration {
+                streakCelebrationOverlay
+                    .transition(.scale.combined(with: .opacity))
+            }
         }
         .fullScreenCoverCompat(item: $resumeShift) { shift in
             VoiceModeView(shift: shift) { resumeShift = nil }
         }
+        .onAppear { checkForStreakBump() }
+    }
+
+    private func checkForStreakBump() {
+        guard streakCount > lastSeenStreak, streakCount > 0 else {
+            lastSeenStreak = streakCount
+            return
+        }
+        withAnimation(.spring(response: 0.45, dampingFraction: 0.7)) {
+            streakCelebration = true
+        }
+        // Auto-dismiss after a beat.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.4) {
+            withAnimation(.easeOut(duration: 0.35)) { streakCelebration = false }
+            lastSeenStreak = streakCount
+        }
+    }
+
+    private var streakCelebrationOverlay: some View {
+        VStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(palette.accent.opacity(0.18))
+                    .frame(width: 110, height: 110)
+                Image(systemName: "flame.fill")
+                    .font(.system(size: 56, weight: .heavy))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Color(red: 1.0, green: 0.65, blue: 0.0),
+                                     Color(red: 0.95, green: 0.30, blue: 0.20)],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    )
+                    .symbolEffect(.bounce, options: .nonRepeating)
+            }
+            Text(streakCount == 1 ? "First shift! 🎉" : "\(streakCount)-day streak")
+                .font(.system(size: 24, weight: .heavy, design: .rounded))
+                .foregroundColor(.white)
+                .contentTransition(.numericText(value: Double(streakCount)))
+            Text("Keep showing up.")
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .foregroundColor(.white.opacity(0.7))
+        }
+        .padding(28)
+        .background(
+            RoundedRectangle(cornerRadius: 22)
+                .fill(Color.black.opacity(0.65))
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 22))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 22)
+                .stroke(palette.accent.opacity(0.5), lineWidth: 1.5)
+        )
+        .shadow(color: .black.opacity(0.5), radius: 24)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Streak: \(streakCount) days")
     }
 
     // MARK: - Atmosphere

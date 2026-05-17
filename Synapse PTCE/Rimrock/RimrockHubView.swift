@@ -79,6 +79,8 @@ struct RimrockDayPickerView: View {
     let onSelectPracticeNext: () -> Void
     let onDismiss: () -> Void
 
+    @AppStorage("rimrock_last_shift_played") private var lastShiftPlayed: Int = 0
+
     // Picker uses the morning palette as a baseline
     private var basePalette: RimrockAtmosphere.Palette {
         RimrockAtmosphere.palette(for: 1)
@@ -97,7 +99,10 @@ struct RimrockDayPickerView: View {
                 ScrollView {
                     LazyVStack(spacing: 12) {
                         ForEach(0..<shifts.count, id: \.self) { idx in
-                            shiftCard(shifts[idx], onVoice: { onSelectVoice(shifts[idx]) })
+                            shiftCard(shifts[idx],
+                                      isCompleted: shifts[idx].dayNumber <= lastShiftPlayed,
+                                      isNext: shifts[idx].dayNumber == lastShiftPlayed + 1,
+                                      onVoice: { onSelectVoice(shifts[idx]) })
                                 .onTapGesture { onSelect(shifts[idx]) }
                                 .contextMenu {
                                     Button {
@@ -370,7 +375,10 @@ struct RimrockDayPickerView: View {
 
     // MARK: - Card
 
-    private func shiftCard(_ shift: RimrockShift, onVoice: @escaping () -> Void) -> some View {
+    private func shiftCard(_ shift: RimrockShift,
+                            isCompleted: Bool,
+                            isNext: Bool,
+                            onVoice: @escaping () -> Void) -> some View {
         let palette = RimrockAtmosphere.palette(for: shift.dayNumber)
         let badge = badgeFor(shift)
 
@@ -387,17 +395,30 @@ struct RimrockDayPickerView: View {
                     .padding(.top, 1)
             }
             .frame(width: 56)
+            .opacity(isCompleted ? 0.6 : 1.0)
 
             // Title + dates
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 8) {
                     Text(shift.title.uppercased())
                         .font(.system(size: 14, weight: .heavy, design: .monospaced))
-                        .foregroundColor(.white.opacity(0.95))
+                        .foregroundColor(.white.opacity(isCompleted ? 0.55 : 0.95))
                         .tracking(1.3)
                         .lineLimit(1)
+                        .strikethrough(isCompleted, color: .white.opacity(0.4))
 
                     badgeView(badge)
+
+                    if isNext {
+                        Text("NEXT")
+                            .font(.system(size: 9, weight: .black, design: .monospaced))
+                            .foregroundColor(.black)
+                            .tracking(1.2)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(palette.accent)
+                            .cornerRadius(4)
+                    }
                 }
 
                 Text(shift.dateLine)
@@ -411,9 +432,16 @@ struct RimrockDayPickerView: View {
 
             Spacer()
 
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(palette.accent.opacity(0.55))
+            if isCompleted {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(Color(red: 0.30, green: 0.85, blue: 0.55))
+                    .symbolEffect(.bounce, value: isCompleted)
+            } else {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(palette.accent.opacity(0.55))
+            }
         }
         .padding(14)
         .background(

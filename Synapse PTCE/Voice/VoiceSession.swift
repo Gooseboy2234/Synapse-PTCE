@@ -288,6 +288,18 @@ final class VoiceSession {
         advance()
     }
 
+    /// Re-speak just the sentence the narrator was on last — much finer-
+    /// grained than repeatLast(), which rewinds the whole beat.
+    func replayLastSentence() {
+        let last = narrator.currentChunkText
+        guard !last.isEmpty else {
+            repeatLast()
+            return
+        }
+        narrator.stop()
+        narrator.speak(last) { [weak self] in self?.advance() }
+    }
+
     func skip() {
         narrator.stop()
         advance()
@@ -523,6 +535,7 @@ final class VoiceSession {
         case pause
         case resume
         case repeatLast
+        case replaySentence
         case skip
         case exit
     }
@@ -540,7 +553,8 @@ final class VoiceSession {
 
         if ["pause", "wait", "hold on", "hold"].contains(normalized) { return .pause }
         if ["resume", "continue", "go", "go on", "go ahead"].contains(normalized) { return .resume }
-        if ["repeat", "again", "say again", "say that again", "what"].contains(normalized) { return .repeatLast }
+        if ["what", "huh", "what was that", "say that again"].contains(normalized) { return .replaySentence }
+        if ["repeat", "again", "say again", "repeat that"].contains(normalized) { return .repeatLast }
         if ["skip", "next", "move on", "skip it"].contains(normalized) { return .skip }
         if ["exit", "quit", "stop", "end", "stop voice", "stop it"].contains(normalized) { return .exit }
         return nil
@@ -565,6 +579,12 @@ final class VoiceSession {
             // Move cursor back so we re-play the question/choice prompt.
             cursor = max(0, cursor - 1)
             advance()
+        case .replaySentence:
+            replayLastSentence()
+            // Re-arm the listener after the sentence finishes so the user
+            // can still answer the question.
+            listenForAnswer(options: options, correct: correct,
+                            completion: pendingAnswerCompletion ?? { _ in })
         case .skip:
             // Treat skip as picking the canonical correct answer for a question,
             // or the first option for a choice, so the shift can continue.

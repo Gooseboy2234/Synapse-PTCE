@@ -914,11 +914,18 @@ struct SettingsSection<Content: View>: View {
     @ViewBuilder let content: () -> Content
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(title)
-                .font(.system(size: 9, weight: .bold, design: .monospaced))
-                .foregroundColor(theme.secondaryText)
-                .tracking(2)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Rectangle()
+                    .fill(accent.opacity(0.7))
+                    .frame(width: 3, height: 12)
+                    .cornerRadius(1.5)
+                Text(title)
+                    .font(.system(size: 10, weight: .heavy, design: .monospaced))
+                    .foregroundColor(accent.opacity(0.9))
+                    .tracking(2.2)
+                    .accessibilityAddTraits(.isHeader)
+            }
             content()
         }
     }
