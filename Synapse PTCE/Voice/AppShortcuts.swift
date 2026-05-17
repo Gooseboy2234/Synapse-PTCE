@@ -49,13 +49,12 @@ struct ContinueShiftIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         VoiceIntentInbox.shared.requestContinue()
-        let summary: String
         if let saved = VoiceSessionMemory.shared.last {
-            summary = "Resuming Day \(saved.dayNumber)."
+            let day = saved.dayNumber
+            return .result(dialog: "Resuming Day \(day).")
         } else {
-            summary = "No saved shift — starting your next one."
+            return .result(dialog: "No saved shift — starting your next one.")
         }
-        return .result(dialog: IntentDialog(stringLiteral: summary))
     }
 }
 

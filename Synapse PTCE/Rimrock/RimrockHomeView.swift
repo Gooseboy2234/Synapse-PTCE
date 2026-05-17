@@ -131,7 +131,7 @@ struct RimrockHomeView: View {
                             startPoint: .top, endPoint: .bottom
                         )
                     )
-                    .symbolEffect(.bounce, options: .nonRepeating)
+                    .symbolEffect(.bounce, value: streakCount)
             }
             Text(streakCount == 1 ? "First shift! 🎉" : "\(streakCount)-day streak")
                 .font(.system(size: 24, weight: .heavy, design: .rounded))

@@ -50,6 +50,10 @@ final class VoiceSession {
     private var resumeAfterPause: (() -> Void)?
     /// Set while we're waiting on the listener; lets the view inject a tapped answer.
     private var pendingAnswerCompletion: ((String) -> Void)?
+    /// Options currently being waited on — lets submitAnswer route arbitrary
+    /// text (a tvOS dictation result, a typed entry) through the matcher.
+    private var pendingOptions: [String] = []
+    private var pendingCorrect: String?
 
     /// Called when the player picks a choice via voice. Returns the index into
     /// the choices array.
@@ -289,15 +293,17 @@ final class VoiceSession {
     }
 
     /// Re-speak just the sentence the narrator was on last — much finer-
-    /// grained than repeatLast(), which rewinds the whole beat.
-    func replayLastSentence() {
+    /// grained than repeatLast(), which rewinds the whole beat. Caller
+    /// is responsible for re-arming the listener (if appropriate) inside
+    /// the onFinished closure.
+    func replayLastSentence(onFinished: (() -> Void)? = nil) {
         let last = narrator.currentChunkText
         guard !last.isEmpty else {
-            repeatLast()
+            if let onFinished { onFinished() } else { advance() }
             return
         }
         narrator.stop()
-        narrator.speak(last) { [weak self] in self?.advance() }
+        narrator.speak(last, onFinished: onFinished)
     }
 
     func skip() {
@@ -305,13 +311,25 @@ final class VoiceSession {
         advance()
     }
 
-    /// Manually resolve the current question or choice. Used when the user taps
-    /// an option in the UI instead of (or after) speaking.
+    /// Manually resolve the current question or choice. Used when the user
+    /// taps an option in the UI, or dictates an answer via tvOS Siri Remote.
+    /// Routes the text through the matcher so a dictated "B" or a typed
+    /// option fragment still resolves to the canonical option string the
+    /// session's completion handler expects.
     func submitAnswer(_ text: String) {
         listener.stop()
         let cb = pendingAnswerCompletion
+        let options = pendingOptions
+        let correct = pendingCorrect
         pendingAnswerCompletion = nil
-        cb?(text)
+        pendingOptions = []
+        pendingCorrect = nil
+        guard !options.isEmpty else {
+            cb?(text)
+            return
+        }
+        let resolved = match(spoken: text, against: options) ?? correct ?? text
+        cb?(resolved)
     }
 
     // MARK: - Beat playback
@@ -446,6 +464,8 @@ final class VoiceSession {
                                   correct: String?,
                                   completion: @escaping (String) -> Void) {
         pendingAnswerCompletion = completion
+        pendingOptions = options
+        pendingCorrect = correct
         listener.requestPermissions { [weak self] granted in
             guard let self else { return }
             guard granted else {
@@ -481,6 +501,8 @@ final class VoiceSession {
               m.confidence < lowConfidenceThreshold else {
             let cb = pendingAnswerCompletion
             pendingAnswerCompletion = nil
+            pendingOptions = []
+            pendingCorrect = nil
             cb?(picked)
             return
         }
@@ -516,6 +538,8 @@ final class VoiceSession {
                 if yes.contains(normalized) || yes.contains(where: { normalized.hasPrefix($0) }) {
                     let cb = self.pendingAnswerCompletion
                     self.pendingAnswerCompletion = nil
+                    self.pendingOptions = []
+                    self.pendingCorrect = nil
                     cb?(picked)
                 } else if no.contains(normalized) || no.contains(where: { normalized.hasPrefix($0) }) {
                     // Re-listen for the full answer.
@@ -580,11 +604,17 @@ final class VoiceSession {
             cursor = max(0, cursor - 1)
             advance()
         case .replaySentence:
-            replayLastSentence()
-            // Re-arm the listener after the sentence finishes so the user
-            // can still answer the question.
-            listenForAnswer(options: options, correct: correct,
-                            completion: pendingAnswerCompletion ?? { _ in })
+            // Stash the original completion before replaying, then re-arm the
+            // listener *after* the narrator finishes — otherwise the listener
+            // would capture the TTS audio.
+            let stashed = pendingAnswerCompletion
+            pendingAnswerCompletion = nil
+            replayLastSentence { [weak self] in
+                guard let self else { return }
+                if let cb = stashed {
+                    self.listenForAnswer(options: options, correct: correct, completion: cb)
+                }
+            }
         case .skip:
             // Treat skip as picking the canonical correct answer for a question,
             // or the first option for a choice, so the shift can continue.
@@ -613,12 +643,14 @@ final class VoiceSession {
         let normalized = spoken.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         guard !normalized.isEmpty, !options.isEmpty else { return nil }
 
-        // 1. Letter / phonetic
+        // 1. Letter / phonetic. Single-letter words and NATO/spelling variants
+        // only — no common English words (e.g. "the" was previously mapped to
+        // "D" and produced false positives on any sentence starting with "the").
         let phonetic: [String: Int] = [
-            "a": 0, "alpha": 0, "ay": 0, "ae": 0,
-            "b": 1, "bravo": 1, "bee": 1, "be": 1,
+            "a": 0, "alpha": 0, "ay": 0,
+            "b": 1, "bravo": 1, "bee": 1,
             "c": 2, "charlie": 2, "see": 2, "sea": 2,
-            "d": 3, "delta": 3, "dee": 3, "the": 3
+            "d": 3, "delta": 3, "dee": 3
         ]
         let firstWord = normalized.split(separator: " ").first.map(String.init) ?? normalized
         if let idx = phonetic[firstWord], idx < options.count {
