@@ -35,9 +35,10 @@ struct RimrockLiveActivityWidget: Widget {
                             .foregroundColor(.green)
                             .font(.system(size: 12, weight: .semibold, design: .monospaced))
                     } else {
-                        Text("\(Int(context.state.progress * 100))%")
-                            .foregroundColor(.white.opacity(0.6))
+                        Text(context.state.sessionStartedAt, style: .timer)
+                            .foregroundColor(.white.opacity(0.7))
                             .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                            .monospacedDigit()
                     }
                 }
                 DynamicIslandExpandedRegion(.bottom) {
@@ -64,10 +65,13 @@ struct RimrockLiveActivityWidget: Widget {
                 if context.state.awaitingResponse {
                     Image(systemName: "mic.fill")
                         .foregroundColor(.green)
+                        .symbolEffect(.pulse, options: .repeating)
                 } else {
-                    Text("\(Int(context.state.progress * 100))%")
+                    Text(context.state.sessionStartedAt, style: .timer)
                         .font(.system(size: 11, weight: .semibold, design: .monospaced))
                         .foregroundColor(.white.opacity(0.7))
+                        .monospacedDigit()
+                        .frame(maxWidth: 44)
                 }
             } minimal: {
                 Image(systemName: context.state.awaitingResponse ? "mic.fill" : "moon.stars.fill")
@@ -105,14 +109,21 @@ private struct RimrockLockScreenView: View {
                     .padding(.top, 2)
             }
             Spacer(minLength: 0)
-            if state.awaitingResponse {
-                Image(systemName: "mic.circle.fill")
-                    .font(.system(size: 30, weight: .bold))
-                    .foregroundColor(.green)
-            } else {
-                Image(systemName: "moon.stars.fill")
-                    .font(.system(size: 26))
-                    .foregroundColor(.orange)
+            VStack(alignment: .trailing, spacing: 6) {
+                if state.awaitingResponse {
+                    Image(systemName: "mic.circle.fill")
+                        .font(.system(size: 30, weight: .bold))
+                        .foregroundColor(.green)
+                        .symbolEffect(.pulse, options: .repeating)
+                } else {
+                    Image(systemName: "moon.stars.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(.orange)
+                }
+                Text(state.sessionStartedAt, style: .timer)
+                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.white.opacity(0.55))
+                    .monospacedDigit()
             }
         }
         .padding(16)

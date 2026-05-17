@@ -207,16 +207,19 @@ struct VoiceModeView: View {
             Image(systemName: icon)
                 .font(.system(size: 11, weight: .bold))
                 .foregroundColor(color)
+                .contentTransition(.symbolEffect(.replace))
             Text(label)
                 .font(.system(size: 10, weight: .black, design: .monospaced))
                 .foregroundColor(color)
                 .tracking(2)
+                .contentTransition(.opacity)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
         .background(color.opacity(0.10))
         .overlay(Capsule().stroke(color.opacity(0.4), lineWidth: 1))
         .clipShape(Capsule())
+        .animation(.easeInOut(duration: 0.2), value: label)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
     }
@@ -376,6 +379,7 @@ struct VoiceModeView: View {
                 Image(systemName: isDenied ? "mic.slash.fill" : "mic.fill")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white)
+                    .symbolEffect(.variableColor.iterative, options: reduceMotion ? .nonRepeating : .repeating, isActive: isListening && !reduceMotion)
             }
             .accessibilityHidden(true)
 

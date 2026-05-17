@@ -44,9 +44,13 @@ struct AppLaunchView: View {
     let progress: Double
     var logMessages: [String] = []
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var haloPulse: Bool = false
+
     private let accent     = Color(red: 1.0, green: 0.65, blue: 0.0)
     private let bgTop      = Color(red: 0.10, green: 0.08, blue: 0.07)
     private let bgBottom   = Color(red: 0.04, green: 0.03, blue: 0.03)
+    private let ridge      = Color(red: 0.16, green: 0.13, blue: 0.11)
 
     private var hasDiagnostic: Bool {
         logMessages.contains { $0.contains("[ERROR]") || $0.contains("[FATAL]") || $0.contains("[WARN]") || $0.contains("[RECOVER]") }
@@ -58,12 +62,40 @@ struct AppLaunchView: View {
             LinearGradient(colors: [bgTop, bgBottom], startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea()
 
+            // Subtle Bighorn ridge silhouette grounding the bottom — same
+            // landscape language as Rimrock without leaning on a bitmap asset.
+            GeometryReader { geo in
+                Path { p in
+                    let w = geo.size.width
+                    let h = geo.size.height
+                    let baseY = h * 0.78
+                    p.move(to: CGPoint(x: 0, y: baseY))
+                    p.addLine(to: CGPoint(x: w * 0.10, y: baseY - 30))
+                    p.addLine(to: CGPoint(x: w * 0.22, y: baseY - 14))
+                    p.addLine(to: CGPoint(x: w * 0.34, y: baseY - 56))
+                    p.addLine(to: CGPoint(x: w * 0.50, y: baseY - 20))
+                    p.addLine(to: CGPoint(x: w * 0.62, y: baseY - 70))
+                    p.addLine(to: CGPoint(x: w * 0.78, y: baseY - 28))
+                    p.addLine(to: CGPoint(x: w * 0.92, y: baseY - 46))
+                    p.addLine(to: CGPoint(x: w, y: baseY - 18))
+                    p.addLine(to: CGPoint(x: w, y: h))
+                    p.addLine(to: CGPoint(x: 0, y: h))
+                    p.closeSubpath()
+                }
+                .fill(ridge)
+                .opacity(0.85)
+            }
+            .ignoresSafeArea()
+            .accessibilityHidden(true)
+
             // Soft accent halo behind the wordmark
             RadialGradient(
-                colors: [accent.opacity(0.18), .clear],
+                colors: [accent.opacity(haloPulse && !reduceMotion ? 0.22 : 0.16), .clear],
                 center: .center, startRadius: 20, endRadius: 320
             )
+            .animation(reduceMotion ? nil : .easeInOut(duration: 3.2).repeatForever(autoreverses: true), value: haloPulse)
             .ignoresSafeArea()
+            .onAppear { haloPulse = true }
 
             VStack(spacing: 0) {
                 Spacer()
@@ -73,6 +105,7 @@ struct AppLaunchView: View {
                         .font(.system(size: 46, weight: .black, design: .monospaced))
                         .foregroundColor(accent)
                         .shadow(color: accent.opacity(0.55), radius: 18)
+                        .accessibilityAddTraits(.isHeader)
 
                     Text("Your pharmacy tech certification,\none shift at a time.")
                         .font(.system(size: 14, weight: .medium, design: .rounded))
@@ -80,6 +113,7 @@ struct AppLaunchView: View {
                         .multilineTextAlignment(.center)
                         .lineSpacing(3)
                 }
+                .accessibilityElement(children: .combine)
 
                 Spacer()
 

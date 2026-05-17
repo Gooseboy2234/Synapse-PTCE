@@ -181,7 +181,8 @@ final class VoiceSession {
                 progress: 0,
                 streak: 0,
                 awaitingResponse: false,
-                promptPreview: nil
+                promptPreview: nil,
+                sessionStartedAt: sessionStartedAt ?? Date()
             )
             LiveActivityController.shared.start(
                 shiftTitle: "\(shift.title) — Day \(shift.dayNumber)",
@@ -202,7 +203,8 @@ final class VoiceSession {
                 progress: min(max(p, 0), 1),
                 streak: 0,
                 awaitingResponse: awaiting,
-                promptPreview: prompt
+                promptPreview: prompt,
+                sessionStartedAt: sessionStartedAt ?? Date()
             )
             LiveActivityController.shared.update(state)
         }

@@ -31,19 +31,24 @@ public struct RimrockActivityAttributes: ActivityAttributes {
         public var awaitingResponse: Bool
         /// Short prompt for the current choice/question (truncated for chrome).
         public var promptPreview: String?
+        /// When the voice-mode session started. Lets the widget render a live
+        /// ticking elapsed-time label via `Text(_, style: .timer)`.
+        public var sessionStartedAt: Date
 
         public init(dayNumber: Int,
                     sceneLabel: String,
                     progress: Double,
                     streak: Int,
                     awaitingResponse: Bool,
-                    promptPreview: String?) {
+                    promptPreview: String?,
+                    sessionStartedAt: Date) {
             self.dayNumber = dayNumber
             self.sceneLabel = sceneLabel
             self.progress = progress
             self.streak = streak
             self.awaitingResponse = awaitingResponse
             self.promptPreview = promptPreview
+            self.sessionStartedAt = sessionStartedAt
         }
     }
 
