@@ -141,34 +141,35 @@ final class NowPlayingController {
 
         let cc = MPRemoteCommandCenter.shared()
 
+        // MPRemoteCommand handlers are documented to be called on the main
+        // queue but Swift's compiler can't verify that statically. We hop to
+        // the main actor explicitly so Swift 6 strict concurrency is happy
+        // and the handler still returns .success synchronously.
         let playToken = cc.playCommand.addTarget { [weak self] _ in
-            guard let s = self?.session else { return .commandFailed }
-            s.resume()
+            Task { @MainActor [weak self] in self?.session?.resume() }
             return .success
         }
         let pauseToken = cc.pauseCommand.addTarget { [weak self] _ in
-            guard let s = self?.session else { return .commandFailed }
-            s.pause()
+            Task { @MainActor [weak self] in self?.session?.pause() }
             return .success
         }
         let toggleToken = cc.togglePlayPauseCommand.addTarget { [weak self] _ in
-            guard let s = self?.session else { return .commandFailed }
-            if case .paused = s.phase { s.resume() } else { s.pause() }
+            Task { @MainActor [weak self] in
+                guard let s = self?.session else { return }
+                if case .paused = s.phase { s.resume() } else { s.pause() }
+            }
             return .success
         }
         let nextToken = cc.nextTrackCommand.addTarget { [weak self] _ in
-            guard let s = self?.session else { return .commandFailed }
-            s.skip()
+            Task { @MainActor [weak self] in self?.session?.skip() }
             return .success
         }
         let prevToken = cc.previousTrackCommand.addTarget { [weak self] _ in
-            guard let s = self?.session else { return .commandFailed }
-            s.repeatLast()
+            Task { @MainActor [weak self] in self?.session?.repeatLast() }
             return .success
         }
         let stopToken = cc.stopCommand.addTarget { [weak self] _ in
-            guard let s = self?.session else { return .commandFailed }
-            s.stop()
+            Task { @MainActor [weak self] in self?.session?.stop() }
             return .success
         }
 
