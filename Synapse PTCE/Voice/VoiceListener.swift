@@ -56,7 +56,7 @@ final class VoiceListener {
     private var task: SFSpeechRecognitionTask?
     /// Auto-finalize after this much silence following the most recent partial.
     private var silenceTimer: Timer?
-    private var silenceThreshold: TimeInterval = 1.6
+    private var silenceThreshold: TimeInterval { VoicePreferences.shared.silenceThreshold }
     #endif
 
     init(locale: Locale = .current) {

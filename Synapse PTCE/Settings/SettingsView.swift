@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 // MARK: - Settings View
 
@@ -54,6 +55,7 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 28) {
                         tutorialSection
                         frontDoorSection
+                        voiceModeSection
                         gameModeSection
                         textSizeSection
                         appearanceSection
@@ -147,6 +149,176 @@ struct SettingsView: View {
     }
 
     // MARK: - Game Mode
+
+    // MARK: - Voice Mode
+
+    @State private var voicePreviewing: Bool = false
+    private let voiceNarrator = VoiceNarrator()
+
+    private var voiceModeSection: some View {
+        let prefs = VoicePreferences.shared
+        return SettingsSection(title: "VOICE MODE", theme: theme, accent: accent) {
+            VStack(alignment: .leading, spacing: 16) {
+
+                // ── Speech rate ──────────────────────────────────────────
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text("SPEAKING RATE")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(theme.secondaryText)
+                            .tracking(1.2)
+                        Spacer()
+                        Text(prefs.rate.speechRateLabel)
+                            .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                            .foregroundColor(accent)
+                    }
+                    Slider(value: Binding(
+                        get: { Double(prefs.rate) },
+                        set: { prefs.rate = Float($0) }
+                    ), in: 0.30...0.70, step: 0.025)
+                    .tint(accent)
+                }
+
+                // ── Pitch ────────────────────────────────────────────────
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text("PITCH")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(theme.secondaryText)
+                            .tracking(1.2)
+                        Spacer()
+                        Text(String(format: "%.2f", prefs.pitch))
+                            .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                            .foregroundColor(accent)
+                    }
+                    Slider(value: Binding(
+                        get: { Double(prefs.pitch) },
+                        set: { prefs.pitch = Float($0) }
+                    ), in: 0.7...1.6, step: 0.05)
+                    .tint(accent)
+                }
+
+                // ── Voice picker ─────────────────────────────────────────
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("VOICE")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .foregroundColor(theme.secondaryText)
+                        .tracking(1.2)
+                    Menu {
+                        Button("System default") { prefs.voiceID = nil }
+                        Divider()
+                        ForEach(VoicePreferences.englishVoices, id: \.identifier) { v in
+                            Button {
+                                prefs.voiceID = v.identifier
+                            } label: {
+                                Text("\(v.name) — \(qualityLabel(v.quality)) · \(v.language)")
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "waveform")
+                                .foregroundColor(accent)
+                            Text(currentVoiceLabel(prefs: prefs))
+                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                .foregroundColor(theme.primaryText)
+                                .lineLimit(1)
+                            Spacer()
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(theme.secondaryText)
+                        }
+                        .padding(12)
+                        .background(theme.surface)
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(theme.divider, lineWidth: 1))
+                        .cornerRadius(10)
+                    }
+                }
+
+                // ── Listener tuning ───────────────────────────────────────
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text("AUTO-STOP AFTER SILENCE")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(theme.secondaryText)
+                            .tracking(1.2)
+                        Spacer()
+                        Text(String(format: "%.1fs", prefs.silenceThreshold))
+                            .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                            .foregroundColor(accent)
+                    }
+                    Slider(value: Binding(
+                        get: { prefs.silenceThreshold },
+                        set: { prefs.silenceThreshold = $0 }
+                    ), in: 0.8...3.0, step: 0.1)
+                    .tint(accent)
+                    Text("How long to wait after you stop talking before sending your answer.")
+                        .font(.system(size: 11, design: .rounded))
+                        .foregroundColor(theme.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                // ── Confirmation toggle ───────────────────────────────────
+                Toggle(isOn: Binding(
+                    get: { prefs.confirmLowConfidenceMatches },
+                    set: { prefs.confirmLowConfidenceMatches = $0 }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Confirm uncertain answers")
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .foregroundColor(theme.primaryText)
+                        Text("Voice Mode asks \u{201C}Did you mean …?\u{201D} when it isn't sure.")
+                            .font(.system(size: 11, design: .rounded))
+                            .foregroundColor(theme.secondaryText)
+                    }
+                }
+                .tint(accent)
+
+                // ── Preview ──────────────────────────────────────────────
+                Button(action: previewVoice) {
+                    HStack(spacing: 10) {
+                        Image(systemName: voicePreviewing ? "stop.fill" : "play.fill")
+                            .font(.system(size: 13, weight: .bold))
+                        Text(voicePreviewing ? "Stop preview" : "Preview voice")
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(accent)
+                    .cornerRadius(10)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private func currentVoiceLabel(prefs: VoicePreferences) -> String {
+        if let id = prefs.voiceID, let v = AVSpeechSynthesisVoice(identifier: id) {
+            return "\(v.name) — \(qualityLabel(v.quality))"
+        }
+        return "System default"
+    }
+
+    private func qualityLabel(_ q: AVSpeechSynthesisVoiceQuality) -> String {
+        switch q {
+        case .default:  return "Default"
+        case .enhanced: return "Enhanced"
+        case .premium:  return "Premium"
+        @unknown default: return "Default"
+        }
+    }
+
+    private func previewVoice() {
+        if voicePreviewing {
+            voiceNarrator.stop()
+            voicePreviewing = false
+            return
+        }
+        voicePreviewing = true
+        voiceNarrator.speak("Welcome to Voice Mode. I'll narrate your shift and listen for your answers.") {
+            voicePreviewing = false
+        }
+    }
 
     // MARK: - Front Door (Hub Mode)
 
