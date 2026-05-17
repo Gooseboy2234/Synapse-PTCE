@@ -96,6 +96,7 @@ struct TVRimrockHomeView: View {
 
     // Active shift presentation (curated + procedural practice both use this)
     @State private var activeShift: RimrockShift? = nil
+    @State private var voiceShift: RimrockShift? = nil
 
     // Domain drill-down stack
     @State private var domainPicker: KnowledgeDomain? = nil
@@ -169,6 +170,14 @@ struct TVRimrockHomeView: View {
         }
     }
 
+    private func startNextShiftInVoiceMode() {
+        if let curated = nextCuratedShift {
+            voiceShift = curated
+        } else {
+            voiceShift = engine.generateNextPracticeShift()
+        }
+    }
+
     var body: some View {
         ZStack {
             // Rimrock dawn backdrop — visible behind every state of the home
@@ -211,6 +220,11 @@ struct TVRimrockHomeView: View {
             RimrockShiftView(shift: shift, gameEngine: engine) {
                 activeShift = nil
             }
+        }
+
+        // ── Voice Mode (hands-free TTS + Siri Remote dictation)
+        .fullScreenCover(item: $voiceShift) { shift in
+            VoiceModeView(shift: shift) { voiceShift = nil }
         }
 
         // ── Domain-encounter answer sheet (existing tvOS flow)
@@ -987,6 +1001,10 @@ struct TVRimrockHomeView: View {
             Rectangle().fill(palette.accent.opacity(0.20)).frame(height: 1)
 
             HStack(spacing: 28) {
+                TVRimrockActionTile(label: "LISTEN", icon: "mic.fill",
+                                    color: Color(red: 1.0, green: 0.65, blue: 0.0)) {
+                    startNextShiftInVoiceMode()
+                }
                 TVRimrockActionTile(label: "BLUEPRINT", icon: "doc.badge.clock",
                                     color: palette.accent) { showBlueprintExam = true }
                 TVRimrockActionTile(label: "READINESS", icon: "gauge.with.needle",

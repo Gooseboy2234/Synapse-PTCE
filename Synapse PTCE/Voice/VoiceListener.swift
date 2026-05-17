@@ -2,9 +2,12 @@
 //  VoiceListener.swift
 //  Synapse PTCE — Voice Mode
 //
-//  Speech recognition wrapper using SFSpeechRecognizer + AVAudioEngine.
-//  iOS only — tvOS uses a different dictation pattern (focused TextField with
-//  Siri Remote dictation), handled by the view layer.
+//  Speech recognition wrapper. iOS uses SFSpeechRecognizer + AVAudioEngine for
+//  continuous on-device recognition. tvOS uses the system's Siri Remote
+//  dictation pattern: the view focuses a TextField, the user holds the mic
+//  button on the remote, and the dictated text is forwarded into the session
+//  via submitText(_:). The two platforms share the same Listener API so
+//  VoiceSession doesn't have to branch.
 //
 
 import Foundation
@@ -12,35 +15,60 @@ import AVFoundation
 
 #if os(iOS)
 import Speech
+#endif
+
+/// State exposed by every Listener implementation. Equatable for SwiftUI diffing.
+enum ListenerState: Equatable {
+    case idle
+    case requestingAuthorization
+    case waitingForRemote     // tvOS: prompt the user to press mic on the Siri Remote
+    case listening
+    case stopped
+    case denied
+    case unavailable
+    case error(String)
+}
 
 @Observable
 @MainActor
 final class VoiceListener {
 
-    enum ListenerState: Equatable {
-        case idle
-        case requestingAuthorization
-        case listening
-        case stopped
-        case denied
-        case unavailable
-        case error(String)
-    }
-
     private(set) var state: ListenerState = .idle
     private(set) var transcript: String = ""
 
+    /// True when this listener captures audio itself (iOS). When false, the
+    /// view layer is responsible for collecting input (tvOS dictation).
+    var capturesAudio: Bool {
+        #if os(iOS)
+        return true
+        #else
+        return false
+        #endif
+    }
+
+    private var onPartial: ((String) -> Void)?
+    private var onFinal:   ((String) -> Void)?
+
+    #if os(iOS)
     private let recognizer: SFSpeechRecognizer?
     private let audioEngine = AVAudioEngine()
     private var request: SFSpeechAudioBufferRecognitionRequest?
     private var task: SFSpeechRecognitionTask?
+    /// Auto-finalize after this much silence following the most recent partial.
+    private var silenceTimer: Timer?
+    private var silenceThreshold: TimeInterval = 1.6
+    #endif
 
     init(locale: Locale = .current) {
+        #if os(iOS)
         self.recognizer = SFSpeechRecognizer(locale: locale) ?? SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
+        #endif
     }
 
-    /// Request mic + speech permissions. Calls back on the main actor.
+    // MARK: - Permissions
+
     func requestPermissions(_ completion: @escaping (Bool) -> Void) {
+        #if os(iOS)
         state = .requestingAuthorization
         SFSpeechRecognizer.requestAuthorization { speechStatus in
             AVAudioApplication.requestRecordPermission { micGranted in
@@ -56,19 +84,28 @@ final class VoiceListener {
                 }
             }
         }
+        #else
+        // tvOS / macOS: no programmatic permissions to request. The view layer
+        // surfaces a focused TextField that activates Siri Remote dictation.
+        state = .waitingForRemote
+        completion(true)
+        #endif
     }
 
-    /// Begin streaming microphone audio to the recognizer. The `onPartial`
-    /// callback fires on every transcript update; `onFinal` fires once when
-    /// the recognizer settles or `stop()` is called.
+    // MARK: - Listening
+
     func start(onPartial: @escaping (String) -> Void,
                onFinal:   @escaping (String) -> Void) {
+        self.onPartial = onPartial
+        self.onFinal   = onFinal
+        transcript = ""
+
+        #if os(iOS)
         guard let recognizer, recognizer.isAvailable else {
             state = .unavailable
             return
         }
 
-        // Configure audio session for record + duck other audio
         let session = AVAudioSession.sharedInstance()
         do {
             try session.setCategory(.playAndRecord, mode: .spokenAudio,
@@ -85,7 +122,6 @@ final class VoiceListener {
             req.requiresOnDeviceRecognition = true
         }
         request = req
-        transcript = ""
 
         let inputNode = audioEngine.inputNode
         let format = inputNode.outputFormat(forBus: 0)
@@ -109,28 +145,66 @@ final class VoiceListener {
                 if let result {
                     let text = result.bestTranscription.formattedString
                     self.transcript = text
-                    onPartial(text)
+                    self.onPartial?(text)
+                    self.armSilenceTimer()
                     if result.isFinal {
-                        self.teardown()
-                        onFinal(text)
+                        self.finalize(with: text)
                     }
                 }
                 if let error {
                     self.state = .error(error.localizedDescription)
-                    self.teardown()
-                    onFinal(self.transcript)
+                    self.finalize(with: self.transcript)
                 }
+            }
+        }
+        #else
+        // tvOS: nothing to do here. The view layer must call submitText(_:).
+        state = .waitingForRemote
+        #endif
+    }
+
+    /// Inject a transcript from outside — used by the tvOS dictation flow.
+    func submitText(_ text: String) {
+        transcript = text
+        onPartial?(text)
+        finalize(with: text)
+    }
+
+    func stop() {
+        #if os(iOS)
+        request?.endAudio()
+        teardown()
+        #endif
+        state = .stopped
+    }
+
+    private func finalize(with text: String) {
+        #if os(iOS)
+        teardown()
+        #endif
+        let cb = onFinal
+        onPartial = nil
+        onFinal   = nil
+        state = .stopped
+        cb?(text)
+    }
+
+    // MARK: - iOS-only internals
+
+    #if os(iOS)
+    private func armSilenceTimer() {
+        silenceTimer?.invalidate()
+        silenceTimer = Timer.scheduledTimer(withTimeInterval: silenceThreshold, repeats: false) { [weak self] _ in
+            Task { @MainActor in
+                guard let self, self.state == .listening else { return }
+                self.finalize(with: self.transcript)
             }
         }
     }
 
-    func stop() {
-        request?.endAudio()
-        teardown()
-        state = .stopped
-    }
-
     private func teardown() {
+        silenceTimer?.invalidate()
+        silenceTimer = nil
         if audioEngine.isRunning {
             audioEngine.stop()
             audioEngine.inputNode.removeTap(onBus: 0)
@@ -139,33 +213,5 @@ final class VoiceListener {
         task = nil
         request = nil
     }
+    #endif
 }
-
-#else
-
-// tvOS / macOS stub: no free-form ASR. The view layer falls back to focused
-// dictation or remote-tap selection.
-@Observable
-@MainActor
-final class VoiceListener {
-    enum ListenerState: Equatable {
-        case idle, unavailable
-    }
-    private(set) var state: ListenerState = .unavailable
-    private(set) var transcript: String = ""
-
-    init(locale: Locale = .current) {}
-
-    func requestPermissions(_ completion: @escaping (Bool) -> Void) {
-        completion(false)
-    }
-
-    func start(onPartial: @escaping (String) -> Void,
-               onFinal:   @escaping (String) -> Void) {
-        onFinal("")
-    }
-
-    func stop() {}
-}
-
-#endif

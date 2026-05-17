@@ -2,217 +2,604 @@
 //  VoiceModeView.swift
 //  Synapse PTCE — Voice Mode
 //
-//  Full-screen hands-free playthrough of a Rimrock shift. TTS narrates;
-//  the mic captures voice answers on iOS. tvOS shows visual choices that
-//  can be selected with the Siri Remote while TTS narrates.
+//  Full-screen hands-free playthrough of a Rimrock shift.
+//
+//  iOS: TTS narrates; SFSpeechRecognizer captures voice answers on-device.
+//       A pulsing mic ring confirms the listener is hot; partial transcript
+//       appears live below the question text.
+//
+//  tvOS: TTS narrates; a focused TextField below the options activates
+//        Siri Remote dictation. The user holds the Siri button, dictates,
+//        and the text is matched against the available options. Visual
+//        options are also focusable via the directional pad as a fallback.
 //
 
 import SwiftUI
 
+#if os(iOS)
+import UIKit
+#endif
+
 struct VoiceModeView: View {
+
     let shift: RimrockShift
     let onExit: () -> Void
 
     @State private var session = VoiceSession()
-    @State private var listening: Bool = false
+    @State private var hasShownOnboarding = false
+    @State private var pulse: Bool = false
+    @State private var elapsedTimer: Timer?
+    @State private var elapsedSeconds: Int = 0
 
+    #if os(tvOS)
+    @FocusState private var dictationFocused: Bool
+    @State private var dictationText: String = ""
+    #endif
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @AppStorage("voice_mode_onboarded") private var voiceOnboarded = false
+
+    // ── Palette ───────────────────────────────────────────────────────────
     private let accent = Color(red: 1.0, green: 0.65, blue: 0.0)
+    private let listen = Color(red: 0.20, green: 0.95, blue: 0.55)
     private let bgTop  = Color(red: 0.08, green: 0.07, blue: 0.06)
     private let bgBot  = Color(red: 0.03, green: 0.025, blue: 0.02)
 
+    // ── Body ──────────────────────────────────────────────────────────────
     var body: some View {
         ZStack {
-            LinearGradient(colors: [bgTop, bgBot], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
+            backdrop
+            content
+                .padding(.horizontal, padding.h)
+                .padding(.vertical, padding.v)
 
-            VStack(spacing: 24) {
-                header
-                Spacer()
-                statusCard
-                Spacer()
-                controls
+            if !voiceOnboarded {
+                onboardingOverlay
+                    .transition(.opacity)
             }
-            .padding(24)
         }
+        .preferredColorScheme(.dark)
         .task {
             session.onFinished = onExit
+            startElapsedTimer()
             session.start(shift: shift)
+            startPulse()
         }
         .onDisappear {
+            stopElapsedTimer()
             session.stop()
         }
     }
 
-    private var header: some View {
-        HStack {
-            Button(action: {
-                session.stop()
-                onExit()
-            }) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.white.opacity(0.7))
-                    .padding(10)
-                    .background(Color.white.opacity(0.06))
-                    .clipShape(Circle())
-            }
-            Spacer()
-            VStack(spacing: 2) {
-                Text("VOICE MODE")
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                    .foregroundColor(accent)
-                    .tracking(2)
-                Text("Day \(shift.dayNumber) — \(shift.title)")
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundColor(.white.opacity(0.85))
-            }
-            Spacer()
-            // Spacer to balance the close button
-            Color.clear.frame(width: 38, height: 38)
+    // MARK: - Background
+
+    @ViewBuilder
+    private var backdrop: some View {
+        ZStack {
+            LinearGradient(colors: [bgTop, bgBot], startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
+
+            // A second very subtle accent halo that breathes with the mic.
+            RadialGradient(
+                colors: [(isListening ? listen : accent).opacity(pulse ? 0.16 : 0.08), .clear],
+                center: .center, startRadius: 40, endRadius: 480
+            )
+            .animation(reduceMotion ? nil : .easeInOut(duration: 2.4).repeatForever(autoreverses: true), value: pulse)
+            .ignoresSafeArea()
         }
     }
+
+    // MARK: - Layout
+
+    private var padding: (h: CGFloat, v: CGFloat) {
+        #if os(tvOS)
+        return (60, 40)
+        #else
+        return (24, 24)
+        #endif
+    }
+
+    private var content: some View {
+        VStack(spacing: 18) {
+            header
+            Spacer(minLength: 8)
+            statusCard
+            Spacer(minLength: 8)
+            transportControls
+        }
+    }
+
+    // MARK: - Header
+
+    private var header: some View {
+        VStack(spacing: 10) {
+            HStack(alignment: .center) {
+                Button(action: exitVoiceMode) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white.opacity(0.7))
+                        .padding(10)
+                        .background(Color.white.opacity(0.06))
+                        .clipShape(Circle())
+                }
+                .accessibilityLabel("Close voice mode")
+                .buttonStyle(.plain)
+
+                Spacer()
+
+                VStack(spacing: 2) {
+                    Text("VOICE MODE")
+                        .font(.system(size: 11, weight: .black, design: .monospaced))
+                        .foregroundColor(accent)
+                        .tracking(2)
+                    Text("Day \(shift.dayNumber) — \(shift.title)")
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundColor(.white.opacity(0.9))
+                }
+
+                Spacer()
+
+                Text(elapsedFormatted)
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.white.opacity(0.55))
+                    .frame(minWidth: 56, alignment: .trailing)
+                    .accessibilityLabel("Elapsed time \(elapsedFormatted)")
+            }
+
+            // Shift-progress bar
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(.white.opacity(0.08)).frame(height: 3)
+                    Capsule().fill(accent.opacity(0.85))
+                        .frame(width: max(0, geo.size.width * shiftProgress), height: 3)
+                        .animation(reduceMotion ? nil : .easeOut(duration: 0.25), value: shiftProgress)
+                }
+            }
+            .frame(height: 3)
+        }
+    }
+
+    // MARK: - Status card
 
     @ViewBuilder
     private var statusCard: some View {
-        VStack(spacing: 16) {
-            phaseHeadline
+        VStack(spacing: 14) {
+            phaseChip
             phaseBody
+                .frame(maxWidth: .infinity, alignment: .leading)
+            if isAwaitingResponse {
+                listenIndicator
+            }
             if !session.lastHeard.isEmpty {
-                Text("You said: \"\(session.lastHeard)\"")
+                Text("\u{201C}\(session.lastHeard)\u{201D}")
                     .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .italic()
                     .foregroundColor(.white.opacity(0.55))
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
+                    .padding(.top, 2)
+                    .accessibilityLabel("You said \(session.lastHeard)")
+                    .transition(.opacity)
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(20)
-        .background(Color.white.opacity(0.04))
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(accent.opacity(0.2), lineWidth: 1))
-        .cornerRadius(16)
+        .padding(22)
+        .background(Color.white.opacity(0.05))
+        .overlay(RoundedRectangle(cornerRadius: 18).stroke(accent.opacity(0.22), lineWidth: 1))
+        .cornerRadius(18)
+        .animation(.easeInOut(duration: 0.25), value: session.lastHeard)
     }
 
-    @ViewBuilder
-    private var phaseHeadline: some View {
-        switch session.phase {
-        case .idle:                        Text("Starting…").phaseHeadlineStyle()
-        case .narrating:                   Text("Narrating").phaseHeadlineStyle()
-        case .awaitingChoice:              Text("Pick a response").phaseHeadlineStyle(.green)
-        case .awaitingQuestion:            Text("Question").phaseHeadlineStyle(.green)
-        case .feedback(_, let correct):
-            Text(correct == true ? "Correct" : correct == false ? "Reflect" : "")
-                .phaseHeadlineStyle(correct == true ? .green : .orange)
-        case .finished:                    Text("Shift complete").phaseHeadlineStyle()
-        case .paused:                      Text("Paused").phaseHeadlineStyle(.gray)
+    private var phaseChip: some View {
+        let (label, color, icon) = phaseChrome
+        return HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundColor(color)
+            Text(label)
+                .font(.system(size: 10, weight: .black, design: .monospaced))
+                .foregroundColor(color)
+                .tracking(2)
         }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(color.opacity(0.10))
+        .overlay(Capsule().stroke(color.opacity(0.4), lineWidth: 1))
+        .clipShape(Capsule())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
     }
 
     @ViewBuilder
     private var phaseBody: some View {
         switch session.phase {
+        case .idle:
+            Text("Preparing your shift…")
+                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                .foregroundColor(.white.opacity(0.85))
+        case .narrating:
+            Text("Listen — the next prompt will arrive shortly.")
+                .font(.system(size: 15, weight: .medium, design: .rounded))
+                .foregroundColor(.white.opacity(0.75))
+                .multilineTextAlignment(.leading)
         case .awaitingChoice(let prompt, let choices):
-            VStack(alignment: .leading, spacing: 12) {
-                Text(prompt)
-                    .font(.system(size: 17, weight: .semibold, design: .rounded))
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.leading)
-                ForEach(Array(choices.enumerated()), id: \.offset) { idx, c in
-                    optionRow(letter: letter(idx), text: c) {
-                        session.submitAnswer(c)
-                    }
-                }
-            }
+            choicePanel(prompt: prompt, options: choices)
         case .awaitingQuestion(let prompt, let options, _):
-            VStack(alignment: .leading, spacing: 12) {
-                Text(prompt)
-                    .font(.system(size: 17, weight: .semibold, design: .rounded))
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.leading)
-                ForEach(Array(options.enumerated()), id: \.offset) { idx, c in
-                    optionRow(letter: letter(idx), text: c) {
-                        session.submitAnswer(c)
-                    }
-                }
-            }
+            choicePanel(prompt: prompt, options: options)
         case .feedback(let line, _):
             Text(line)
                 .font(.system(size: 16, weight: .medium, design: .rounded))
                 .foregroundColor(.white.opacity(0.9))
-                .multilineTextAlignment(.center)
-        default:
-            EmptyView()
+                .multilineTextAlignment(.leading)
+        case .finished:
+            Text("Shift complete.")
+                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                .foregroundColor(.white.opacity(0.85))
+        case .paused:
+            Text("Paused. Press Resume when you're ready.")
+                .font(.system(size: 15, weight: .medium, design: .rounded))
+                .foregroundColor(.white.opacity(0.7))
+        }
+    }
+
+    private func choicePanel(prompt: String, options: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(prompt)
+                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                .foregroundColor(.white)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(Array(options.enumerated()), id: \.offset) { idx, c in
+                optionRow(letter: letter(idx), text: c) {
+                    session.submitAnswer(c)
+                }
+            }
+
+            #if os(tvOS)
+            dictationField
+            #endif
         }
     }
 
     private func optionRow(letter: String, text: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button(action: {
+            haptic(.selection)
+            action()
+        }) {
             HStack(spacing: 12) {
                 Text(letter)
                     .font(.system(size: 14, weight: .black, design: .monospaced))
                     .foregroundColor(accent)
-                    .frame(width: 24, height: 24)
-                    .background(accent.opacity(0.12))
+                    .frame(width: 26, height: 26)
+                    .background(accent.opacity(0.14))
                     .clipShape(Circle())
                 Text(text)
                     .font(.system(size: 14, weight: .medium, design: .rounded))
-                    .foregroundColor(.white.opacity(0.88))
+                    .foregroundColor(.white.opacity(0.9))
                     .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
                 Spacer()
             }
-            .padding(10)
+            .padding(12)
             .background(Color.white.opacity(0.04))
-            .overlay(RoundedRectangle(cornerRadius: 10).stroke(.white.opacity(0.08)))
-            .cornerRadius(10)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(.white.opacity(0.08), lineWidth: 1))
+            .cornerRadius(12)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(letter). \(text)")
     }
 
-    private var controls: some View {
+    // MARK: - Listening indicator
+
+    private var listenIndicator: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(listen.opacity(0.18))
+                    .frame(width: pulse ? 56 : 44, height: pulse ? 56 : 44)
+                    .animation(reduceMotion ? nil : .easeInOut(duration: 0.9).repeatForever(autoreverses: true), value: pulse)
+                Circle()
+                    .fill(listen.opacity(0.55))
+                    .frame(width: 28, height: 28)
+                Image(systemName: "mic.fill")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white)
+            }
+            .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(listenHeadline)
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundColor(.white.opacity(0.92))
+                Text(listenSubhead)
+                    .font(.system(size: 11, design: .rounded))
+                    .foregroundColor(.white.opacity(0.55))
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(listen.opacity(0.06))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(listen.opacity(0.3), lineWidth: 1))
+        .cornerRadius(12)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Listening. \(listenSubhead)")
+    }
+
+    private var listenHeadline: String {
+        #if os(iOS)
+        switch session.listener.state {
+        case .denied:               return "Microphone access needed"
+        case .unavailable:          return "Voice answers unavailable"
+        case .listening:            return "Listening…"
+        case .requestingAuthorization: return "Asking for permission…"
+        case .error:                return "Listening hit a snag"
+        default:                    return "Tap an option, or say it"
+        }
+        #else
+        return "Press the Siri button on your remote"
+        #endif
+    }
+
+    private var listenSubhead: String {
+        #if os(iOS)
+        switch session.listener.state {
+        case .denied:    return "Enable Microphone + Speech Recognition in Settings."
+        case .listening: return "Say a letter (A/B/C/D) or paraphrase the choice."
+        case .error(let e): return e
+        default:         return "Or tap an answer above."
+        }
+        #else
+        return "Then dictate your answer, or use the directional pad to pick."
+        #endif
+    }
+
+    // MARK: - tvOS Siri Remote dictation field
+
+    #if os(tvOS)
+    private var dictationField: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("OR DICTATE")
+                .font(.system(size: 10, weight: .black, design: .monospaced))
+                .foregroundColor(listen.opacity(0.85))
+                .tracking(2)
+            TextField("Press Siri to speak, or type", text: $dictationText)
+                .focused($dictationFocused)
+                .submitLabel(.send)
+                .onSubmit {
+                    let text = dictationText.trimmingCharacters(in: .whitespacesAndNewlines)
+                    guard !text.isEmpty else { return }
+                    session.submitAnswer(text)
+                    dictationText = ""
+                }
+                .padding(12)
+                .background(Color.white.opacity(0.06))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(listen.opacity(0.35), lineWidth: 1))
+                .cornerRadius(10)
+        }
+    }
+    #endif
+
+    // MARK: - Transport controls
+
+    private var transportControls: some View {
         HStack(spacing: 22) {
-            controlButton(icon: "backward.fill", label: "Repeat") {
+            controlButton(icon: "backward.fill", label: "Repeat", tint: .white) {
+                haptic(.light)
                 session.repeatLast()
             }
             controlButton(
-                icon: session.phase == .paused ? "play.fill" : "pause.fill",
-                label: session.phase == .paused ? "Resume" : "Pause"
+                icon: isPaused ? "play.fill" : "pause.fill",
+                label: isPaused ? "Resume" : "Pause",
+                tint: isPaused ? listen : .white
             ) {
-                if session.phase == .paused { session.resume() } else { session.pause() }
+                haptic(.medium)
+                if isPaused { session.resume() } else { session.pause() }
             }
-            controlButton(icon: "forward.fill", label: "Skip") {
+            controlButton(icon: "forward.fill", label: "Skip", tint: .white) {
+                haptic(.light)
                 session.skip()
             }
         }
-        .padding(.bottom, 8)
+        .padding(.bottom, 4)
     }
 
-    private func controlButton(icon: String, label: String, action: @escaping () -> Void) -> some View {
+    private func controlButton(icon: String, label: String, tint: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack(spacing: 6) {
                 Image(systemName: icon)
                     .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.white.opacity(0.85))
-                    .frame(width: 52, height: 52)
+                    .foregroundColor(tint.opacity(0.95))
+                    .frame(width: 56, height: 56)
                     .background(Color.white.opacity(0.06))
+                    .overlay(Circle().stroke(.white.opacity(0.1), lineWidth: 1))
                     .clipShape(Circle())
                 Text(label)
                     .font(.system(size: 10, weight: .semibold, design: .monospaced))
                     .foregroundColor(.white.opacity(0.55))
+                    .tracking(1.2)
             }
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(label)
+    }
+
+    // MARK: - Onboarding overlay
+
+    private var onboardingOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.65).ignoresSafeArea()
+            VStack(alignment: .leading, spacing: 20) {
+                Text("VOICE MODE")
+                    .font(.system(size: 11, weight: .black, design: .monospaced))
+                    .foregroundColor(accent)
+                    .tracking(2.5)
+
+                Text("Study with your hands free.")
+                    .font(.system(size: 26, weight: .black, design: .rounded))
+                    .foregroundColor(.white)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    onboardingRow(icon: "headphones",
+                                  title: "Listen to the shift",
+                                  body: "Mara narrates each scene. Pause, skip, or repeat any time.")
+                    #if os(iOS)
+                    onboardingRow(icon: "mic.fill",
+                                  title: "Answer out loud",
+                                  body: "Say a letter, the choice itself, or paraphrase. On-device recognition — nothing leaves your phone.")
+                    #else
+                    onboardingRow(icon: "av.remote",
+                                  title: "Press Siri on your remote",
+                                  body: "Dictate your answer, or use the directional pad to pick visually.")
+                    #endif
+                    onboardingRow(icon: "lock.shield",
+                                  title: "Lock-screen safe",
+                                  body: "Audio keeps playing while the screen is off. Great for commutes and chores.")
+                }
+
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.25)) { voiceOnboarded = true }
+                }) {
+                    Text("Start the shift")
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(accent)
+                        .cornerRadius(12)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(28)
+            .frame(maxWidth: 460)
+            .background(Color(white: 0.08))
+            .overlay(RoundedRectangle(cornerRadius: 20).stroke(accent.opacity(0.4), lineWidth: 1))
+            .cornerRadius(20)
+            .shadow(color: .black.opacity(0.55), radius: 30)
+            .padding(.horizontal, 24)
+        }
+    }
+
+    private func onboardingRow(icon: String, title: String, body: String) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(accent)
+                .frame(width: 30)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                Text(body)
+                    .font(.system(size: 12, design: .rounded))
+                    .foregroundColor(.white.opacity(0.7))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    // MARK: - Derived state
+
+    private var phaseChrome: (label: String, color: Color, icon: String) {
+        switch session.phase {
+        case .idle:                  return ("PREPARING",  .white.opacity(0.6), "ellipsis")
+        case .narrating:             return ("NARRATING",  accent,              "waveform")
+        case .awaitingChoice:        return ("YOUR CALL",  listen,              "questionmark.bubble.fill")
+        case .awaitingQuestion:      return ("QUESTION",   listen,              "questionmark.bubble.fill")
+        case .feedback(_, let ok):
+            if ok == true  { return ("CORRECT", Color(red: 0.30, green: 0.85, blue: 0.55), "checkmark.seal.fill") }
+            if ok == false { return ("REFLECT", Color(red: 0.95, green: 0.65, blue: 0.30), "exclamationmark.bubble.fill") }
+            return ("MARA",   accent, "ellipsis.bubble.fill")
+        case .finished:              return ("COMPLETE",   accent,              "checkmark.circle.fill")
+        case .paused:                return ("PAUSED",     .white.opacity(0.55), "pause.circle.fill")
+        }
+    }
+
+    private var shiftProgress: Double {
+        let total = max(shift.beats.count, 1)
+        // Approximate — VoiceSession increments its cursor as it advances.
+        switch session.phase {
+        case .finished: return 1.0
+        case .idle:     return 0.0
+        default:        break
+        }
+        // We don't have a public progress on the session; derive a rough one
+        // from elapsed seconds vs. an estimate (1.5s per beat).
+        let estimate = Double(elapsedSeconds) / Double(total) / 1.5
+        return min(max(estimate, 0), 1)
+    }
+
+    private var isAwaitingResponse: Bool {
+        switch session.phase {
+        case .awaitingChoice, .awaitingQuestion: return true
+        default: return false
+        }
+    }
+
+    private var isListening: Bool {
+        #if os(iOS)
+        if case .listening = session.listener.state { return true }
+        #endif
+        return isAwaitingResponse
+    }
+
+    private var isPaused: Bool {
+        if case .paused = session.phase { return true }
+        return false
+    }
+
+    private var elapsedFormatted: String {
+        let m = elapsedSeconds / 60
+        let s = elapsedSeconds % 60
+        return String(format: "%d:%02d", m, s)
+    }
+
+    // MARK: - Helpers
+
+    private func startElapsedTimer() {
+        elapsedTimer?.invalidate()
+        elapsedSeconds = 0
+        elapsedTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            elapsedSeconds += 1
+        }
+    }
+
+    private func stopElapsedTimer() {
+        elapsedTimer?.invalidate()
+        elapsedTimer = nil
+    }
+
+    private func startPulse() {
+        guard !reduceMotion else { return }
+        pulse = true
+    }
+
+    private func exitVoiceMode() {
+        haptic(.medium)
+        session.stop()
+        onExit()
     }
 
     private func letter(_ i: Int) -> String {
         guard i >= 0, i < 26 else { return "\(i + 1)" }
         return String(UnicodeScalar(65 + i)!)
     }
-}
 
-private extension Text {
-    func phaseHeadlineStyle(_ color: Color = .orange) -> some View {
-        self
-            .font(.system(size: 11, weight: .black, design: .monospaced))
-            .foregroundColor(color)
-            .tracking(2)
+    private enum HapticStrength { case selection, light, medium, heavy }
+
+    private func haptic(_ kind: HapticStrength) {
+        #if os(iOS)
+        switch kind {
+        case .selection:
+            UISelectionFeedbackGenerator().selectionChanged()
+        case .light:
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        case .medium:
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        case .heavy:
+            UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+        }
+        #endif
     }
 }
