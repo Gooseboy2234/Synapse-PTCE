@@ -44,50 +44,47 @@ struct AppLaunchView: View {
     let progress: Double
     var logMessages: [String] = []
 
-    private let accent = Color(red: 1.0, green: 0.65, blue: 0.0)
-    private let bg     = Color(red: 0.059, green: 0.059, blue: 0.059)
+    private let accent     = Color(red: 1.0, green: 0.65, blue: 0.0)
+    private let bgTop      = Color(red: 0.10, green: 0.08, blue: 0.07)
+    private let bgBottom   = Color(red: 0.04, green: 0.03, blue: 0.03)
+
+    private var hasDiagnostic: Bool {
+        logMessages.contains { $0.contains("[ERROR]") || $0.contains("[FATAL]") || $0.contains("[WARN]") || $0.contains("[RECOVER]") }
+    }
 
     var body: some View {
         ZStack {
-            bg.ignoresSafeArea()
+            // Warm vertical gradient — calm, not hacker-terminal
+            LinearGradient(colors: [bgTop, bgBottom], startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
 
-            // Subtle grid
-            Canvas { ctx, size in
-                let spacing: CGFloat = 28
-                let lineColor = accent.opacity(0.05)
-                var x: CGFloat = 0
-                while x <= size.width {
-                    var p = Path(); p.move(to: CGPoint(x: x, y: 0)); p.addLine(to: CGPoint(x: x, y: size.height))
-                    ctx.stroke(p, with: .color(lineColor), lineWidth: 0.5)
-                    x += spacing
-                }
-                var y: CGFloat = 0
-                while y <= size.height {
-                    var p = Path(); p.move(to: CGPoint(x: 0, y: y)); p.addLine(to: CGPoint(x: size.width, y: y))
-                    ctx.stroke(p, with: .color(lineColor), lineWidth: 0.5)
-                    y += spacing
-                }
-            }
+            // Soft accent halo behind the wordmark
+            RadialGradient(
+                colors: [accent.opacity(0.18), .clear],
+                center: .center, startRadius: 20, endRadius: 320
+            )
             .ignoresSafeArea()
 
             VStack(spacing: 0) {
                 Spacer()
 
-                // App title
-                VStack(spacing: 8) {
+                VStack(spacing: 14) {
                     Text("SYNAPSE")
                         .font(.system(size: 46, weight: .black, design: .monospaced))
                         .foregroundColor(accent)
-                        .shadow(color: accent.opacity(0.65), radius: 16)
-                    Text("PTCE NETWORK  v13.0")
-                        .font(.system(size: 11, weight: .bold, design: .monospaced))
-                        .foregroundColor(accent.opacity(0.50))
+                        .shadow(color: accent.opacity(0.55), radius: 18)
+
+                    Text("Your pharmacy tech certification,\none shift at a time.")
+                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.72))
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(3)
                 }
 
                 Spacer()
 
-                // ── Diagnostic terminal log ──────────────────────────────────
-                if !logMessages.isEmpty {
+                // Diagnostic terminal log — only when something's wrong.
+                if hasDiagnostic {
                     VStack(alignment: .leading, spacing: 4) {
                         ForEach(Array(logMessages.suffix(8).enumerated()), id: \.offset) { idx, msg in
                             let isNewest = idx == min(logMessages.count, 8) - 1
@@ -112,25 +109,18 @@ struct AppLaunchView: View {
                     .padding(.bottom, 14)
                 }
 
-                // ── Progress bar ─────────────────────────────────────────────
-                VStack(spacing: 6) {
-                    GeometryReader { geo in
-                        ZStack(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: 2).fill(accent.opacity(0.12)).frame(height: 4)
-                            RoundedRectangle(cornerRadius: 2).fill(accent)
-                                .frame(width: geo.size.width * max(0, min(1, progress)), height: 4)
-                                .shadow(color: accent.opacity(0.8), radius: 6)
-                        }
+                // Slim progress bar — no numeric readout on the happy path.
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(.white.opacity(0.08)).frame(height: 3)
+                        Capsule().fill(accent)
+                            .frame(width: geo.size.width * max(0, min(1, progress)), height: 3)
+                            .shadow(color: accent.opacity(0.7), radius: 4)
                     }
-                    .frame(height: 4)
-
-                    // Numeric % readout so it's obvious if stuck
-                    Text(String(format: "%.0f%%", progress * 100))
-                        .font(.system(size: 9, design: .monospaced))
-                        .foregroundColor(accent.opacity(0.40))
                 }
-                .padding(.horizontal, 48)
-                .padding(.bottom, 52)
+                .frame(height: 3)
+                .padding(.horizontal, 64)
+                .padding(.bottom, 56)
             }
         }
     }

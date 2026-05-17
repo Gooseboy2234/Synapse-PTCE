@@ -20,6 +20,8 @@ struct SettingsView: View {
     @State private var showDatePicker   = false
     @State private var pickedDate       = Date()
 
+    @AppStorage("narrative_mode_enabled") private var narrativeEnabled = true
+
     private var accent: Color { engine.currentTheme.accentColor }
 
     var body: some View {
@@ -51,6 +53,7 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 28) {
                         tutorialSection
+                        frontDoorSection
                         gameModeSection
                         textSizeSection
                         appearanceSection
@@ -144,6 +147,30 @@ struct SettingsView: View {
     }
 
     // MARK: - Game Mode
+
+    // MARK: - Front Door (Hub Mode)
+
+    private var frontDoorSection: some View {
+        SettingsSection(title: "FRONT DOOR", theme: theme, accent: accent) {
+            VStack(spacing: 10) {
+                FrontDoorCard(
+                    title: "Rimrock — narrative shifts",
+                    subtitle: "Choose-your-own-adventure pharmacy shifts. Recommended for new users.",
+                    icon: "book.fill",
+                    isSelected: narrativeEnabled,
+                    theme: theme, accent: accent
+                ) { narrativeEnabled = true }
+
+                FrontDoorCard(
+                    title: "Classic — domain map",
+                    subtitle: "Pick a domain, pick a quest, drill questions. The original layout.",
+                    icon: "map.fill",
+                    isSelected: !narrativeEnabled,
+                    theme: theme, accent: accent
+                ) { narrativeEnabled = false }
+            }
+        }
+    }
 
     private var gameModeSection: some View {
         SettingsSection(title: "GAME MODE", theme: theme, accent: accent) {
@@ -557,6 +584,57 @@ struct SettingsSection<Content: View>: View {
                 .tracking(2)
             content()
         }
+    }
+}
+
+// MARK: - Game Mode Card
+
+// MARK: - Front Door Card
+
+struct FrontDoorCard: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let isSelected: Bool
+    let theme: AppTheme
+    let accent: Color
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 14) {
+                Image(systemName: icon)
+                    .font(.system(size: 20))
+                    .foregroundColor(isSelected ? accent : theme.secondaryText)
+                    .frame(width: 34)
+                    .shadow(color: isSelected ? accent.opacity(0.7) : .clear, radius: 5)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundColor(isSelected ? accent : theme.primaryText)
+                    Text(subtitle)
+                        .font(.system(size: 11, design: .rounded))
+                        .foregroundColor(theme.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer()
+
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(accent)
+                        .shadow(color: accent.opacity(0.6), radius: 4)
+                }
+            }
+            .padding(14)
+            .background(isSelected ? accent.opacity(0.08) : theme.surface)
+            .overlay(RoundedRectangle(cornerRadius: 10)
+                .stroke(isSelected ? accent.opacity(0.55) : theme.divider,
+                        lineWidth: isSelected ? 1.5 : 1))
+            .cornerRadius(10)
+        }
+        .buttonStyle(.plain)
     }
 }
 
