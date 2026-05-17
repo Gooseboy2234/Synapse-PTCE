@@ -61,6 +61,17 @@ struct VoiceModeView: View {
         .preferredColorScheme(.dark)
         .task {
             session.onFinished = onExit
+            session.onAnswerResolved = { isCorrect in
+                #if os(iOS)
+                if isCorrect == true {
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                } else if isCorrect == false {
+                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                } else {
+                    UISelectionFeedbackGenerator().selectionChanged()
+                }
+                #endif
+            }
             startElapsedTimer()
             session.start(shift: shift)
             startPulse()
@@ -296,13 +307,13 @@ struct VoiceModeView: View {
         HStack(spacing: 12) {
             ZStack {
                 Circle()
-                    .fill(listen.opacity(0.18))
+                    .fill((isDenied ? Color.red : listen).opacity(0.18))
                     .frame(width: pulse ? 56 : 44, height: pulse ? 56 : 44)
                     .animation(reduceMotion ? nil : .easeInOut(duration: 0.9).repeatForever(autoreverses: true), value: pulse)
                 Circle()
-                    .fill(listen.opacity(0.55))
+                    .fill((isDenied ? Color.red : listen).opacity(0.55))
                     .frame(width: 28, height: 28)
-                Image(systemName: "mic.fill")
+                Image(systemName: isDenied ? "mic.slash.fill" : "mic.fill")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white)
             }
@@ -315,16 +326,41 @@ struct VoiceModeView: View {
                 Text(listenSubhead)
                     .font(.system(size: 11, design: .rounded))
                     .foregroundColor(.white.opacity(0.55))
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Spacer()
+
+            #if os(iOS)
+            if isDenied {
+                Button("Open Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .foregroundColor(.black)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color.white.opacity(0.85))
+                .cornerRadius(8)
+            }
+            #endif
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(listen.opacity(0.06))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(listen.opacity(0.3), lineWidth: 1))
+        .background((isDenied ? Color.red : listen).opacity(0.06))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke((isDenied ? Color.red : listen).opacity(0.3), lineWidth: 1))
         .cornerRadius(12)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Listening. \(listenSubhead)")
+        .accessibilityLabel("\(listenHeadline). \(listenSubhead)")
+    }
+
+    private var isDenied: Bool {
+        #if os(iOS)
+        if case .denied = session.listener.state { return true }
+        if case .unavailable = session.listener.state { return true }
+        #endif
+        return false
     }
 
     private var listenHeadline: String {
@@ -346,7 +382,7 @@ struct VoiceModeView: View {
         #if os(iOS)
         switch session.listener.state {
         case .denied:    return "Enable Microphone + Speech Recognition in Settings."
-        case .listening: return "Say a letter (A/B/C/D) or paraphrase the choice."
+        case .listening: return "Say a letter, paraphrase, or say \u{201C}pause\u{201D} / \u{201C}skip\u{201D} / \u{201C}repeat\u{201D}."
         case .error(let e): return e
         default:         return "Or tap an answer above."
         }

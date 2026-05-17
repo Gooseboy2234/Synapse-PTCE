@@ -97,12 +97,14 @@ struct RimrockDayPickerView: View {
                 ScrollView {
                     LazyVStack(spacing: 12) {
                         ForEach(0..<shifts.count, id: \.self) { idx in
-                            shiftCard(shifts[idx])
+                            shiftCard(shifts[idx], onVoice: { onSelectVoice(shifts[idx]) })
                                 .onTapGesture { onSelect(shifts[idx]) }
-                                .onLongPressGesture(minimumDuration: 0.6) {
-                                    onSelectVoice(shifts[idx])
-                                }
                                 .contextMenu {
+                                    Button {
+                                        onSelect(shifts[idx])
+                                    } label: {
+                                        Label("Read shift", systemImage: "book.fill")
+                                    }
                                     Button {
                                         onSelectVoice(shifts[idx])
                                     } label: {
@@ -368,7 +370,7 @@ struct RimrockDayPickerView: View {
 
     // MARK: - Card
 
-    private func shiftCard(_ shift: RimrockShift) -> some View {
+    private func shiftCard(_ shift: RimrockShift, onVoice: @escaping () -> Void) -> some View {
         let palette = RimrockAtmosphere.palette(for: shift.dayNumber)
         let badge = badgeFor(shift)
 
@@ -425,6 +427,20 @@ struct RimrockDayPickerView: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(palette.accent.opacity(0.22), lineWidth: 1)
         )
+        .overlay(alignment: .topTrailing) {
+            Button(action: onVoice) {
+                Image(systemName: "mic.fill")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(palette.accent)
+                    .padding(7)
+                    .background(Color.black.opacity(0.45))
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(palette.accent.opacity(0.4), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .padding(8)
+            .accessibilityLabel("Listen to Day \(shift.dayNumber) in Voice Mode")
+        }
         .cornerRadius(10)
         .shadow(color: .black.opacity(0.25), radius: 6, y: 3)
         .contentShape(Rectangle())

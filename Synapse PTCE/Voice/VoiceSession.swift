@@ -8,6 +8,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 @Observable
 @MainActor
@@ -44,6 +45,9 @@ final class VoiceSession {
     var onQuestionResolved: ((String, Bool) -> Void)?
     /// Called when the shift's beat list is exhausted.
     var onFinished: (() -> Void)?
+    /// Optional view hook for haptics or sound effects on every answer.
+    /// Bool argument is isCorrect for questions; nil for tone-only choices.
+    var onAnswerResolved: ((Bool?) -> Void)?
 
     private var activeShift: RimrockShift?
 
@@ -54,8 +58,63 @@ final class VoiceSession {
         cursor = 0
         activeShift = shift
         startLiveActivity(for: shift)
+        setupAudioSession()
+        observeInterruptions()
         narrator.speak("\(shift.title). Day \(shift.dayNumber).") { [weak self] in
             self?.advance()
+        }
+    }
+
+    private func setupAudioSession() {
+        #if os(iOS) || os(tvOS)
+        do {
+            let session = AVAudioSession.sharedInstance()
+            // .playback keeps TTS audible while the screen is locked. When the
+            // listener actually starts mic capture, it upgrades to .playAndRecord
+            // temporarily.
+            try session.setCategory(.playback, mode: .spokenAudio,
+                                    options: [.duckOthers])
+            try session.setActive(true, options: [])
+        } catch {
+            // Best-effort; voice mode degrades to foreground-only audio.
+        }
+        #endif
+    }
+
+    private var interruptionObserver: NSObjectProtocol?
+
+    private func observeInterruptions() {
+        #if os(iOS) || os(tvOS)
+        if interruptionObserver != nil { return }
+        interruptionObserver = NotificationCenter.default.addObserver(
+            forName: AVAudioSession.interruptionNotification,
+            object: AVAudioSession.sharedInstance(),
+            queue: .main
+        ) { [weak self] note in
+            guard let self else { return }
+            guard let raw = note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+                  let type = AVAudioSession.InterruptionType(rawValue: raw) else { return }
+            Task { @MainActor in
+                switch type {
+                case .began:
+                    self.pause()
+                case .ended:
+                    // Don't auto-resume — let the user decide. They tapped into
+                    // a phone call or Siri; coming back to the app and pressing
+                    // Resume is the correct mental model.
+                    break
+                @unknown default:
+                    break
+                }
+            }
+        }
+        #endif
+    }
+
+    private func teardownInterruptionObserver() {
+        if let obs = interruptionObserver {
+            NotificationCenter.default.removeObserver(obs)
+            interruptionObserver = nil
         }
     }
 
@@ -77,6 +136,7 @@ final class VoiceSession {
         narrator.stop()
         listener.stop()
         endLiveActivity()
+        teardownInterruptionObserver()
         phase = .finished
     }
 
@@ -231,6 +291,7 @@ final class VoiceSession {
                 let line = isCorrect ? q.onCorrect : q.onWrong
                 self?.phase = .feedback(line: line, isCorrect: isCorrect)
                 self?.onQuestionResolved?(picked, isCorrect)
+                self?.onAnswerResolved?(isCorrect)
                 self?.narrator.speak(line) { self?.advance() }
             }
         }
@@ -245,11 +306,13 @@ final class VoiceSession {
             .joined(separator: ". ")
         narrator.speak("\(prompt). \(optionText).") { [weak self] in
             self?.listenForAnswer(options: labels, correct: nil) { picked in
+                guard let self else { return }
                 let idx = labels.firstIndex(of: picked) ?? 0
-                self?.onChoiceResolved?(idx)
+                self.onChoiceResolved?(idx)
+                self.onAnswerResolved?(nil)
                 let response = choices[idx].response
-                self?.beats.insert(contentsOf: response, at: self?.cursor ?? 0)
-                self?.advance()
+                self.beats.insert(contentsOf: response, at: self.cursor)
+                self.advance()
             }
         }
     }
@@ -271,12 +334,78 @@ final class VoiceSession {
                 },
                 onFinal: { final in
                     self.lastHeard = final
+                    // Intercept global voice commands first.
+                    if let cmd = self.interpretGlobalCommand(final) {
+                        self.handleGlobalCommand(cmd, options: options, correct: correct)
+                        return
+                    }
                     let picked = self.match(spoken: final, against: options) ?? correct ?? options.first ?? ""
                     let cb = self.pendingAnswerCompletion
                     self.pendingAnswerCompletion = nil
                     cb?(picked)
                 }
             )
+        }
+    }
+
+    // MARK: - Global voice commands
+
+    enum GlobalCommand {
+        case pause
+        case resume
+        case repeatLast
+        case skip
+        case exit
+    }
+
+    /// Maps a free-form utterance to a global command, if it matches one.
+    /// Only triggers on short, unambiguous utterances so it doesn't swallow
+    /// answers like "skip the morphine question".
+    func interpretGlobalCommand(_ spoken: String) -> GlobalCommand? {
+        let normalized = spoken
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: .punctuationCharacters)
+        // Heuristic: only treat as a command if the utterance is ≤ 3 words.
+        guard normalized.split(separator: " ").count <= 3 else { return nil }
+
+        if ["pause", "wait", "hold on", "hold"].contains(normalized) { return .pause }
+        if ["resume", "continue", "go", "go on", "go ahead"].contains(normalized) { return .resume }
+        if ["repeat", "again", "say again", "say that again", "what"].contains(normalized) { return .repeatLast }
+        if ["skip", "next", "move on", "skip it"].contains(normalized) { return .skip }
+        if ["exit", "quit", "stop", "end", "stop voice", "stop it"].contains(normalized) { return .exit }
+        return nil
+    }
+
+    /// Execute a global command in the middle of an answer prompt. If the
+    /// command doesn't end the prompt, we re-arm the listener so the user can
+    /// still answer the question.
+    private func handleGlobalCommand(_ cmd: GlobalCommand,
+                                     options: [String],
+                                     correct: String?) {
+        switch cmd {
+        case .pause:
+            pause()
+        case .resume:
+            resume()
+            // Re-listen for the answer.
+            listenForAnswer(options: options, correct: correct,
+                            completion: pendingAnswerCompletion ?? { _ in })
+        case .repeatLast:
+            pendingAnswerCompletion = nil
+            // Move cursor back so we re-play the question/choice prompt.
+            cursor = max(0, cursor - 1)
+            advance()
+        case .skip:
+            // Treat skip as picking the canonical correct answer for a question,
+            // or the first option for a choice, so the shift can continue.
+            let picked = correct ?? options.first ?? ""
+            let cb = pendingAnswerCompletion
+            pendingAnswerCompletion = nil
+            cb?(picked)
+        case .exit:
+            stop()
+            onFinished?()
         }
     }
 
