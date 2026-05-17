@@ -23,9 +23,13 @@ final class VoiceNarrator: NSObject {
     private(set) var state: NarratorState = .idle
 
     var volume: Float = 1.0
+    /// Sentence-level chunking gives the narration natural breath pauses.
+    /// Disable to send the whole string as a single utterance.
+    var chunkBySentence: Bool = true
 
     private let synth = AVSpeechSynthesizer()
     private var onFinished: (() -> Void)?
+    private var pendingChunks: [String] = []
 
     override init() {
         super.init()
@@ -33,21 +37,50 @@ final class VoiceNarrator: NSObject {
     }
 
     func speak(_ text: String, onFinished: (() -> Void)? = nil) {
-        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
             onFinished?()
             return
         }
         self.onFinished = onFinished
+        pendingChunks = chunkBySentence ? Self.splitIntoSentences(trimmed) : [trimmed]
+        state = .speaking
+        speakNextChunk()
+    }
+
+    private func speakNextChunk() {
+        guard !pendingChunks.isEmpty else {
+            let cb = onFinished
+            onFinished = nil
+            state = .idle
+            cb?()
+            return
+        }
+        let chunk = pendingChunks.removeFirst()
         let prefs = VoicePreferences.shared
-        let utterance = AVSpeechUtterance(string: text)
+        let utterance = AVSpeechUtterance(string: chunk)
         utterance.rate = prefs.rate
         utterance.pitchMultiplier = prefs.pitch
         utterance.volume = volume
         utterance.voice = prefs.resolvedVoice()
         utterance.preUtteranceDelay = 0.05
-        utterance.postUtteranceDelay = 0.15
-        state = .speaking
+        // More breath between sentences than at the end of a longer beat.
+        utterance.postUtteranceDelay = pendingChunks.isEmpty ? 0.18 : 0.28
         synth.speak(utterance)
+    }
+
+    /// Split a paragraph into sentence-sized chunks using NSString's
+    /// linguistic-aware sentence enumeration. Falls back to a single chunk if
+    /// enumeration yields nothing.
+    static func splitIntoSentences(_ text: String) -> [String] {
+        var sentences: [String] = []
+        let range = text.startIndex..<text.endIndex
+        text.enumerateSubstrings(in: range, options: .bySentences) { sub, _, _, _ in
+            if let s = sub?.trimmingCharacters(in: .whitespacesAndNewlines), !s.isEmpty {
+                sentences.append(s)
+            }
+        }
+        return sentences.isEmpty ? [text] : sentences
     }
 
     func pause() {
@@ -64,6 +97,7 @@ final class VoiceNarrator: NSObject {
 
     func stop() {
         synth.stopSpeaking(at: .immediate)
+        pendingChunks.removeAll()
         onFinished = nil
         state = .idle
     }
@@ -74,10 +108,8 @@ extension VoiceNarrator: AVSpeechSynthesizerDelegate {
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer,
                                        didFinish utterance: AVSpeechUtterance) {
         Task { @MainActor in
-            self.state = .idle
-            let cb = self.onFinished
-            self.onFinished = nil
-            cb?()
+            // Drive the queue forward; speakNextChunk handles the final callback.
+            self.speakNextChunk()
         }
     }
 
@@ -85,6 +117,7 @@ extension VoiceNarrator: AVSpeechSynthesizerDelegate {
                                        didCancel utterance: AVSpeechUtterance) {
         Task { @MainActor in
             self.state = .idle
+            self.pendingChunks.removeAll()
             self.onFinished = nil
         }
     }

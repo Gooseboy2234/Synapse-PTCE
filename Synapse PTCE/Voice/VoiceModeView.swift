@@ -237,6 +237,8 @@ struct VoiceModeView: View {
             choicePanel(prompt: prompt, options: choices)
         case .awaitingQuestion(let prompt, let options, _):
             choicePanel(prompt: prompt, options: options)
+        case .confirmingAnswer(let picked, let heard):
+            confirmationPanel(picked: picked, heard: heard)
         case .feedback(let line, _):
             Text(line)
                 .font(.system(size: 16, weight: .medium, design: .rounded))
@@ -250,6 +252,64 @@ struct VoiceModeView: View {
             Text("Paused. Press Resume when you're ready.")
                 .font(.system(size: 15, weight: .medium, design: .rounded))
                 .foregroundColor(.white.opacity(0.7))
+        }
+    }
+
+    private func confirmationPanel(picked: String, heard: String) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("I HEARD")
+                    .font(.system(size: 10, weight: .black, design: .monospaced))
+                    .foregroundColor(.white.opacity(0.45))
+                    .tracking(1.5)
+                Text("\u{201C}\(heard)\u{201D}")
+                    .italic()
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundColor(.white.opacity(0.7))
+                    .lineLimit(2)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("DID YOU MEAN")
+                    .font(.system(size: 10, weight: .black, design: .monospaced))
+                    .foregroundColor(listen)
+                    .tracking(1.5)
+                Text(picked)
+                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .foregroundColor(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            HStack(spacing: 12) {
+                Button(action: { session.submitAnswer(picked) }) {
+                    HStack {
+                        Image(systemName: "checkmark")
+                        Text("Yes — submit")
+                    }
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(listen)
+                    .cornerRadius(10)
+                }
+                .buttonStyle(.plain)
+
+                Button(action: { session.repeatLast() }) {
+                    HStack {
+                        Image(systemName: "arrow.uturn.left")
+                        Text("No — try again")
+                    }
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Color.white.opacity(0.08))
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(.white.opacity(0.18), lineWidth: 1))
+                    .cornerRadius(10)
+                }
+                .buttonStyle(.plain)
+            }
         }
     }
 
@@ -543,6 +603,7 @@ struct VoiceModeView: View {
         case .narrating:             return ("NARRATING",  accent,              "waveform")
         case .awaitingChoice:        return ("YOUR CALL",  listen,              "questionmark.bubble.fill")
         case .awaitingQuestion:      return ("QUESTION",   listen,              "questionmark.bubble.fill")
+        case .confirmingAnswer:      return ("CONFIRM",    listen,              "questionmark.diamond.fill")
         case .feedback(_, let ok):
             if ok == true  { return ("CORRECT", Color(red: 0.30, green: 0.85, blue: 0.55), "checkmark.seal.fill") }
             if ok == false { return ("REFLECT", Color(red: 0.95, green: 0.65, blue: 0.30), "exclamationmark.bubble.fill") }
@@ -568,7 +629,7 @@ struct VoiceModeView: View {
 
     private var isAwaitingResponse: Bool {
         switch session.phase {
-        case .awaitingChoice, .awaitingQuestion: return true
+        case .awaitingChoice, .awaitingQuestion, .confirmingAnswer: return true
         default: return false
         }
     }

@@ -19,6 +19,8 @@ final class VoiceSession {
         case narrating(beatIndex: Int)
         case awaitingChoice(prompt: String, choices: [String])
         case awaitingQuestion(prompt: String, options: [String], correct: String)
+        /// Low-confidence match — asking the user to confirm before submitting.
+        case confirmingAnswer(picked: String, heard: String)
         case feedback(line: String, isCorrect: Bool?)
         case finished
         case paused
@@ -350,6 +352,10 @@ final class VoiceSession {
         }
     }
 
+    /// Confidence threshold below which we ask the user to confirm before
+    /// submitting (subject to VoicePreferences.confirmLowConfidenceMatches).
+    private let lowConfidenceThreshold: Double = 0.55
+
     private func listenForAnswer(options: [String],
                                   correct: String?,
                                   completion: @escaping (String) -> Void) {
@@ -372,13 +378,69 @@ final class VoiceSession {
                         self.handleGlobalCommand(cmd, options: options, correct: correct)
                         return
                     }
-                    let picked = self.match(spoken: final, against: options) ?? correct ?? options.first ?? ""
-                    let cb = self.pendingAnswerCompletion
-                    self.pendingAnswerCompletion = nil
-                    cb?(picked)
+                    self.resolveAnswer(spoken: final, options: options, correct: correct)
                 }
             )
         }
+    }
+
+    private func resolveAnswer(spoken: String, options: [String], correct: String?) {
+        let prefs = VoicePreferences.shared
+        let match = matchWithConfidence(spoken: spoken, against: options)
+        let picked = match?.option ?? correct ?? options.first ?? ""
+
+        // If confidence is comfortably high, or confirmation is disabled, just submit.
+        guard prefs.confirmLowConfidenceMatches,
+              let m = match,
+              m.confidence < lowConfidenceThreshold else {
+            let cb = pendingAnswerCompletion
+            pendingAnswerCompletion = nil
+            cb?(picked)
+            return
+        }
+
+        // Otherwise present a confirmation prompt: "Did you mean X? Yes or no."
+        confirmAnswer(picked: m.option, heard: spoken, options: options, correct: correct)
+    }
+
+    private func confirmAnswer(picked: String, heard: String,
+                                options: [String], correct: String?) {
+        phase = .confirmingAnswer(picked: picked, heard: heard)
+        updateLiveActivity(label: "Confirming…", awaiting: true, prompt: "Did you mean: \(picked)?")
+        pushNowPlaying(label: "Confirming — \(picked.prefix(40))", awaiting: true)
+        let prompt = "I heard \(heard). Did you mean: \(picked)? Say yes or no."
+        narrator.speak(prompt) { [weak self] in
+            self?.listenForYesNo(options: options, correct: correct, picked: picked)
+        }
+    }
+
+    private func listenForYesNo(options: [String], correct: String?, picked: String) {
+        // Re-arm the listener for a short yes/no answer.
+        listener.start(
+            onPartial: { [weak self] partial in self?.lastHeard = partial },
+            onFinal:   { [weak self] final in
+                guard let self else { return }
+                self.lastHeard = final
+                let normalized = final
+                    .lowercased()
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .trimmingCharacters(in: .punctuationCharacters)
+                let yes = ["yes", "yeah", "yep", "yup", "correct", "right", "submit", "send it", "uh huh", "mm hm"]
+                let no  = ["no", "nope", "nah", "wrong", "redo", "try again", "let me redo", "again"]
+                if yes.contains(normalized) || yes.contains(where: { normalized.hasPrefix($0) }) {
+                    let cb = self.pendingAnswerCompletion
+                    self.pendingAnswerCompletion = nil
+                    cb?(picked)
+                } else if no.contains(normalized) || no.contains(where: { normalized.hasPrefix($0) }) {
+                    // Re-listen for the full answer.
+                    self.listenForAnswer(options: options, correct: correct,
+                                         completion: self.pendingAnswerCompletion ?? { _ in })
+                } else {
+                    // Ambiguous yes/no — treat as a fresh answer attempt.
+                    self.resolveAnswer(spoken: final, options: options, correct: correct)
+                }
+            }
+        )
     }
 
     // MARK: - Global voice commands
@@ -445,27 +507,31 @@ final class VoiceSession {
     // MARK: - Utterance matching
 
     /// Match a free-form spoken response to one of the available option texts.
+    /// Returns the matched option and a confidence score (0…∞ — higher is
+    /// better; 1.0 is the threshold above which we treat a match as certain).
     /// Strategy:
-    ///   1. Letter ("A"/"B"/"C"/"D" or phonetic alpha/bravo/charlie/delta)
-    ///   2. Token overlap (largest Jaccard wins)
-    ///   3. Substring containment
-    func match(spoken: String, against options: [String]) -> String? {
+    ///   1. Letter ("A"/"B"/"C"/"D" or phonetic alpha/bravo/charlie/delta) →
+    ///      perfect confidence (1.5).
+    ///   2. Substring containment of an option's text inside the spoken phrase
+    ///      → high confidence.
+    ///   3. Token overlap (Jaccard) → graded confidence.
+    func matchWithConfidence(spoken: String, against options: [String]) -> (option: String, confidence: Double)? {
         let normalized = spoken.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !normalized.isEmpty else { return nil }
+        guard !normalized.isEmpty, !options.isEmpty else { return nil }
 
         // 1. Letter / phonetic
         let phonetic: [String: Int] = [
-            "a": 0, "alpha": 0, "ay": 0,
-            "b": 1, "bravo": 1, "bee": 1,
+            "a": 0, "alpha": 0, "ay": 0, "ae": 0,
+            "b": 1, "bravo": 1, "bee": 1, "be": 1,
             "c": 2, "charlie": 2, "see": 2, "sea": 2,
-            "d": 3, "delta": 3, "dee": 3
+            "d": 3, "delta": 3, "dee": 3, "the": 3
         ]
         let firstWord = normalized.split(separator: " ").first.map(String.init) ?? normalized
         if let idx = phonetic[firstWord], idx < options.count {
-            return options[idx]
+            return (options[idx], 1.5)
         }
 
-        // 2. Token overlap (Jaccard) and substring containment
+        // 2 + 3 — score every option, pick the best.
         let spokenTokens = Set(normalized.split(separator: " ").map(String.init))
         var best: (option: String, score: Double)? = nil
         for opt in options {
@@ -474,14 +540,20 @@ final class VoiceSession {
             let inter = spokenTokens.intersection(optTokens).count
             let union = spokenTokens.union(optTokens).count
             let jaccard = union == 0 ? 0 : Double(inter) / Double(union)
-            let containment = (normalized.contains(optLower) || optLower.contains(normalized)) ? 0.5 : 0
+            let containment = (normalized.contains(optLower) || optLower.contains(normalized)) ? 0.6 : 0
             let score = jaccard + containment
             if best == nil || score > best!.score {
                 best = (opt, score)
             }
         }
-        if let b = best, b.score > 0.2 { return b.option }
+        if let b = best, b.score > 0.15 { return (b.option, b.score) }
         return nil
+    }
+
+    /// Back-compat — drops the confidence and falls back to the canonical
+    /// answer when no match is found.
+    func match(spoken: String, against options: [String]) -> String? {
+        matchWithConfidence(spoken: spoken, against: options)?.option
     }
 
     private func letter(for index: Int) -> String {
