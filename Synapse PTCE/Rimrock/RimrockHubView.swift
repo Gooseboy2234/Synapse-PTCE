@@ -15,6 +15,7 @@ struct RimrockHubView: View {
     let onDismiss: () -> Void
 
     @State private var activeShift: RimrockShift? = nil
+    @State private var voiceShift: RimrockShift? = nil
 
     init(gameEngine: GameEngine? = nil, onDismiss: @escaping () -> Void) {
         self.gameEngine = gameEngine
@@ -40,6 +41,9 @@ struct RimrockHubView: View {
                             activeShift = shift
                         }
                     },
+                    onSelectVoice: { shift in
+                        voiceShift = shift
+                    },
                     onSelectPracticeNext: {
                         guard let engine = gameEngine else { return }
                         let shift = engine.generateNextPracticeShift()
@@ -50,6 +54,14 @@ struct RimrockHubView: View {
                     onDismiss: onDismiss
                 )
                 .transition(.move(edge: .leading).combined(with: .opacity))
+            }
+        }
+        .fullScreenCoverCompat(isPresented: Binding(
+            get: { voiceShift != nil },
+            set: { if !$0 { voiceShift = nil } }
+        )) {
+            if let shift = voiceShift {
+                VoiceModeView(shift: shift) { voiceShift = nil }
             }
         }
     }
@@ -63,6 +75,7 @@ struct RimrockDayPickerView: View {
     let masterySnapshot: GlobalMasterySnapshot?
     let practiceCoverage: PracticeCoverage?
     let onSelect: (RimrockShift) -> Void
+    let onSelectVoice: (RimrockShift) -> Void
     let onSelectPracticeNext: () -> Void
     let onDismiss: () -> Void
 
@@ -86,6 +99,16 @@ struct RimrockDayPickerView: View {
                         ForEach(0..<shifts.count, id: \.self) { idx in
                             shiftCard(shifts[idx])
                                 .onTapGesture { onSelect(shifts[idx]) }
+                                .onLongPressGesture(minimumDuration: 0.6) {
+                                    onSelectVoice(shifts[idx])
+                                }
+                                .contextMenu {
+                                    Button {
+                                        onSelectVoice(shifts[idx])
+                                    } label: {
+                                        Label("Listen — Voice Mode", systemImage: "mic.fill")
+                                    }
+                                }
                         }
 
                         // After the curated arc, surface ongoing practice shifts —
