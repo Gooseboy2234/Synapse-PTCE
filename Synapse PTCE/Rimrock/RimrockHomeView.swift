@@ -25,7 +25,17 @@ struct RimrockHomeView: View {
     let onShowMasteryDetail: () -> Void
 
     @State private var heroRingPhase: Double = 0
+    @State private var resumeShift: RimrockShift? = nil
     @AppStorage("rimrock_last_shift_played") private var lastShiftPlayed: Int = 0
+
+    /// Reactive read of the persisted voice-mode session, if any.
+    private var savedVoice: SavedVoiceSession? {
+        VoiceSessionMemory.shared.last
+    }
+    private var resumeCandidate: RimrockShift? {
+        guard let saved = savedVoice else { return nil }
+        return RimrockContent.allShifts.first { $0.dayNumber == saved.dayNumber }
+    }
 
     private var palette: RimrockAtmosphere.Palette {
         // Use the morning palette as the home base (warm, hopeful, ready-to-start)
@@ -76,6 +86,9 @@ struct RimrockHomeView: View {
                 .padding(.horizontal, 22)
                 .padding(.bottom, 40)
             }
+        }
+        .fullScreenCoverCompat(item: $resumeShift) { shift in
+            VoiceModeView(shift: shift) { resumeShift = nil }
         }
     }
 
@@ -295,6 +308,10 @@ struct RimrockHomeView: View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader("TODAY'S PATH", subtitle: pathSubtitle)
 
+            if let resume = resumeCandidate {
+                resumeVoiceCard(shift: resume)
+            }
+
             primaryActionCard
 
             HStack(spacing: 12) {
@@ -310,6 +327,70 @@ struct RimrockHomeView: View {
                     icon: "bell",
                     action: onShowReview
                 )
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func resumeVoiceCard(shift: RimrockShift) -> some View {
+        let listenColor = Color(red: 0.20, green: 0.95, blue: 0.55)
+        let minutes = (savedVoice?.elapsedSeconds ?? 0) / 60
+        let minutesLabel = minutes <= 0 ? "Less than a minute in"
+                                        : minutes == 1 ? "1 minute in"
+                                                       : "\(minutes) minutes in"
+        let when = VoiceSessionMemory.shared.lastSavedRelative ?? ""
+
+        Button(action: { resumeShift = shift }) {
+            HStack(spacing: 14) {
+                ZStack {
+                    Circle()
+                        .fill(listenColor.opacity(0.18))
+                        .frame(width: 44, height: 44)
+                    Image(systemName: "mic.fill")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(listenColor)
+                        .symbolEffect(.pulse, options: .repeating)
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("CONTINUE YOUR SHIFT")
+                        .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                        .tracking(1.5)
+                        .foregroundColor(listenColor)
+                    Text("Day \(shift.dayNumber) — \(shift.title)")
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                    Text("\(minutesLabel) · \(when)")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.6))
+                        .lineLimit(1)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "play.fill")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(listenColor)
+                    .padding(10)
+                    .background(listenColor.opacity(0.18))
+                    .clipShape(Circle())
+            }
+            .padding(14)
+            .background(
+                LinearGradient(
+                    colors: [listenColor.opacity(0.08), Color.black.opacity(0.35)],
+                    startPoint: .leading, endPoint: .trailing
+                )
+            )
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(listenColor.opacity(0.4), lineWidth: 1))
+            .cornerRadius(14)
+            .shadow(color: .black.opacity(0.25), radius: 6, y: 3)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Continue Day \(shift.dayNumber), \(minutesLabel)")
+        .contextMenu {
+            Button(role: .destructive) {
+                VoiceSessionMemory.shared.clear()
+            } label: {
+                Label("Discard saved session", systemImage: "trash")
             }
         }
     }

@@ -162,6 +162,22 @@ final class VoiceSession {
     }
 
     func stop() {
+        // Persist mid-shift state for the "Continue your shift" CTA, but only
+        // for curated shifts (procedural shifts can't be reconstructed).
+        if let shift = activeShift,
+           phase != .finished,
+           !beats.isEmpty,
+           cursor > 0,
+           cursor < beats.count {
+            let elapsed = sessionStartedAt.map { Int(Date().timeIntervalSince($0)) } ?? 0
+            VoiceSessionMemory.shared.record(
+                dayNumber: shift.dayNumber,
+                elapsedSeconds: elapsed,
+                beatCursor: cursor
+            )
+        } else if phase == .finished {
+            VoiceSessionMemory.shared.clear()
+        }
         narrator.stop()
         listener.stop()
         endLiveActivity()
