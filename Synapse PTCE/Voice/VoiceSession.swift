@@ -33,6 +33,14 @@ final class VoiceSession {
     /// Optional label identifying the speaker, e.g. "Mara", "Narrator".
     private(set) var currentSpeaker: String = ""
 
+    /// Real progress through the shift's beat list: 0…1. Use this for the
+    /// progress bar instead of estimating from elapsed time.
+    var beatProgress: Double {
+        let total = beats.count
+        guard total > 0 else { return 0 }
+        return min(max(Double(cursor) / Double(total), 0), 1)
+    }
+
     let narrator = VoiceNarrator()
     let listener = VoiceListener()
 
@@ -68,6 +76,7 @@ final class VoiceSession {
         setupAudioSession()
         observeInterruptions()
         NowPlayingController.shared.attach(self)
+        NowPlayingController.shared.setDayNumber(shift.dayNumber)
         pushNowPlaying(label: "Starting…", awaiting: false)
         narrator.speak("\(shift.title). Day \(shift.dayNumber).") { [weak self] in
             self?.advance()

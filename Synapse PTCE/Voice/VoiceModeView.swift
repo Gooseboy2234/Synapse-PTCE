@@ -710,17 +710,11 @@ struct VoiceModeView: View {
     }
 
     private var shiftProgress: Double {
-        let total = max(shift.beats.count, 1)
-        // Approximate — VoiceSession increments its cursor as it advances.
         switch session.phase {
         case .finished: return 1.0
         case .idle:     return 0.0
-        default:        break
+        default:        return session.beatProgress
         }
-        // We don't have a public progress on the session; derive a rough one
-        // from elapsed seconds vs. an estimate (1.5s per beat).
-        let estimate = Double(elapsedSeconds) / Double(total) / 1.5
-        return min(max(estimate, 0), 1)
     }
 
     private var isAwaitingResponse: Bool {

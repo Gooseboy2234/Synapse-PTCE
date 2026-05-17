@@ -11,6 +11,9 @@
 
 import Foundation
 import MediaPlayer
+#if canImport(UIKit)
+import UIKit
+#endif
 
 @MainActor
 final class NowPlayingController {
@@ -56,7 +59,76 @@ final class NowPlayingController {
 
     func clearMetadata() {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+        artworkProvider = nil
     }
+
+    // MARK: - Procedural artwork
+
+    /// Called by VoiceSession on attach with the active shift's day number.
+    /// Renders a gradient + ridge silhouette + "DAY N" tile and uses it as
+    /// the Now Playing artwork so the lock-screen / Control Center / Apple
+    /// Watch Now Playing don't fall back to a generic music glyph.
+    func setDayNumber(_ day: Int) {
+        #if canImport(UIKit)
+        artworkProvider = makeArtworkRenderer(for: day)
+        #endif
+    }
+
+    #if canImport(UIKit)
+    private func makeArtworkRenderer(for dayNumber: Int) -> MPMediaItemArtwork {
+        let size = CGSize(width: 600, height: 600)
+        let palette = RimrockAtmosphere.palette(for: dayNumber)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let image = renderer.image { ctx in
+            let cg = ctx.cgContext
+            let colors = [
+                UIColor(palette.skyTop).cgColor,
+                UIColor(palette.skyMid).cgColor,
+                UIColor(palette.skyBottom).cgColor
+            ] as CFArray
+            let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(),
+                                      colors: colors, locations: [0, 0.55, 1])!
+            cg.drawLinearGradient(gradient,
+                                  start: .zero,
+                                  end: CGPoint(x: 0, y: size.height),
+                                  options: [])
+            let ridgePath = UIBezierPath()
+            let baseY = size.height * 0.74
+            ridgePath.move(to: CGPoint(x: 0, y: baseY))
+            ridgePath.addLine(to: CGPoint(x: size.width * 0.12, y: baseY - 70))
+            ridgePath.addLine(to: CGPoint(x: size.width * 0.24, y: baseY - 30))
+            ridgePath.addLine(to: CGPoint(x: size.width * 0.38, y: baseY - 110))
+            ridgePath.addLine(to: CGPoint(x: size.width * 0.52, y: baseY - 50))
+            ridgePath.addLine(to: CGPoint(x: size.width * 0.66, y: baseY - 130))
+            ridgePath.addLine(to: CGPoint(x: size.width * 0.80, y: baseY - 60))
+            ridgePath.addLine(to: CGPoint(x: size.width * 0.92, y: baseY - 90))
+            ridgePath.addLine(to: CGPoint(x: size.width, y: baseY - 40))
+            ridgePath.addLine(to: CGPoint(x: size.width, y: size.height))
+            ridgePath.addLine(to: CGPoint(x: 0, y: size.height))
+            ridgePath.close()
+            UIColor.black.withAlphaComponent(0.55).setFill()
+            ridgePath.fill()
+            let dayString = "DAY \(dayNumber)"
+            let attrs: [NSAttributedString.Key: Any] = [
+                .font: UIFont.monospacedSystemFont(ofSize: 64, weight: .heavy),
+                .foregroundColor: UIColor(palette.accent),
+            ]
+            let textSize = (dayString as NSString).size(withAttributes: attrs)
+            (dayString as NSString).draw(
+                at: CGPoint(x: 36, y: size.height - textSize.height - 36),
+                withAttributes: attrs
+            )
+            let app = "SYNAPSE PTCE"
+            let smallAttrs: [NSAttributedString.Key: Any] = [
+                .font: UIFont.monospacedSystemFont(ofSize: 18, weight: .bold),
+                .foregroundColor: UIColor.white.withAlphaComponent(0.7),
+                .kern: 2.0,
+            ]
+            (app as NSString).draw(at: CGPoint(x: 36, y: 36), withAttributes: smallAttrs)
+        }
+        return MPMediaItemArtwork(boundsSize: size) { _ in image }
+    }
+    #endif
 
     // MARK: - Remote command targets
 
