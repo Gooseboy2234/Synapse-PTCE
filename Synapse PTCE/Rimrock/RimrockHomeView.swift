@@ -322,6 +322,12 @@ struct RimrockHomeView: View {
                     action: onShowRimrockShifts
                 )
                 secondarySmallButton(
+                    label: "LISTEN",
+                    detail: "hands-free",
+                    icon: "mic.fill",
+                    action: { resumeShift = nextShiftForVoice() }
+                )
+                secondarySmallButton(
                     label: "REVIEW",
                     detail: mastery.dueForReview > 0 ? "\(mastery.dueForReview) due" : "no reviews",
                     icon: "bell",
@@ -329,6 +335,15 @@ struct RimrockHomeView: View {
                 )
             }
         }
+    }
+
+    /// The shift voice mode should target when the user taps the LISTEN tile.
+    /// Prefers the saved mid-session, falls back to the next curated shift,
+    /// then to Day 1 if the bank is empty.
+    private func nextShiftForVoice() -> RimrockShift {
+        if let resume = resumeCandidate { return resume }
+        if let next = nextCuratedShift   { return next }
+        return RimrockContent.allShifts.first ?? RimrockContent.allShifts[0]
     }
 
     @ViewBuilder

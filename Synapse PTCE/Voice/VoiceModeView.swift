@@ -30,6 +30,7 @@ struct VoiceModeView: View {
     @State private var pulse: Bool = false
     @State private var elapsedTimer: Timer?
     @State private var elapsedSeconds: Int = 0
+    @State private var muted: Bool = false
 
     #if os(tvOS)
     @FocusState private var dictationFocused: Bool
@@ -581,7 +582,7 @@ struct VoiceModeView: View {
     // MARK: - Transport controls
 
     private var transportControls: some View {
-        HStack(spacing: 22) {
+        HStack(spacing: 18) {
             controlButton(icon: "backward.fill", label: "Repeat", tint: .white) {
                 haptic(.light)
                 session.repeatLast()
@@ -597,6 +598,15 @@ struct VoiceModeView: View {
             controlButton(icon: "forward.fill", label: "Skip", tint: .white) {
                 haptic(.light)
                 session.skip()
+            }
+            controlButton(
+                icon: muted ? "speaker.slash.fill" : "speaker.wave.2.fill",
+                label: muted ? "Unmute" : "Mute",
+                tint: muted ? Color(red: 0.95, green: 0.65, blue: 0.30) : .white
+            ) {
+                haptic(.selection)
+                muted.toggle()
+                session.narrator.volume = muted ? 0 : 1
             }
         }
         .padding(.bottom, 4)

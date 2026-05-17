@@ -373,24 +373,89 @@ struct SettingsView: View {
                 }
                 .tint(accent)
 
-                // ── Preview ──────────────────────────────────────────────
-                Button(action: previewVoice) {
-                    HStack(spacing: 10) {
-                        Image(systemName: voicePreviewing ? "stop.fill" : "play.fill")
-                            .font(.system(size: 13, weight: .bold))
-                        Text(voicePreviewing ? "Stop preview" : "Preview voice")
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                // ── Preview + Recognition test ───────────────────────────
+                HStack(spacing: 10) {
+                    Button(action: previewVoice) {
+                        HStack(spacing: 8) {
+                            Image(systemName: voicePreviewing ? "stop.fill" : "play.fill")
+                                .font(.system(size: 13, weight: .bold))
+                            Text(voicePreviewing ? "Stop preview" : "Preview voice")
+                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        }
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(accent)
+                        .cornerRadius(10)
                     }
-                    .foregroundColor(.black)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-                    .background(accent)
-                    .cornerRadius(10)
+                    .buttonStyle(.plain)
+
+                    #if os(iOS)
+                    Button(action: testRecognition) {
+                        HStack(spacing: 8) {
+                            Image(systemName: recognitionTesting ? "mic.fill" : "mic")
+                                .font(.system(size: 13, weight: .bold))
+                                .symbolEffect(.variableColor.iterative,
+                                              options: .repeating,
+                                              isActive: recognitionTesting)
+                            Text(recognitionTesting ? "Listening…" : "Test recognition")
+                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(Color.white.opacity(0.08))
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(.white.opacity(0.18), lineWidth: 1))
+                        .cornerRadius(10)
+                    }
+                    .buttonStyle(.plain)
+                    #endif
                 }
-                .buttonStyle(.plain)
+
+                #if os(iOS)
+                if !recognitionResult.isEmpty {
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(Color(red: 0.30, green: 0.85, blue: 0.55))
+                        Text("Heard: \u{201C}\(recognitionResult)\u{201D}")
+                            .font(.system(size: 12, design: .rounded))
+                            .foregroundColor(theme.primaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                #endif
             }
         }
     }
+
+    #if os(iOS)
+    @State private var recognitionTesting: Bool = false
+    @State private var recognitionResult: String = ""
+    @State private var recognitionListener = VoiceListener()
+
+    private func testRecognition() {
+        if recognitionTesting {
+            recognitionListener.stop()
+            recognitionTesting = false
+            return
+        }
+        recognitionResult = ""
+        recognitionListener.requestPermissions { granted in
+            guard granted else {
+                recognitionResult = "Permission denied. Enable Speech Recognition + Microphone in Settings."
+                return
+            }
+            recognitionTesting = true
+            recognitionListener.start(
+                onPartial: { _ in },
+                onFinal: { final in
+                    recognitionTesting = false
+                    recognitionResult = final.isEmpty ? "Didn't catch anything — try again." : final
+                }
+            )
+        }
+    }
+    #endif
 
     private func currentVoiceLabel(prefs: VoicePreferences) -> String {
         if let id = prefs.voiceID, let v = AVSpeechSynthesisVoice(identifier: id) {
