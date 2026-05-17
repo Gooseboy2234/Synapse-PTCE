@@ -177,6 +177,7 @@ struct MapView: View {
     @State private var showBlueprintExam = false
     @State private var showExamHistory  = false
     @State private var showReadiness    = false
+    @State private var intentShift: RimrockShift? = nil
     @AppStorage("narrative_mode_enabled") private var narrativeEnabled = true
 
     var body: some View {
@@ -342,6 +343,10 @@ struct MapView: View {
         }
         // Tutorial overlay system
         .tutorialOverlay(manager: engine.tutorialManager, theme: ThemeManager())
+        // Siri / App Shortcuts voice-mode entry point
+        .fullScreenCoverCompat(item: $intentShift) { shift in
+            VoiceModeView(shift: shift) { intentShift = nil }
+        }
         .onAppear {
             // Show onboarding tutorial on first launch
             if engine.tutorialManager.shouldShowOnboarding() {
@@ -349,7 +354,35 @@ struct MapView: View {
                     engine.tutorialManager.startOnboarding()
                 }
             }
+            consumeVoiceIntent()
         }
+        .onChange(of: VoiceIntentInbox.shared.pending) { _, _ in
+            consumeVoiceIntent()
+        }
+    }
+
+    /// Read a pending Siri intent and translate it into the appropriate
+    /// VoiceMode entry point (next curated shift, or the saved resume).
+    private func consumeVoiceIntent() {
+        guard let pending = VoiceIntentInbox.shared.consume() else { return }
+        switch pending {
+        case .startNext:
+            intentShift = nextCuratedShiftForVoice()
+        case .continueLast:
+            if let saved = VoiceSessionMemory.shared.last,
+               let shift = RimrockContent.allShifts.first(where: { $0.dayNumber == saved.dayNumber }) {
+                intentShift = shift
+            } else {
+                intentShift = nextCuratedShiftForVoice()
+            }
+        }
+    }
+
+    private func nextCuratedShiftForVoice() -> RimrockShift? {
+        let lastPlayed = UserDefaults.standard.integer(forKey: "rimrock_last_shift_played")
+        let nextDay = max(1, lastPlayed + 1)
+        return RimrockContent.allShifts.first { $0.dayNumber >= nextDay }
+            ?? RimrockContent.allShifts.first
     }
 
 }
