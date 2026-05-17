@@ -265,12 +265,20 @@ struct VoiceModeView: View {
     @ViewBuilder
     private var narrationCaption: some View {
         VStack(alignment: .leading, spacing: 10) {
-            if !session.currentSpeaker.isEmpty {
-                Text(session.currentSpeaker.uppercased())
-                    .font(.system(.caption2, design: .monospaced).weight(.heavy))
-                    .foregroundColor(accent.opacity(0.85))
-                    .tracking(2)
-                    .accessibilityLabel(session.currentSpeaker)
+            HStack(alignment: .firstTextBaseline) {
+                if !session.currentSpeaker.isEmpty {
+                    Text(session.currentSpeaker.uppercased())
+                        .font(.system(.caption2, design: .monospaced).weight(.heavy))
+                        .foregroundColor(accent.opacity(0.85))
+                        .tracking(2)
+                        .accessibilityLabel(session.currentSpeaker)
+                }
+                Spacer()
+                Text("TAP TO SKIP")
+                    .font(.system(.caption2, design: .monospaced).weight(.bold))
+                    .foregroundColor(.white.opacity(0.32))
+                    .tracking(1.5)
+                    .accessibilityHidden(true)
             }
             if session.currentNarration.isEmpty {
                 Text("Listen — the next prompt will arrive shortly.")
@@ -305,6 +313,14 @@ struct VoiceModeView: View {
         }
         .animation(.easeInOut(duration: 0.28), value: session.currentNarration)
         .animation(.easeInOut(duration: 0.18), value: session.narrator.currentChunkText)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            haptic(.light)
+            session.skip()
+        }
+        .accessibilityAction(named: "Skip this beat") {
+            session.skip()
+        }
     }
 
     /// Renders the full beat text with the currently-speaking sentence

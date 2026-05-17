@@ -56,6 +56,7 @@ struct SettingsView: View {
                         tutorialSection
                         frontDoorSection
                         voiceModeSection
+                        dailyReminderSection
                         gameModeSection
                         textSizeSection
                         appearanceSection
@@ -149,6 +150,73 @@ struct SettingsView: View {
     }
 
     // MARK: - Game Mode
+
+    // MARK: - Daily Reminder
+
+    @State private var reminderEnabled = DailyReminderController.shared.isEnabled
+    @State private var reminderHour    = DailyReminderController.shared.hour
+    @State private var reminderMinute  = DailyReminderController.shared.minute
+    @State private var reminderDenied  = false
+
+    private var dailyReminderSection: some View {
+        SettingsSection(title: "DAILY REMINDER", theme: theme, accent: accent) {
+            VStack(alignment: .leading, spacing: 14) {
+                Toggle(isOn: Binding(
+                    get: { reminderEnabled },
+                    set: { newValue in
+                        if newValue {
+                            DailyReminderController.shared.enableAndSchedule { granted in
+                                reminderEnabled = granted
+                                reminderDenied  = !granted
+                            }
+                        } else {
+                            DailyReminderController.shared.isEnabled = false
+                            reminderEnabled = false
+                            reminderDenied  = false
+                        }
+                    }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Remind me to study")
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .foregroundColor(theme.primaryText)
+                        Text("A daily nudge that respects your streak. Five minutes is enough.")
+                            .font(.system(size: 11, design: .rounded))
+                            .foregroundColor(theme.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .tint(accent)
+
+                if reminderEnabled {
+                    DatePicker("Time", selection: Binding(
+                        get: {
+                            Calendar.current.date(from: DateComponents(hour: reminderHour, minute: reminderMinute)) ?? Date()
+                        },
+                        set: { newDate in
+                            let comps = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                            reminderHour = comps.hour ?? 19
+                            reminderMinute = comps.minute ?? 0
+                            DailyReminderController.shared.hour = reminderHour
+                            DailyReminderController.shared.minute = reminderMinute
+                        }
+                    ), displayedComponents: .hourAndMinute)
+                    .tint(accent)
+                }
+
+                if reminderDenied {
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(Color(red: 0.95, green: 0.65, blue: 0.30))
+                        Text("Notifications were denied. Enable them in iOS Settings to schedule reminders.")
+                            .font(.system(size: 11, design: .rounded))
+                            .foregroundColor(theme.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+        }
+    }
 
     // MARK: - Voice Mode
 
