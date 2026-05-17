@@ -57,12 +57,28 @@ final class VoiceSession {
         beats = shift.beats
         cursor = 0
         activeShift = shift
+        sessionStartedAt = Date()
         startLiveActivity(for: shift)
         setupAudioSession()
         observeInterruptions()
+        NowPlayingController.shared.attach(self)
+        pushNowPlaying(label: "Starting…", awaiting: false)
         narrator.speak("\(shift.title). Day \(shift.dayNumber).") { [weak self] in
             self?.advance()
         }
+    }
+
+    private var sessionStartedAt: Date?
+
+    private func pushNowPlaying(label: String, awaiting: Bool) {
+        guard let shift = activeShift else { return }
+        let elapsed = sessionStartedAt.map { Date().timeIntervalSince($0) } ?? 0
+        NowPlayingController.shared.updateMetadata(
+            shiftTitle: "\(shift.title) — Day \(shift.dayNumber)",
+            sceneLabel: label,
+            awaiting: awaiting,
+            elapsedSeconds: elapsed
+        )
     }
 
     private func setupAudioSession() {
@@ -122,6 +138,7 @@ final class VoiceSession {
         narrator.pause()
         listener.stop()
         phase = .paused
+        pushNowPlaying(label: "Paused", awaiting: true)
     }
 
     func resume() {
@@ -130,6 +147,16 @@ final class VoiceSession {
         } else {
             advance()
         }
+        pushNowPlaying(label: nowPlayingLabelForCurrentPhase(), awaiting: false)
+    }
+
+    private func nowPlayingLabelForCurrentPhase() -> String {
+        switch phase {
+        case .awaitingChoice(let prompt, _): return "Your call — \(prompt)"
+        case .awaitingQuestion(let prompt, _, _): return "Question — \(prompt)"
+        case .feedback(let line, _):  return "Mara: \(line.prefix(60))"
+        default:                      return "Listening to your shift"
+        }
     }
 
     func stop() {
@@ -137,6 +164,7 @@ final class VoiceSession {
         listener.stop()
         endLiveActivity()
         teardownInterruptionObserver()
+        NowPlayingController.shared.detach()
         phase = .finished
     }
 
@@ -228,12 +256,15 @@ final class VoiceSession {
         case .scene(let text):
             phase = .narrating(beatIndex: cursor - 1)
             updateLiveActivity(label: "Scene", awaiting: false)
+            pushNowPlaying(label: "Scene", awaiting: false)
             narrator.speak(text) { [weak self] in self?.advance() }
 
         case .dialogue(let speaker, let lines):
             phase = .narrating(beatIndex: cursor - 1)
             let label = speaker.displayLabel.isEmpty ? "" : "\(speaker.displayLabel) says, "
-            updateLiveActivity(label: speaker.displayLabel.isEmpty ? "Narration" : speaker.displayLabel, awaiting: false)
+            let nowLabel = speaker.displayLabel.isEmpty ? "Narration" : speaker.displayLabel
+            updateLiveActivity(label: nowLabel, awaiting: false)
+            pushNowPlaying(label: nowLabel, awaiting: false)
             narrator.speak(label + lines.joined(separator: " ")) { [weak self] in self?.advance() }
 
         case .nameEntry:
@@ -282,6 +313,7 @@ final class VoiceSession {
     private func presentQuestion(_ q: RimrockQuestion) {
         phase = .awaitingQuestion(prompt: q.prompt, options: q.options, correct: q.correctAnswer)
         updateLiveActivity(label: "Question", awaiting: true, prompt: q.prompt)
+        pushNowPlaying(label: "Question — \(q.prompt)", awaiting: true)
         let optionText = q.options.enumerated()
             .map { "\(letter(for: $0.offset)). \($0.element)" }
             .joined(separator: ". ")
@@ -301,6 +333,7 @@ final class VoiceSession {
         let labels = choices.map(\.label)
         phase = .awaitingChoice(prompt: prompt, choices: labels)
         updateLiveActivity(label: "Choice", awaiting: true, prompt: prompt)
+        pushNowPlaying(label: "Your call — \(prompt)", awaiting: true)
         let optionText = labels.enumerated()
             .map { "\(letter(for: $0.offset)). \($0.element)" }
             .joined(separator: ". ")
