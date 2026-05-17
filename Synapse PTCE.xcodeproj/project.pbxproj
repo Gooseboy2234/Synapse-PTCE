@@ -7,134 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AA1BA0072F8EC5110015709F /* StoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0062F8EC5110015709F /* StoryManager.swift */; };
-		AA1BA0092F8EC5640015709F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0082F8EC5640015709F /* SettingsView.swift */; };
-		AA1BA00B2F8ECB150015709F /* MultiAngle_D1.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA00A2F8ECB150015709F /* MultiAngle_D1.swift */; };
-		AA1BA00D2F8ECBAA0015709F /* MultiAngle_D2.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA00C2F8ECBAA0015709F /* MultiAngle_D2.swift */; };
-		AA1BA00F2F8ECC3C0015709F /* MultiAngle_D3.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA00E2F8ECC3C0015709F /* MultiAngle_D3.swift */; };
-		AA1BA0112F8ECCB90015709F /* MultiAngle_D4.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0102F8ECCB90015709F /* MultiAngle_D4.swift */; };
-		AA1BA0132F8ECED80015709F /* MultiAngle_D1b.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0122F8ECED80015709F /* MultiAngle_D1b.swift */; };
-		AA1BA0152F8ED01D0015709F /* MultiAngle_D1c.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0142F8ED01D0015709F /* MultiAngle_D1c.swift */; };
-		AA1BA0172F8ED0910015709F /* MultiAngle_D2b.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0162F8ED0910015709F /* MultiAngle_D2b.swift */; };
-		AA1BA0192F8ED1BC0015709F /* MultiAngle_D3b.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0182F8ED1BC0015709F /* MultiAngle_D3b.swift */; };
-		AA1BA01B2F8ED2280015709F /* MultiAngle_D4b.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA01A2F8ED2280015709F /* MultiAngle_D4b.swift */; };
-		AA1BA01D2F8EFD7C0015709F /* MultiAngle_D1d.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA01C2F8EFD7C0015709F /* MultiAngle_D1d.swift */; };
-		AA1BA01F2F8EFDFE0015709F /* MultiAngle_D1e.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA01E2F8EFDFE0015709F /* MultiAngle_D1e.swift */; };
-		AA1BA0212F8EFE5C0015709F /* MultiAngle_D2c.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0202F8EFE5C0015709F /* MultiAngle_D2c.swift */; };
-		AA1BA0232F8EFECB0015709F /* MultiAngle_D3c.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0222F8EFECB0015709F /* MultiAngle_D3c.swift */; };
-		AA1BA0252F8EFF3A0015709F /* MultiAngle_D4c.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0242F8EFF3A0015709F /* MultiAngle_D4c.swift */; };
-		AA1BA0272F8F08120015709F /* MultiAngle_D1f.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0262F8F08120015709F /* MultiAngle_D1f.swift */; };
-		AA1BA0292F8F092F0015709F /* MultiAngle_D1g.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0282F8F092F0015709F /* MultiAngle_D1g.swift */; };
-		AA1BA02B2F8F0AB80015709F /* MultiAngle_D1h.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA02A2F8F0AB80015709F /* MultiAngle_D1h.swift */; };
-		AA1BA02D2F8F0B420015709F /* MultiAngle_D1i.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA02C2F8F0B420015709F /* MultiAngle_D1i.swift */; };
-		AA1BA02F2F8F0C1C0015709F /* MultiAngle_D1j.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA02E2F8F0C1C0015709F /* MultiAngle_D1j.swift */; };
-		AA1BA0312F8F0C6E0015709F /* MultiAngle_D2d.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0302F8F0C6E0015709F /* MultiAngle_D2d.swift */; };
-		AA1BA0332F8F0CC50015709F /* MultiAngle_D3d.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0322F8F0CC50015709F /* MultiAngle_D3d.swift */; };
-		AA1BA0352F8F0D210015709F /* MultiAngle_D4d.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0342F8F0D210015709F /* MultiAngle_D4d.swift */; };
-		AA1BA0372F8F0EC70015709F /* MultiAngle_D1k.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0362F8F0EC70015709F /* MultiAngle_D1k.swift */; };
-		AA1BA0392F8F0F040015709F /* MultiAngle_D1l.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0382F8F0F040015709F /* MultiAngle_D1l.swift */; };
-		AA1BA03B2F8F0F870015709F /* MultiAngle_D1m.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA03A2F8F0F870015709F /* MultiAngle_D1m.swift */; };
-		AA1BA03D2F8F0FBD0015709F /* MultiAngle_D2e.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA03C2F8F0FBD0015709F /* MultiAngle_D2e.swift */; };
-		AA1BA03F2F8F0FF20015709F /* MultiAngle_D3e.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA03E2F8F0FF20015709F /* MultiAngle_D3e.swift */; };
-		AA1BA0412F8F10290015709F /* MultiAngle_D4e.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0402F8F10290015709F /* MultiAngle_D4e.swift */; };
-		AA1BA0432F8F10AA0015709F /* MultiAngle_D1n.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0422F8F10AA0015709F /* MultiAngle_D1n.swift */; };
-		AA1BA0472F8F15850015709F /* MultiAngle_D1o.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1BA0462F8F15850015709F /* MultiAngle_D1o.swift */; };
-		AAA745D22FA7BB90001CD048 /* DrugStems.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745D12FA7BB8F001CD048 /* DrugStems.swift */; };
-		AAA745D42FA7BBDC001CD048 /* HighRiskMedications.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745D32FA7BBDC001CD048 /* HighRiskMedications.swift */; };
-		AAA745D62FA7BC31001CD048 /* DrugInteractions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745D52FA7BC31001CD048 /* DrugInteractions.swift */; };
-		AAA745D82FA7BC54001CD048 /* ConceptualLearningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745D72FA7BC54001CD048 /* ConceptualLearningView.swift */; };
-		AAA745DA2FA7BC70001CD048 /* DrugStemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745D92FA7BC70001CD048 /* DrugStemsView.swift */; };
-		AAA745DC2FA7BC86001CD048 /* BodySystemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745DB2FA7BC86001CD048 /* BodySystemsView.swift */; };
-		AAA745DE2FA7BCA5001CD048 /* HighRiskMedicationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745DD2FA7BCA5001CD048 /* HighRiskMedicationsView.swift */; };
-		AAA745E02FA7BCC7001CD048 /* DrugInteractionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745DF2FA7BCC7001CD048 /* DrugInteractionsView.swift */; };
-		AAA745E22FA7BCF3001CD048 /* INTEGRATION_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = AAA745E12FA7BCF3001CD048 /* INTEGRATION_GUIDE.md */; };
-		AAA745E42FA7BD38001CD048 /* D1_MEDICATIONS_OVERHAUL_SUMMARY.md in Resources */ = {isa = PBXBuildFile; fileRef = AAA745E32FA7BD38001CD048 /* D1_MEDICATIONS_OVERHAUL_SUMMARY.md */; };
-		AAA745E62FA7BD5E001CD048 /* QuickStartIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745E52FA7BD5E001CD048 /* QuickStartIntegration.swift */; };
-		AAA745E82FA7BEA9001CD048 /* GuidedLearningHub.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745E72FA7BEA9001CD048 /* GuidedLearningHub.swift */; };
-		AAA745EA2FA7BEC3001CD048 /* LearningProgressModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745E92FA7BEC3001CD048 /* LearningProgressModels.swift */; };
-		AAA745EC2FA7BEE9001CD048 /* MedicationDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745EB2FA7BEE9001CD048 /* MedicationDataModels.swift */; };
-		AAA745EE2FA7BF13001CD048 /* MedicationDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745ED2FA7BF13001CD048 /* MedicationDatabase.swift */; };
-		AAA745F02FA7BF8A001CD048 /* FlashcardModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745EF2FA7BF8A001CD048 /* FlashcardModeView.swift */; };
-		AAA745F22FA7BFCF001CD048 /* StemQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745F12FA7BFCF001CD048 /* StemQuizView.swift */; };
-		AAA745F42FA7C009001CD048 /* DrugSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745F32FA7C009001CD048 /* DrugSearchView.swift */; };
-		AAA745F62FA7C044001CD048 /* SimplifiedLearningViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745F52FA7C044001CD048 /* SimplifiedLearningViews.swift */; };
-		AAA745F82FA7C088001CD048 /* COMPLETE_INTEGRATION_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = AAA745F72FA7C088001CD048 /* COMPLETE_INTEGRATION_GUIDE.md */; };
-		AAA745FA2FA7D5A2001CD048 /* PTCEMedicationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745F92FA7D5A2001CD048 /* PTCEMedicationModels.swift */; };
-		AAA745FC2FA7D5F9001CD048 /* PTCEMedicationDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA745FB2FA7D5F9001CD048 /* PTCEMedicationDatabase.swift */; };
-		AAA745FE2FA7D655001CD048 /* FINAL_INTEGRATION_INSTRUCTIONS.md in Resources */ = {isa = PBXBuildFile; fileRef = AAA745FD2FA7D655001CD048 /* FINAL_INTEGRATION_INSTRUCTIONS.md */; };
-		AAA746002FA7FC71001CD048 /* GUIDED_LEARNING_COMPLETE_IMPLEMENTATION.md in Resources */ = {isa = PBXBuildFile; fileRef = AAA745FF2FA7FC71001CD048 /* GUIDED_LEARNING_COMPLETE_IMPLEMENTATION.md */; };
-		AAA746022FA7FDD2001CD048 /* DATABASE_EXPANSION_COMPLETE.md in Resources */ = {isa = PBXBuildFile; fileRef = AAA746012FA7FDD2001CD048 /* DATABASE_EXPANSION_COMPLETE.md */; };
-		AAEF108D2F907AB4006102AF /* TVContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF108C2F907AB4006102AF /* TVContentView.swift */; };
-		AAEF108F2F907AE9006102AF /* TVHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF108E2F907AE9006102AF /* TVHubView.swift */; };
-		AAEF10912F907B1B006102AF /* TVMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF10902F907B1B006102AF /* TVMapView.swift */; };
-		AAEF10932F907B66006102AF /* TVEncounterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF10922F907B66006102AF /* TVEncounterView.swift */; };
-		AAEF10952F907BA5006102AF /* TVSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEF10942F907BA5006102AF /* TVSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		AA1B9FD82F8E95590015709F /* Synapse PTCE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Synapse PTCE.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		AA1BA0062F8EC5110015709F /* StoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryManager.swift; sourceTree = "<group>"; };
-		AA1BA0082F8EC5640015709F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		AA1BA00A2F8ECB150015709F /* MultiAngle_D1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1.swift; sourceTree = "<group>"; };
-		AA1BA00C2F8ECBAA0015709F /* MultiAngle_D2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D2.swift; sourceTree = "<group>"; };
-		AA1BA00E2F8ECC3C0015709F /* MultiAngle_D3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D3.swift; sourceTree = "<group>"; };
-		AA1BA0102F8ECCB90015709F /* MultiAngle_D4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D4.swift; sourceTree = "<group>"; };
-		AA1BA0122F8ECED80015709F /* MultiAngle_D1b.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1b.swift; sourceTree = "<group>"; };
-		AA1BA0142F8ED01D0015709F /* MultiAngle_D1c.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1c.swift; sourceTree = "<group>"; };
-		AA1BA0162F8ED0910015709F /* MultiAngle_D2b.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D2b.swift; sourceTree = "<group>"; };
-		AA1BA0182F8ED1BC0015709F /* MultiAngle_D3b.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D3b.swift; sourceTree = "<group>"; };
-		AA1BA01A2F8ED2280015709F /* MultiAngle_D4b.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D4b.swift; sourceTree = "<group>"; };
-		AA1BA01C2F8EFD7C0015709F /* MultiAngle_D1d.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1d.swift; sourceTree = "<group>"; };
-		AA1BA01E2F8EFDFE0015709F /* MultiAngle_D1e.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1e.swift; sourceTree = "<group>"; };
-		AA1BA0202F8EFE5C0015709F /* MultiAngle_D2c.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D2c.swift; sourceTree = "<group>"; };
-		AA1BA0222F8EFECB0015709F /* MultiAngle_D3c.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D3c.swift; sourceTree = "<group>"; };
-		AA1BA0242F8EFF3A0015709F /* MultiAngle_D4c.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D4c.swift; sourceTree = "<group>"; };
-		AA1BA0262F8F08120015709F /* MultiAngle_D1f.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1f.swift; sourceTree = "<group>"; };
-		AA1BA0282F8F092F0015709F /* MultiAngle_D1g.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1g.swift; sourceTree = "<group>"; };
-		AA1BA02A2F8F0AB80015709F /* MultiAngle_D1h.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1h.swift; sourceTree = "<group>"; };
-		AA1BA02C2F8F0B420015709F /* MultiAngle_D1i.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1i.swift; sourceTree = "<group>"; };
-		AA1BA02E2F8F0C1C0015709F /* MultiAngle_D1j.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1j.swift; sourceTree = "<group>"; };
-		AA1BA0302F8F0C6E0015709F /* MultiAngle_D2d.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D2d.swift; sourceTree = "<group>"; };
-		AA1BA0322F8F0CC50015709F /* MultiAngle_D3d.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D3d.swift; sourceTree = "<group>"; };
-		AA1BA0342F8F0D210015709F /* MultiAngle_D4d.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D4d.swift; sourceTree = "<group>"; };
-		AA1BA0362F8F0EC70015709F /* MultiAngle_D1k.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1k.swift; sourceTree = "<group>"; };
-		AA1BA0382F8F0F040015709F /* MultiAngle_D1l.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1l.swift; sourceTree = "<group>"; };
-		AA1BA03A2F8F0F870015709F /* MultiAngle_D1m.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1m.swift; sourceTree = "<group>"; };
-		AA1BA03C2F8F0FBD0015709F /* MultiAngle_D2e.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D2e.swift; sourceTree = "<group>"; };
-		AA1BA03E2F8F0FF20015709F /* MultiAngle_D3e.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D3e.swift; sourceTree = "<group>"; };
-		AA1BA0402F8F10290015709F /* MultiAngle_D4e.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D4e.swift; sourceTree = "<group>"; };
-		AA1BA0422F8F10AA0015709F /* MultiAngle_D1n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1n.swift; sourceTree = "<group>"; };
-		AA1BA0462F8F15850015709F /* MultiAngle_D1o.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiAngle_D1o.swift; sourceTree = "<group>"; };
-		AAA745D12FA7BB8F001CD048 /* DrugStems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugStems.swift; sourceTree = "<group>"; };
-		AAA745D32FA7BBDC001CD048 /* HighRiskMedications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighRiskMedications.swift; sourceTree = "<group>"; };
-		AAA745D52FA7BC31001CD048 /* DrugInteractions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugInteractions.swift; sourceTree = "<group>"; };
-		AAA745D72FA7BC54001CD048 /* ConceptualLearningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConceptualLearningView.swift; sourceTree = "<group>"; };
-		AAA745D92FA7BC70001CD048 /* DrugStemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugStemsView.swift; sourceTree = "<group>"; };
-		AAA745DB2FA7BC86001CD048 /* BodySystemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodySystemsView.swift; sourceTree = "<group>"; };
-		AAA745DD2FA7BCA5001CD048 /* HighRiskMedicationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighRiskMedicationsView.swift; sourceTree = "<group>"; };
-		AAA745DF2FA7BCC7001CD048 /* DrugInteractionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugInteractionsView.swift; sourceTree = "<group>"; };
-		AAA745E12FA7BCF3001CD048 /* INTEGRATION_GUIDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = INTEGRATION_GUIDE.md; sourceTree = "<group>"; };
-		AAA745E32FA7BD38001CD048 /* D1_MEDICATIONS_OVERHAUL_SUMMARY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = D1_MEDICATIONS_OVERHAUL_SUMMARY.md; sourceTree = "<group>"; };
-		AAA745E52FA7BD5E001CD048 /* QuickStartIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickStartIntegration.swift; sourceTree = "<group>"; };
-		AAA745E72FA7BEA9001CD048 /* GuidedLearningHub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedLearningHub.swift; sourceTree = "<group>"; };
-		AAA745E92FA7BEC3001CD048 /* LearningProgressModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningProgressModels.swift; sourceTree = "<group>"; };
-		AAA745EB2FA7BEE9001CD048 /* MedicationDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationDataModels.swift; sourceTree = "<group>"; };
-		AAA745ED2FA7BF13001CD048 /* MedicationDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationDatabase.swift; sourceTree = "<group>"; };
-		AAA745EF2FA7BF8A001CD048 /* FlashcardModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlashcardModeView.swift; sourceTree = "<group>"; };
-		AAA745F12FA7BFCF001CD048 /* StemQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StemQuizView.swift; sourceTree = "<group>"; };
-		AAA745F32FA7C009001CD048 /* DrugSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugSearchView.swift; sourceTree = "<group>"; };
-		AAA745F52FA7C044001CD048 /* SimplifiedLearningViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimplifiedLearningViews.swift; sourceTree = "<group>"; };
-		AAA745F72FA7C088001CD048 /* COMPLETE_INTEGRATION_GUIDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = COMPLETE_INTEGRATION_GUIDE.md; sourceTree = "<group>"; };
-		AAA745F92FA7D5A2001CD048 /* PTCEMedicationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PTCEMedicationModels.swift; sourceTree = "<group>"; };
-		AAA745FB2FA7D5F9001CD048 /* PTCEMedicationDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PTCEMedicationDatabase.swift; sourceTree = "<group>"; };
-		AAA745FD2FA7D655001CD048 /* FINAL_INTEGRATION_INSTRUCTIONS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = FINAL_INTEGRATION_INSTRUCTIONS.md; sourceTree = "<group>"; };
-		AAA745FF2FA7FC71001CD048 /* GUIDED_LEARNING_COMPLETE_IMPLEMENTATION.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = GUIDED_LEARNING_COMPLETE_IMPLEMENTATION.md; sourceTree = "<group>"; };
-		AAA746012FA7FDD2001CD048 /* DATABASE_EXPANSION_COMPLETE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DATABASE_EXPANSION_COMPLETE.md; sourceTree = "<group>"; };
-		AAEF108C2F907AB4006102AF /* TVContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVContentView.swift; sourceTree = "<group>"; };
-		AAEF108E2F907AE9006102AF /* TVHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVHubView.swift; sourceTree = "<group>"; };
-		AAEF10902F907B1B006102AF /* TVMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVMapView.swift; sourceTree = "<group>"; };
-		AAEF10922F907B66006102AF /* TVEncounterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVEncounterView.swift; sourceTree = "<group>"; };
-		AAEF10942F907BA5006102AF /* TVSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVSettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -161,68 +37,6 @@
 			children = (
 				AA1B9FDA2F8E95590015709F /* Synapse PTCE */,
 				AA1B9FD92F8E95590015709F /* Products */,
-				AA1BA0062F8EC5110015709F /* StoryManager.swift */,
-				AA1BA0082F8EC5640015709F /* SettingsView.swift */,
-				AA1BA00A2F8ECB150015709F /* MultiAngle_D1.swift */,
-				AA1BA00C2F8ECBAA0015709F /* MultiAngle_D2.swift */,
-				AA1BA00E2F8ECC3C0015709F /* MultiAngle_D3.swift */,
-				AA1BA0102F8ECCB90015709F /* MultiAngle_D4.swift */,
-				AA1BA0122F8ECED80015709F /* MultiAngle_D1b.swift */,
-				AA1BA0142F8ED01D0015709F /* MultiAngle_D1c.swift */,
-				AA1BA0162F8ED0910015709F /* MultiAngle_D2b.swift */,
-				AA1BA0182F8ED1BC0015709F /* MultiAngle_D3b.swift */,
-				AA1BA01A2F8ED2280015709F /* MultiAngle_D4b.swift */,
-				AA1BA01C2F8EFD7C0015709F /* MultiAngle_D1d.swift */,
-				AA1BA01E2F8EFDFE0015709F /* MultiAngle_D1e.swift */,
-				AA1BA0202F8EFE5C0015709F /* MultiAngle_D2c.swift */,
-				AA1BA0222F8EFECB0015709F /* MultiAngle_D3c.swift */,
-				AA1BA0242F8EFF3A0015709F /* MultiAngle_D4c.swift */,
-				AA1BA0262F8F08120015709F /* MultiAngle_D1f.swift */,
-				AA1BA0282F8F092F0015709F /* MultiAngle_D1g.swift */,
-				AA1BA02A2F8F0AB80015709F /* MultiAngle_D1h.swift */,
-				AA1BA02C2F8F0B420015709F /* MultiAngle_D1i.swift */,
-				AA1BA02E2F8F0C1C0015709F /* MultiAngle_D1j.swift */,
-				AA1BA0302F8F0C6E0015709F /* MultiAngle_D2d.swift */,
-				AA1BA0322F8F0CC50015709F /* MultiAngle_D3d.swift */,
-				AA1BA0342F8F0D210015709F /* MultiAngle_D4d.swift */,
-				AA1BA0362F8F0EC70015709F /* MultiAngle_D1k.swift */,
-				AA1BA0382F8F0F040015709F /* MultiAngle_D1l.swift */,
-				AA1BA03A2F8F0F870015709F /* MultiAngle_D1m.swift */,
-				AA1BA03C2F8F0FBD0015709F /* MultiAngle_D2e.swift */,
-				AA1BA03E2F8F0FF20015709F /* MultiAngle_D3e.swift */,
-				AA1BA0402F8F10290015709F /* MultiAngle_D4e.swift */,
-				AA1BA0422F8F10AA0015709F /* MultiAngle_D1n.swift */,
-				AA1BA0462F8F15850015709F /* MultiAngle_D1o.swift */,
-				AAEF108C2F907AB4006102AF /* TVContentView.swift */,
-				AAEF108E2F907AE9006102AF /* TVHubView.swift */,
-				AAEF10902F907B1B006102AF /* TVMapView.swift */,
-				AAEF10922F907B66006102AF /* TVEncounterView.swift */,
-				AAEF10942F907BA5006102AF /* TVSettingsView.swift */,
-				AAA745D12FA7BB8F001CD048 /* DrugStems.swift */,
-				AAA745D32FA7BBDC001CD048 /* HighRiskMedications.swift */,
-				AAA745D52FA7BC31001CD048 /* DrugInteractions.swift */,
-				AAA745D72FA7BC54001CD048 /* ConceptualLearningView.swift */,
-				AAA745D92FA7BC70001CD048 /* DrugStemsView.swift */,
-				AAA745DB2FA7BC86001CD048 /* BodySystemsView.swift */,
-				AAA745DD2FA7BCA5001CD048 /* HighRiskMedicationsView.swift */,
-				AAA745DF2FA7BCC7001CD048 /* DrugInteractionsView.swift */,
-				AAA745E12FA7BCF3001CD048 /* INTEGRATION_GUIDE.md */,
-				AAA745E32FA7BD38001CD048 /* D1_MEDICATIONS_OVERHAUL_SUMMARY.md */,
-				AAA745E52FA7BD5E001CD048 /* QuickStartIntegration.swift */,
-				AAA745E72FA7BEA9001CD048 /* GuidedLearningHub.swift */,
-				AAA745E92FA7BEC3001CD048 /* LearningProgressModels.swift */,
-				AAA745EB2FA7BEE9001CD048 /* MedicationDataModels.swift */,
-				AAA745ED2FA7BF13001CD048 /* MedicationDatabase.swift */,
-				AAA745EF2FA7BF8A001CD048 /* FlashcardModeView.swift */,
-				AAA745F12FA7BFCF001CD048 /* StemQuizView.swift */,
-				AAA745F32FA7C009001CD048 /* DrugSearchView.swift */,
-				AAA745F52FA7C044001CD048 /* SimplifiedLearningViews.swift */,
-				AAA745F72FA7C088001CD048 /* COMPLETE_INTEGRATION_GUIDE.md */,
-				AAA745F92FA7D5A2001CD048 /* PTCEMedicationModels.swift */,
-				AAA745FB2FA7D5F9001CD048 /* PTCEMedicationDatabase.swift */,
-				AAA745FD2FA7D655001CD048 /* FINAL_INTEGRATION_INSTRUCTIONS.md */,
-				AAA745FF2FA7FC71001CD048 /* GUIDED_LEARNING_COMPLETE_IMPLEMENTATION.md */,
-				AAA746012FA7FDD2001CD048 /* DATABASE_EXPANSION_COMPLETE.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -298,12 +112,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AAA745E42FA7BD38001CD048 /* D1_MEDICATIONS_OVERHAUL_SUMMARY.md in Resources */,
-				AAA746022FA7FDD2001CD048 /* DATABASE_EXPANSION_COMPLETE.md in Resources */,
-				AAA746002FA7FC71001CD048 /* GUIDED_LEARNING_COMPLETE_IMPLEMENTATION.md in Resources */,
-				AAA745F82FA7C088001CD048 /* COMPLETE_INTEGRATION_GUIDE.md in Resources */,
-				AAA745E22FA7BCF3001CD048 /* INTEGRATION_GUIDE.md in Resources */,
-				AAA745FE2FA7D655001CD048 /* FINAL_INTEGRATION_INSTRUCTIONS.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -314,62 +122,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA1BA0372F8F0EC70015709F /* MultiAngle_D1k.swift in Sources */,
-				AA1BA0172F8ED0910015709F /* MultiAngle_D2b.swift in Sources */,
-				AA1BA0412F8F10290015709F /* MultiAngle_D4e.swift in Sources */,
-				AAA745F22FA7BFCF001CD048 /* StemQuizView.swift in Sources */,
-				AAA745E62FA7BD5E001CD048 /* QuickStartIntegration.swift in Sources */,
-				AAA745F02FA7BF8A001CD048 /* FlashcardModeView.swift in Sources */,
-				AAA745D62FA7BC31001CD048 /* DrugInteractions.swift in Sources */,
-				AA1BA0152F8ED01D0015709F /* MultiAngle_D1c.swift in Sources */,
-				AAA745FC2FA7D5F9001CD048 /* PTCEMedicationDatabase.swift in Sources */,
-				AAA745EA2FA7BEC3001CD048 /* LearningProgressModels.swift in Sources */,
-				AAEF10932F907B66006102AF /* TVEncounterView.swift in Sources */,
-				AA1BA01F2F8EFDFE0015709F /* MultiAngle_D1e.swift in Sources */,
-				AA1BA0212F8EFE5C0015709F /* MultiAngle_D2c.swift in Sources */,
-				AA1BA00F2F8ECC3C0015709F /* MultiAngle_D3.swift in Sources */,
-				AA1BA0192F8ED1BC0015709F /* MultiAngle_D3b.swift in Sources */,
-				AA1BA00D2F8ECBAA0015709F /* MultiAngle_D2.swift in Sources */,
-				AA1BA00B2F8ECB150015709F /* MultiAngle_D1.swift in Sources */,
-				AAA745D82FA7BC54001CD048 /* ConceptualLearningView.swift in Sources */,
-				AAA745DA2FA7BC70001CD048 /* DrugStemsView.swift in Sources */,
-				AAEF108D2F907AB4006102AF /* TVContentView.swift in Sources */,
-				AA1BA01D2F8EFD7C0015709F /* MultiAngle_D1d.swift in Sources */,
-				AAA745DE2FA7BCA5001CD048 /* HighRiskMedicationsView.swift in Sources */,
-				AAA745E02FA7BCC7001CD048 /* DrugInteractionsView.swift in Sources */,
-				AAA745F42FA7C009001CD048 /* DrugSearchView.swift in Sources */,
-				AAA745E82FA7BEA9001CD048 /* GuidedLearningHub.swift in Sources */,
-				AAA745D22FA7BB90001CD048 /* DrugStems.swift in Sources */,
-				AA1BA03D2F8F0FBD0015709F /* MultiAngle_D2e.swift in Sources */,
-				AA1BA0272F8F08120015709F /* MultiAngle_D1f.swift in Sources */,
-				AA1BA0392F8F0F040015709F /* MultiAngle_D1l.swift in Sources */,
-				AA1BA0332F8F0CC50015709F /* MultiAngle_D3d.swift in Sources */,
-				AA1BA02B2F8F0AB80015709F /* MultiAngle_D1h.swift in Sources */,
-				AAEF108F2F907AE9006102AF /* TVHubView.swift in Sources */,
-				AA1BA0072F8EC5110015709F /* StoryManager.swift in Sources */,
-				AA1BA03B2F8F0F870015709F /* MultiAngle_D1m.swift in Sources */,
-				AA1BA01B2F8ED2280015709F /* MultiAngle_D4b.swift in Sources */,
-				AA1BA0112F8ECCB90015709F /* MultiAngle_D4.swift in Sources */,
-				AA1BA0472F8F15850015709F /* MultiAngle_D1o.swift in Sources */,
-				AA1BA0352F8F0D210015709F /* MultiAngle_D4d.swift in Sources */,
-				AAA745F62FA7C044001CD048 /* SimplifiedLearningViews.swift in Sources */,
-				AA1BA03F2F8F0FF20015709F /* MultiAngle_D3e.swift in Sources */,
-				AAA745FA2FA7D5A2001CD048 /* PTCEMedicationModels.swift in Sources */,
-				AAEF10952F907BA5006102AF /* TVSettingsView.swift in Sources */,
-				AA1BA02D2F8F0B420015709F /* MultiAngle_D1i.swift in Sources */,
-				AAA745DC2FA7BC86001CD048 /* BodySystemsView.swift in Sources */,
-				AA1BA0432F8F10AA0015709F /* MultiAngle_D1n.swift in Sources */,
-				AAA745EE2FA7BF13001CD048 /* MedicationDatabase.swift in Sources */,
-				AA1BA02F2F8F0C1C0015709F /* MultiAngle_D1j.swift in Sources */,
-				AA1BA0232F8EFECB0015709F /* MultiAngle_D3c.swift in Sources */,
-				AAA745EC2FA7BEE9001CD048 /* MedicationDataModels.swift in Sources */,
-				AA1BA0292F8F092F0015709F /* MultiAngle_D1g.swift in Sources */,
-				AA1BA0312F8F0C6E0015709F /* MultiAngle_D2d.swift in Sources */,
-				AAA745D42FA7BBDC001CD048 /* HighRiskMedications.swift in Sources */,
-				AA1BA0092F8EC5640015709F /* SettingsView.swift in Sources */,
-				AA1BA0252F8EFF3A0015709F /* MultiAngle_D4c.swift in Sources */,
-				AA1BA0132F8ECED80015709F /* MultiAngle_D1b.swift in Sources */,
-				AAEF10912F907B1B006102AF /* TVMapView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -496,16 +248,23 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletvos*]" = "Brand Assets";
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletvsimulator*]" = "Brand Assets";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = W2487L856D;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Ethan Bradley Synapse";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Synapse PTCE uses your microphone in Voice Mode so you can answer hands-free while the app narrates your shift.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Voice Mode recognizes your spoken answers on-device so you can study hands-free.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_UIBackgroundModes = audio;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -517,10 +276,9 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 26.4;
 				MARKETING_VERSION = 12;
 				PRODUCT_BUNDLE_IDENTIFIER = "Yellow-Labs.Synapse-PTCE";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -535,6 +293,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 26.0;
 				XROS_DEPLOYMENT_TARGET = 26.4;
 			};
 			name = Debug;
@@ -543,6 +302,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletvos*]" = "Brand Assets";
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletvsimulator*]" = "Brand Assets";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -553,6 +314,10 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Ethan Bradley Synapse";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Synapse PTCE uses your microphone in Voice Mode so you can answer hands-free while the app narrates your shift.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Voice Mode recognizes your spoken answers on-device so you can study hands-free.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_UIBackgroundModes = audio;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -564,10 +329,9 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 26.4;
 				MARKETING_VERSION = 12;
 				PRODUCT_BUNDLE_IDENTIFIER = "Yellow-Labs.Synapse-PTCE";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -582,6 +346,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 26.0;
 				XROS_DEPLOYMENT_TARGET = 26.4;
 			};
 			name = Release;
